@@ -1,0 +1,35 @@
+.product-container {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+}
+
+
+.see-more-btn {
+    padding: 0.3rem 1.2rem;
+    font-size: 1rem;
+    cursor: pointer;
+    background: transparent;
+
+}
+
+.see-more-container {
+    justify-self: center;
+}
+
+
+.product-section {
+    margin-top: 2rem;
+    display: grid;
+    grid-template-rows: auto auto auto;
+    row-gap: 2rem;
+    justify-content: center;
+
+
+}
+
+.section-title {
+    justify-self: center;
+    font-size: 1.5rem;
+
+}
