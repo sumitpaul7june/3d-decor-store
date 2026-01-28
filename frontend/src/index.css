@@ -1,5 +1,51 @@
+:root {
+
+    /* Colors */
+    --color-text-primary: #111;
+    --color-text-muted: #6f6f6f;
+    --color-border-light: #e5e5e5;
+    --color-accent: #222;
+
+    /* Backgrounds */
+    --color-bg-main: #fff;
+    --color-bg-muted: #f7f7f7;
+
+    /* Typography */
+    --font-primary: 'Cormorant Garamond', serif;
+
+    /* Spacing */
+    --space-xs: 0.4rem;
+    --space-sm: 0.75rem;
+    --space-md: 1rem;
+    --space-lg: 2rem;
+
+    /* Radius */
+    --radius-sm: 4px;
+    --radius-md: 8px;
+
+    /* Shadows */
+    --shadow-card: 0 6px 20px rgba(0, 0, 0, 0.08);
+}
+
+
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+}
+
+
+body {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 400;
+    color: #111;
+    -webkit-font-smoothing: antialiased;
+}
+
+.section-title {
+    font-weight: 500;
+}
+
+.product-title {
+    font-weight: 500;
 }
