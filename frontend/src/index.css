@@ -11,7 +11,9 @@
     --color-bg-muted: #f7f7f7;
 
     /* Typography */
-    --font-primary: 'Cormorant Garamond', serif;
+    --font-ui: 'Inter', system-ui, sans-serif;
+    --font-display: 'Cormorant Garamond', serif;
+
 
     /* Spacing */
     --space-xs: 0.4rem;
@@ -36,11 +38,21 @@
 
 
 body {
-    font-family: 'Cormorant Garamond', serif;
+    font-family: var(--font-ui);
     font-weight: 400;
-    color: #111;
+    color: var(--color-text-primary);
     -webkit-font-smoothing: antialiased;
 }
+
+
+h1,
+h2,
+.section-title,
+.product-title {
+    font-family: var(--font-display);
+    font-weight: 500;
+}
+
 
 .section-title {
     font-weight: 500;

@@ -1,10 +1,11 @@
 import { Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import Products from "./pages/Products";
+import ProductDetail from "./pages/ProductDetail";
 import MainLayout from "./layouts/MainLayout";
+import Signup from "./pages/Signup";
+import Login from "./pages/Login";
 
-import stlProducts from "./data/stlProducts";          // ✅ ADD
-import physicalProducts from "./data/physicalProducts"; // ✅ ADD
 
 function App() {
   return (
@@ -18,29 +19,54 @@ function App() {
         }
       />
 
+      {/* LISTING */}
       <Route
-        path="/products"
+        path="/products/:type"
         element={
           <MainLayout>
-            <Products
-              title="Physical Products"
-              products={physicalProducts}
-            />
+            <Products />
+          </MainLayout>
+        }
+      />
+
+      {/* PDP */}
+      <Route
+        path="/products/:type/:id"
+        element={
+          <MainLayout>
+            <ProductDetail />
           </MainLayout>
         }
       />
 
       <Route
-        path="/stl-products"
+        path="*"
         element={
           <MainLayout>
-            <Products
-              title="3D STL Files"
-              products={stlProducts}
-            />
+            <section className="not-found">Page not found</section>
           </MainLayout>
         }
       />
+
+      <Route
+        path="/signup"
+        element = {
+          <MainLayout>
+        <Signup />
+      </MainLayout>
+        }
+      />
+
+      <Route
+        path="/login"
+        element = {
+          <MainLayout>
+        <Login/>
+      </MainLayout>
+        }
+      />
+
+     
     </Routes>
   );
 }

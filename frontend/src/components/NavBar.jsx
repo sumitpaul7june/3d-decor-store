@@ -1,5 +1,6 @@
+import { Link } from "react-router-dom";
 import "./NavBar.css";
-import {Link } from "react-router-dom";
+
 function NavBar() {
   return (
     <nav className="navbar">
@@ -7,26 +8,22 @@ function NavBar() {
         <Link to="/">Logo</Link>
       </div>
 
-      <div className="navbar-links">
-        <ul className="nav-links nav-center">
-            <li>
-            <Link to="/">Home</Link>
-            </li>
-          <li>
-          <Link to="/stl-products">3D Files</Link>
-          </li>
-          <li>
-          <Link to="/products">Products</Link>
-          </li>
-        </ul>
-      </div>
+      <ul className="nav-links nav-center">
+        <li>
+          <Link to="/">Home</Link>
+        </li>
+        <li>
+          <Link to="/products/stl">STL Files</Link>
+        </li>
+        <li>
+          <Link to="/products/physical">Products</Link>
+        </li>
+      </ul>
 
-      <div className="navbar-links">
-        <ul className="nav-links nav-right">
-          <li>Cart</li>
-          <li>Login</li>
-        </ul>
-      </div>
+      <ul className="nav-links nav-right">
+        <li>Cart</li>
+        <li> <Link to="/login">Login</Link></li>
+      </ul>
     </nav>
   );
 }

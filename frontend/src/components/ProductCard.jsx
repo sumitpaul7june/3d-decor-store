@@ -1,9 +1,22 @@
+import { useNavigate } from "react-router-dom";
 import "./ProductCard.css";
-function ProductCard({product}) {
+
+function ProductCard({ product, type }) {
+  const navigate = useNavigate();
+
+  const handleCardClick = () => {
+    navigate(`/products/${type}/${product.id}`);
+  };
+
+  const handleAddToCart = (e) => {
+    e.stopPropagation();
+    console.log("Added to cart", product.id);
+  };
+
   return (
-    <div className="product">
+    <div className="product" onClick={handleCardClick}>
       <div className="product-image">
-        <img src={product.image} alt="Product name" />
+        <img src={product.image} alt={product.name} />
       </div>
 
       <div className="product-info">
@@ -14,7 +27,9 @@ function ProductCard({product}) {
           <span className="original-price">₹{product.originalPrice}</span>
         </div>
 
-        <button className="btn-primary">Add to Cart</button>
+        <button className="btn-primary" onClick={handleAddToCart}>
+          Add to Cart
+        </button>
       </div>
     </div>
   );

@@ -4,28 +4,26 @@ import "./Home.css";
 import stlProducts from "../data/stlProducts";
 import physicalProducts from "../data/physicalProducts";
 
-
 function Home() {
   const navigate = useNavigate();
 
-  const handleSeeMore = () => {
-    navigate("/products");
+  const handleSeeMore = (type) => {
+    navigate(`/products/${type}`);
   };
 
   return (
     <div>
       <section className="product-section">
-        <h2 className="section-title">3D STL Files</h2>
+        <h2 className="section-title">STL Files</h2>
 
         <div className="product-container stl-products">
-          {stlProducts.slice(0, 4).map(product => (
-            <ProductCard key={product.id} product={product} />
+          {stlProducts.slice(0, 4).map((product) => (
+            <ProductCard key={product.id} product={product} type="stl" />
           ))}
         </div>
 
-
         <div className="see-more-container">
-          <button className="see-more-btn" onClick={handleSeeMore}>
+          <button className="see-more-btn" onClick={() => handleSeeMore("stl")}>
             See more
           </button>
         </div>
@@ -35,14 +33,16 @@ function Home() {
         <h2 className="section-title">Physical Products</h2>
 
         <div className="product-container physical-products">
-          {physicalProducts.slice(0, 4).map(product => (
-            <ProductCard key={product.id} product={product} />
+          {physicalProducts.slice(0, 4).map((product) => (
+            <ProductCard key={product.id} product={product} type="physical" />
           ))}
         </div>
 
-
         <div className="see-more-container">
-          <button className="see-more-btn" onClick={handleSeeMore}>
+          <button
+            className="see-more-btn"
+            onClick={() => handleSeeMore("physical")}
+          >
             See more
           </button>
         </div>
