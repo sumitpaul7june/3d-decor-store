@@ -79,3 +79,9 @@
     color: inherit;
     text-decoration: underline;
 }
+
+.error {
+    font-size: 0.75rem;
+    color: #d32f2f;
+    line-height: 1.2;
+}

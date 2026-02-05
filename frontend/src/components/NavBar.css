@@ -64,3 +64,20 @@
     color: inherit;
 
 }
+
+.cart-btn {
+    position: relative;
+    cursor: pointer;
+}
+
+.cart-badge {
+    position: absolute;
+    top: -6px;
+    right: -10px;
+    background: #111;
+    color: #fff;
+    font-size: 11px;
+    padding: 2px 6px;
+    border-radius: 999px;
+    font-weight: 600;
+}
