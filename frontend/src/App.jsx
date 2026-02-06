@@ -6,6 +6,7 @@ import MainLayout from "./layouts/MainLayout";
 import Signup from "./pages/Signup";
 import Login from "./pages/Login";
 import Address from "./pages/Address";
+import Profile from "./pages/Profile"
 
 
 function App() {
@@ -76,6 +77,13 @@ function App() {
         }
       />
 
+        <Route
+        
+        path="/profile"
+        element = {<MainLayout>
+          <Profile/>
+        </MainLayout>}
+        />
      
 
      

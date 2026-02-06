@@ -1,16 +1,50 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "./NavBar.css";
-import { useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import CartDrawer from "./CartDrawer";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { logout } from "../store/authSlice";
+
 
 
 function NavBar() {
   const [isCartOpen, setIsCartOpen] = useState(false);
-  const items = useSelector((state) => state.cart.items);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
 
+  const items = useSelector((state) => state.cart.items);
   const cardCount = items.reduce((total, item) => total + item.qty, 0);
 
+  const isLoggedIn = useSelector(
+    (state) => state.auth.isAuthenticated
+  );
+  
+    // const isLoggedIn = true;
+  const navigate = useNavigate();
+
+  const dispatch = useDispatch();
+  const profileRef = useRef(null);
+
+  const handleLogout = () => {
+    setIsProfileOpen(false);
+    dispatch(logout());
+    navigate('/');
+  }
+
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if(profileRef.current && !profileRef.current.contains(e.target))
+      {
+        setIsProfileOpen(false);
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside);
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [])
   return (
     <>
    
@@ -31,6 +65,8 @@ function NavBar() {
         </li>
       </ul>
 
+
+
       <ul className="nav-links nav-right">
         <li className="cart-btn" onClick={() => setIsCartOpen(true)}>
           Cart
@@ -38,8 +74,35 @@ function NavBar() {
             cardCount > 0 && (<span className="card-badge">{cardCount}</span>)
           }
           
-          </li>
-        <li> <Link to="/login">Login</Link></li>
+        </li>
+
+        {/* Auth */}
+       {
+          !isLoggedIn ? (
+            <li> <Link to="/login">Login</Link></li>
+          ) : 
+          (
+
+            <li className="profile-wrapper" ref={profileRef}>
+                <button className="profile-btn" onClick={() => setIsProfileOpen(prev => !prev)}
+                >
+                  Profile ▾
+                </button>
+
+                {
+                  isProfileOpen && 
+                  (
+                      <ul className="profile-dropdown">
+                        <li onClick={() => navigate("/profile")}>My Profile</li>
+                        <li onClick={handleLogout}>Logout</li>
+                      </ul>
+                  )
+                }
+            </li>
+
+          )
+       }
+       
       </ul>
     </nav>
 

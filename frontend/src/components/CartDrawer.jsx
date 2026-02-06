@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 function CartDrawer({ isOpen, onClose }) {
   const items = useSelector((state) => state.cart.items);
   const dispatch = useDispatch();
-  const isLoggedIn = true;
+  const isLoggedIn = useSelector((state) => state.auth.isAuthenticated);
   const navigate = useNavigate();
   const subtotal = items.reduce((sum, item) => sum + item.price * item.qty, 0);
 

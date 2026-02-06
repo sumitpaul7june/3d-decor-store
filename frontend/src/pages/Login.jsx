@@ -1,7 +1,12 @@
 import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate, useLocation } from "react-router-dom";
+import GoogleAuthButton from "../components/GoogleAuthButton";
+import { loginStart, loginSuccess } from "../store/authSlice";
 import "./Auth.css";
 
 function Login() {
+  // Local form state
   const [form, setForm] = useState({
     email: "",
     password: "",
@@ -9,15 +14,27 @@ function Login() {
 
   const [error, setError] = useState("");
 
+  // Redux
+  const dispatch = useDispatch();
+  const { loading } = useSelector((state) => state.auth);
+
+  // Router helpers
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // Where to redirect after login
+  const redirectTo = location.state?.from || "/";
+
+  // Handle input change
   const handleChange = (e) => {
     const { name, value } = e.target;
-
     setForm((prev) => ({
       ...prev,
       [name]: value,
     }));
   };
 
+  // Handle login submit
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -32,7 +49,23 @@ function Login() {
     }
 
     setError("");
-    console.log("Login data:", form);
+
+   
+    dispatch(loginStart());
+
+   
+    setTimeout(() => {
+      dispatch(
+        loginSuccess({
+          id: Date.now(),
+          name: "Demo User",
+          email: form.email,
+        })
+      );
+
+     
+      navigate(redirectTo, { replace: true });
+    }, 500);
   };
 
   return (
@@ -63,7 +96,17 @@ function Login() {
 
           {error && <span className="error">{error}</span>}
 
-          <button type="submit">Login</button>
+        
+          <div className="auth-actions">
+            <button type="submit" disabled={loading}>
+              {loading ? "Logging in..." : "Login"}
+            </button>
+
+            <div className="auth-divider">or</div>
+
+           
+            <GoogleAuthButton text="Login with Google" />
+          </div>
         </form>
 
         <p className="auth-switch">

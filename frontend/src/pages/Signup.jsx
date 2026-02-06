@@ -1,5 +1,9 @@
-import "./Auth.css";
 import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import GoogleAuthButton from "../components/GoogleAuthButton";
+import { loginStart, loginSuccess } from "../store/authSlice";
+import "./Auth.css";
 
 function Signup() {
   const [form, setForm] = useState({
@@ -11,18 +15,16 @@ function Signup() {
 
   const [errors, setErrors] = useState({});
 
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { loading } = useSelector((state) => state.auth);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-
-    // Takes the old form and add the new input data --- the [name] searches the key ....if it's exist and update the value if it doesn't find then it would create the new key and value pair
-    // setForm({ ...form, [name]: value });
-    setForm((prevForm) => {
-      return {
-        ...prevForm,
-        [name]: value,
-      };
-    });
-    
+    setForm((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
   const handleSubmit = (e) => {
@@ -30,27 +32,36 @@ function Signup() {
 
     const newErrors = {};
 
-    if (form.fullName.trim().length < 2) {
+    if (form.fullName.trim().length < 2)
       newErrors.fullName = "Please enter your full name";
-    }
 
-    if (!form.email.includes("@")) {
+    if (!form.email.includes("@"))
       newErrors.email = "Please enter a valid email";
-    }
 
-    if (form.password.length < 6) {
-      newErrors.password = "Password must be atlease 6 characters";
-    }
+    if (form.password.length < 6)
+      newErrors.password = "Password must be at least 6 characters";
 
-    if (form.password !== form.confirmPassword) {
-      newErrors.confirmPassword = "Password do not match";
-    }
+    if (form.password !== form.confirmPassword)
+      newErrors.confirmPassword = "Passwords do not match";
 
     setErrors(newErrors);
+    if (Object.keys(newErrors).length > 0) return;
 
-    if (Object.keys(newErrors).length === 0) {
-      console.log("Signup data", form);
-    }
+    
+    dispatch(loginStart());
+
+   
+    setTimeout(() => {
+      dispatch(
+        loginSuccess({
+          id: Date.now(),
+          name: form.fullName,
+          email: form.email,
+        })
+      );
+
+      navigate("/", { replace: true });
+    }, 600);
   };
 
   return (
@@ -59,36 +70,32 @@ function Signup() {
         <h1>Create account</h1>
 
         <form className="auth-form" onSubmit={handleSubmit}>
-          {/* Full Name */}
           <label>
             Name
             <input
-             type="text" 
-             name="fullName"
-             value={form.fullName}
-             onChange={handleChange}
-             
-             />
-
-             {errors.fullName && (<span className="error">{errors.fullName}</span>)}
+              type="text"
+              name="fullName"
+              value={form.fullName}
+              onChange={handleChange}
+            />
+            {errors.fullName && (
+              <span className="error">{errors.fullName}</span>
+            )}
           </label>
 
-
-         {/* Email */}
           <label>
             Email
-            <input 
-            type="email"
-            name="email"
-            value={form.email}
-            onChange={handleChange} />
-
-            {
-              errors.email && (<span className="error">{errors.email}</span>)
-            }
+            <input
+              type="email"
+              name="email"
+              value={form.email}
+              onChange={handleChange}
+            />
+            {errors.email && (
+              <span className="error">{errors.email}</span>
+            )}
           </label>
 
-          {/* Password */}
           <label>
             Password
             <input
@@ -96,14 +103,13 @@ function Signup() {
               name="password"
               value={form.password}
               onChange={handleChange}
-              />
-              {errors.password && (
+            />
+            {errors.password && (
               <span className="error">{errors.password}</span>
             )}
           </label>
 
-           {/* Confirm Password */}
-           <label>
+          <label>
             Confirm Password
             <input
               type="password"
@@ -116,7 +122,16 @@ function Signup() {
             )}
           </label>
 
-          <button type="submit">Sign up</button>
+       
+          <div className="auth-actions">
+            <button type="submit" disabled={loading}>
+              {loading ? "Creating account..." : "Sign up"}
+            </button>
+
+            <div className="auth-divider">or</div>
+
+            <GoogleAuthButton text="Sign up with Google" />
+          </div>
         </form>
 
         <p className="auth-switch">
