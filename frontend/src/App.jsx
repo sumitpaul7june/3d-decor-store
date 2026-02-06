@@ -5,6 +5,7 @@ import ProductDetail from "./pages/ProductDetail";
 import MainLayout from "./layouts/MainLayout";
 import Signup from "./pages/Signup";
 import Login from "./pages/Login";
+import Address from "./pages/Address";
 
 
 function App() {
@@ -65,6 +66,17 @@ function App() {
       </MainLayout>
         }
       />
+
+      <Route
+        path="/checkout/address"
+        element = {
+          <MainLayout>
+            <Address/>
+          </MainLayout>
+        }
+      />
+
+     
 
      
     </Routes>

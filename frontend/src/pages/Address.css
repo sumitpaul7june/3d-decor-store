@@ -1,0 +1,140 @@
+.address-page {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+}
+
+.address-page h2 {
+    font-size: 1.4rem;
+    font-weight: 500;
+    margin-bottom: 1.5rem;
+}
+
+/* Address list */
+.address-list {
+    display: grid;
+    gap: 1rem;
+}
+
+/* Address card */
+.address-card {
+    padding: 1rem 1.2rem;
+    border: 1px solid var(--color-border-light);
+    border-radius: var(--radius-md);
+    background: #fff;
+    cursor: pointer;
+    transition: border 0.2s ease, background 0.2s ease;
+}
+
+.address-card:hover {
+    border-color: var(--color-accent);
+}
+
+.address-card.selected {
+    border-color: var(--color-accent);
+    background: rgba(0, 0, 0, 0.02);
+}
+
+.address-card .name {
+    font-weight: 500;
+    margin-bottom: 0.25rem;
+}
+
+.address-card .address {
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+}
+
+/* Add address button */
+.add-address-btn {
+    margin-top: 2rem;
+    width: 100%;
+    padding: 0.9rem;
+    background: transparent;
+    border: 1px dashed var(--color-border-light);
+    border-radius: var(--radius-md);
+    font-size: 0.95rem;
+    cursor: pointer;
+}
+
+.add-address-btn:hover {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+}
+
+/* Address form */
+.address-form {
+    margin-top: 2rem;
+    display: grid;
+    gap: 1.2rem;
+}
+
+.address-form label {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+}
+
+.address-form input,
+.address-form select {
+    margin-top: 0.4rem;
+    padding: 0.7rem 0.75rem;
+    border: 1px solid var(--color-border-light);
+    border-radius: var(--radius-sm);
+    font-size: 0.95rem;
+    background: #fff;
+}
+
+.address-form input:focus,
+.address-form select:focus {
+    outline: none;
+    border-color: var(--color-accent);
+}
+
+/* Actions */
+.address-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.address-actions button {
+    flex: 1;
+    padding: 0.8rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+.address-actions button[type="button"] {
+    background: transparent;
+    border: 1px solid var(--color-border-light);
+}
+
+.address-actions button[type="submit"] {
+    background: var(--color-accent);
+    color: #fff;
+    border: none;
+}
+
+.error {
+    font-size: 0.75rem;
+    color: #d32f2f;
+    margin-top: 0.25rem;
+}
+
+.continue-btn {
+    margin-top: 1.5rem;
+    width: 100%;
+    padding: 0.95rem;
+    background: var(--color-accent);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: 0.95rem;
+    cursor: pointer;
+}
+
+.continue-btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}

@@ -1,14 +1,31 @@
 import { useSelector, useDispatch } from "react-redux";
 import { increaseQty, decreaseQty } from "../store/cartSlice";
 import { removeCart } from "../store/cartSlice";
-
 import "./CartDrawer.css";
+import { useNavigate } from "react-router-dom";
 
 function CartDrawer({ isOpen, onClose }) {
   const items = useSelector((state) => state.cart.items);
   const dispatch = useDispatch();
-
+  const isLoggedIn = true;
+  const navigate = useNavigate();
   const subtotal = items.reduce((sum, item) => sum + item.price * item.qty, 0);
+
+
+  const handleCheckout = () => {
+    if(isLoggedIn)
+    {
+      navigate('/checkout/address');
+
+    }
+    else
+    {
+      navigate('/login', {
+        state : {from : "/checkout/address"}
+      });
+    }
+  }
+
 
   return (
     <div className={`cart-overlay ${isOpen ? "open" : ""}`} onClick={onClose}>
@@ -81,7 +98,7 @@ function CartDrawer({ isOpen, onClose }) {
             <span>Subtotal</span>
             <strong>₹{subtotal}</strong>
           </div>
-          <button className="checkout-btn">Checkout</button>
+          <button className="checkout-btn" onClick={handleCheckout}> Proceed to Checkout</button>
         </div>
       </div>
     </div>
