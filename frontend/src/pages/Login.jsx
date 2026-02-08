@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 import GoogleAuthButton from "../components/GoogleAuthButton";
 import { loginStart, loginSuccess } from "../store/authSlice";
 import "./Auth.css";
@@ -110,7 +110,7 @@ function Login() {
         </form>
 
         <p className="auth-switch">
-          Don’t have an account? <a href="/signup">Sign up</a>
+          Don’t have an account? <Link to="/signup">Sign up</Link>
         </p>
       </div>
     </section>
