@@ -1,0 +1,56 @@
+.admin-header {
+    height: 64px;
+    background: white;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 0 24px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.admin-header-title {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.admin-header-home {
+    font-size: 13px;
+    color: #6b7280;
+    text-decoration: none;
+}
+
+.admin-header-home:hover {
+    text-decoration: underline;
+}
+
+.admin-header-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.admin-header-logout {
+    background: transparent;
+    border: 1px solid #e5e7eb;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.admin-header-logout:hover {
+    background: #f3f4f6;
+}
+
+.admin-header-title a {
+    color: inherit;
+    /* takes parent text color */
+    text-decoration: none;
+    /* removes underline */
+    font-weight: 600;
+}
+
+.admin-header-title a:hover {
+    text-decoration: underline;
+    /* optional hover effect */
+}

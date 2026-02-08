@@ -13,6 +13,9 @@ function CartDrawer({ isOpen, onClose }) {
 
 
   const handleCheckout = () => {
+    if (items.length === 0) {
+      return; 
+    }
     if(isLoggedIn)
     {
       navigate('/checkout/address');

@@ -5,112 +5,124 @@ import CartDrawer from "./CartDrawer";
 import { useSelector, useDispatch } from "react-redux";
 import { logout } from "../store/authSlice";
 
-
-
 function NavBar() {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
 
+  // Cart
   const items = useSelector((state) => state.cart.items);
-  const cardCount = items.reduce((total, item) => total + item.qty, 0);
+  const cartCount = items.reduce((total, item) => total + item.qty, 0);
 
-  const isLoggedIn = useSelector(
-    (state) => state.auth.isAuthenticated
-  );
-  
-    // const isLoggedIn = true;
+  // Auth
+  const auth = useSelector((state) => state.auth);
+  const isLoggedIn = auth.isAuthenticated;
+
   const navigate = useNavigate();
-
   const dispatch = useDispatch();
   const profileRef = useRef(null);
 
   const handleLogout = () => {
     setIsProfileOpen(false);
     dispatch(logout());
-    navigate('/');
-  }
+    navigate("/");
+  };
 
-
+  // Close profile dropdown on outside click
   useEffect(() => {
     const handleClickOutside = (e) => {
-      if(profileRef.current && !profileRef.current.contains(e.target))
-      {
+      if (
+        profileRef.current &&
+        !profileRef.current.contains(e.target)
+      ) {
         setIsProfileOpen(false);
       }
-    }
+    };
 
-    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
 
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    }
-  }, [])
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   return (
     <>
-   
-    <nav className="navbar">
-      <div className="navbar-logo">
-        <Link to="/">Logo</Link>
-      </div>
+      <nav className="navbar">
+        {/* Logo */}
+        <div className="navbar-logo">
+          <Link to="/">Logo</Link>
+        </div>
 
-      <ul className="nav-links nav-center">
-        <li>
-          <Link to="/">Home</Link>
-        </li>
-        <li>
-          <Link to="/products/stl">STL Files</Link>
-        </li>
-        <li>
-          <Link to="/products/physical">Products</Link>
-        </li>
-      </ul>
+        {/* Center links */}
+        <ul className="nav-links nav-center">
+          <li>
+            <Link to="/">Home</Link>
+          </li>
+          <li>
+            <Link to="/products/stl">STL Files</Link>
+          </li>
+          <li>
+            <Link to="/products/physical">Products</Link>
+          </li>
+        </ul>
 
+        {/* Right side */}
+        <ul className="nav-links nav-right">
+          {/* Cart */}
+          <li
+            className="cart-btn"
+            onClick={() => setIsCartOpen(true)}
+          >
+            Cart
+            {cartCount > 0 && (
+              <span className="cart-badge">{cartCount}</span>
+            )}
+          </li>
 
-
-      <ul className="nav-links nav-right">
-        <li className="cart-btn" onClick={() => setIsCartOpen(true)}>
-          Cart
-          {
-            cardCount > 0 && (<span className="card-badge">{cardCount}</span>)
-          }
-          
-        </li>
-
-        {/* Auth */}
-       {
-          !isLoggedIn ? (
-            <li> <Link to="/login">Login</Link></li>
-          ) : 
-          (
-
-            <li className="profile-wrapper" ref={profileRef}>
-                <button className="profile-btn" onClick={() => setIsProfileOpen(prev => !prev)}
-                >
-                  Profile ▾
-                </button>
-
-                {
-                  isProfileOpen && 
-                  (
-                      <ul className="profile-dropdown">
-                        <li onClick={() => navigate("/profile")}>My Profile</li>
-                        <li onClick={handleLogout}>Logout</li>
-                      </ul>
-                  )
-                }
+          {/* Auth */}
+          {!isLoggedIn ? (
+            <li>
+              <Link to="/login">Login</Link>
             </li>
+          ) : (
+            <li className="profile-wrapper" ref={profileRef}>
+              <button
+                className="profile-btn"
+                onClick={() =>
+                  setIsProfileOpen((prev) => !prev)
+                }
+              >
+                Profile ▾
+              </button>
 
-          )
-       }
-       
-      </ul>
-    </nav>
+              {isProfileOpen && (
+                <ul className="profile-dropdown">
+                  <li onClick={() => navigate("/profile")}>
+                    My Profile
+                  </li>
 
+                  {/* ADMIN LINK (explicit checks, no shortcuts) */}
+                  {auth.user !== null &&
+                    auth.user.role === "admin" && (
+                      <li onClick={() => navigate("/admin")}>
+                        Admin Panel
+                      </li>
+                    )}
 
-    <CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)}/>
+                  <li onClick={handleLogout}>Logout</li>
+                </ul>
+              )}
+            </li>
+          )}
+        </ul>
+      </nav>
 
+      {/* Cart Drawer */}
+      <CartDrawer
+        isOpen={isCartOpen}
+        onClose={() => setIsCartOpen(false)}
+      />
     </>
-    
   );
 }
 

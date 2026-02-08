@@ -23,7 +23,15 @@ function Login() {
   const location = useLocation();
 
   // Where to redirect after login
-  const redirectTo = location.state?.from || "/";
+  let redirectTo;
+
+  if (location.state && location.state.from) {
+    // 1. If there is a "saved location" (like Profile)
+    redirectTo = location.state.from;
+  } else {
+    // 2. If not (user just clicked Login normally)
+    redirectTo = "/"; // Go to Home
+  }
 
   // Handle input change
   const handleChange = (e) => {
@@ -50,20 +58,18 @@ function Login() {
 
     setError("");
 
-   
     dispatch(loginStart());
 
-   
     setTimeout(() => {
       dispatch(
         loginSuccess({
           id: Date.now(),
           name: "Demo User",
           email: form.email,
+          role : "admin"
         })
       );
 
-     
       navigate(redirectTo, { replace: true });
     }, 500);
   };
@@ -96,7 +102,6 @@ function Login() {
 
           {error && <span className="error">{error}</span>}
 
-        
           <div className="auth-actions">
             <button type="submit" disabled={loading}>
               {loading ? "Logging in..." : "Login"}
@@ -104,7 +109,6 @@ function Login() {
 
             <div className="auth-divider">or</div>
 
-           
             <GoogleAuthButton text="Login with Google" />
           </div>
         </form>

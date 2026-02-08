@@ -4,7 +4,6 @@ import {useSelector } from "react-redux";
 function PublicRoute() {
     const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
 
-    const location = useLocation();
 
     if(isAuthenticated)
     {

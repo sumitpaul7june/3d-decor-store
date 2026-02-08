@@ -1,14 +1,23 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-const persistedAuth = JSON.parse(localStorage.getItem("auth"));
+let persistedAuth = null;
 
-const initialState = persistedAuth || {
+try {
+    persistedAuth = JSON.parse(localStorage.getItem("auth"));
+} catch {
+    persistedAuth = null;
+}
+
+const defaultState = {
     isAuthenticated: false,
     user: null,
     loading: false,
     error: null,
-}
+};
 
+const initialState = persistedAuth
+    ? { ...defaultState, ...persistedAuth }
+    : defaultState;
 
 const authSlice = createSlice({
     name: "auth",
@@ -24,11 +33,13 @@ const authSlice = createSlice({
             state.isAuthenticated = true;
             state.user = action.payload;
 
-            localStorage.setItem("auth", JSON.stringify({
-                isAuthenticated: true,
-                user: action.payload
-
-            }))
+            localStorage.setItem(
+                "auth",
+                JSON.stringify({
+                    isAuthenticated: true,
+                    user: action.payload,
+                })
+            );
         },
 
         loginFailure(state, action) {
@@ -39,10 +50,9 @@ const authSlice = createSlice({
         logout(state) {
             state.isAuthenticated = false;
             state.user = null;
-
-            localStorage.removeItem('auth');
+            localStorage.removeItem("auth");
         },
-    }
+    },
 });
 
 export const {

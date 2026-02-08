@@ -13,11 +13,15 @@ import Profile from "./pages/Profile";
 import Address from "./pages/Address";
 import Products from "./pages/Products";
 import ProductDetail from "./pages/ProductDetail"
-
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminProducts from "./pages/admin/AdminProducts";
 
 // Route guards
 import ProtectedRoute from "./routes/ProtectedRoute";
 import PublicRoute from "./routes/PublicRoute";
+import AdminLayout from "./layouts/AdminLayout";
+import AdminOrders from "./pages/admin/AdminOrders";
+import AdminRoute from "./routes/AdminRoute";
 
 const router = createBrowserRouter([
   {
@@ -48,9 +52,26 @@ const router = createBrowserRouter([
         ],
       },
 
+
       { path: "*", element: <section>Page Not Found</section> },
     ],
   },
+
+  {
+    element: <AdminRoute />, // 👈 GUARD FIRST
+    children: [
+      {
+        path: "/admin",
+        element: <AdminLayout />,
+        children: [
+          { index: true, element: <AdminDashboard /> },
+          { path: "products", element: <AdminProducts /> },
+          { path: "orders", element: <AdminOrders /> },
+        ],
+      },
+    ],
+  },
+  
 ]);
 
 function App() {

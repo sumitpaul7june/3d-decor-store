@@ -1,10 +1,14 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 import countries from "../data/countries";
 import "./Address.css";
 
 function Address() {
   const [selectedAddressId, setSelectedAddressId] = useState(null);
   const [showForm, setShowForm] = useState(false);
+  const items = useSelector((state) => state.cart.items);
+  const navigate = useNavigate();
 
   const [savedAddress, setSavedAddress] = useState([
     {
@@ -89,6 +93,13 @@ function Address() {
     });
   };
 
+
+  useEffect(() => {
+    if(items.length === 0)
+    {
+      navigate("/", {replace: true})
+    }
+  }, [items, navigate]);
   return (
     <section className="address-page">
       <h2>Select Delivery Address</h2>

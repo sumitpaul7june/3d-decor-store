@@ -1,0 +1,41 @@
+.admin-orders {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.admin-orders-title {
+    font-size: 22px;
+    font-weight: 600;
+}
+
+.orders-table {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.orders-head,
+.orders-row {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr 1.5fr;
+    padding: 14px 16px;
+    align-items: center;
+}
+
+.orders-head {
+    background: #f9fafb;
+    font-size: 13px;
+    color: #6b7280;
+}
+
+.orders-row {
+    border-top: 1px solid #e5e7eb;
+}
+
+.orders-row select {
+    padding: 6px;
+    border-radius: 6px;
+    border: 1px solid #e5e7eb;
+}

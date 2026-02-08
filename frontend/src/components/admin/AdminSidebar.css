@@ -1,0 +1,79 @@
+/* Sidebar container */
+.sidebar {
+    background-color: #ffffff;
+    color: #1f2937;
+    /* dark gray text */
+    padding: 24px 16px;
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid #e5e7eb;
+    /* subtle divider */
+    min-width: 220px;
+}
+
+/* Logo */
+.sidebar-logo {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 32px;
+    padding-left: 8px;
+}
+
+/* Navigation groups */
+.sidebar-nav,
+.sidebar-footer {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+/* Items */
+.sidebar-item {
+    padding: 10px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #374151;
+    /* neutral gray */
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* Hover */
+.sidebar-item:hover {
+    background-color: #f3f4f6;
+    /* light gray */
+}
+
+
+/* Active (use your brand accent here if you want) */
+.sidebar-item.active {
+    background-color: #eef2ff;
+    /* very light accent */
+    color: #1d4ed8;
+    /* blue-600 style accent */
+    font-weight: 500;
+}
+
+.sidebar-item.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+
+/* Footer spacing */
+.sidebar-footer {
+    margin-top: auto;
+    padding-top: 16px;
+    border-top: 1px solid #e5e7eb;
+}
+
+
+/* Logout */
+.logout {
+    color: #b91c1c;
+}
+
+.logout:hover {
+    background-color: #fee2e2;
+}
