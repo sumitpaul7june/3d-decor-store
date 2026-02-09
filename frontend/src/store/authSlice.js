@@ -1,5 +1,7 @@
+// Auth slice with localStorage persistence for login state.
 import { createSlice } from "@reduxjs/toolkit";
 
+// Attempt to load persisted auth state from localStorage.
 let persistedAuth = null;
 
 try {
@@ -8,6 +10,7 @@ try {
     persistedAuth = null;
 }
 
+// Base auth state.
 const defaultState = {
     isAuthenticated: false,
     user: null,
@@ -15,6 +18,7 @@ const defaultState = {
     error: null,
 };
 
+// Merge persisted data over defaults if available.
 const initialState = persistedAuth
     ? { ...defaultState, ...persistedAuth }
     : defaultState;
@@ -33,6 +37,7 @@ const authSlice = createSlice({
             state.isAuthenticated = true;
             state.user = action.payload;
 
+            // Persist auth state for refresh support.
             localStorage.setItem(
                 "auth",
                 JSON.stringify({
@@ -50,6 +55,7 @@ const authSlice = createSlice({
         logout(state) {
             state.isAuthenticated = false;
             state.user = null;
+            // Clear persisted auth on logout.
             localStorage.removeItem("auth");
         },
     },

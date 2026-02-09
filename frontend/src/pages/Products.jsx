@@ -1,3 +1,4 @@
+// Category listing page based on URL param (stl or physical).
 import { useParams } from "react-router-dom";
 import ProductCard from "../components/ProductCard";
 import stlProducts from "../data/stlProducts";

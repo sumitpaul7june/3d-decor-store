@@ -1,11 +1,14 @@
+// Modal form for adding or editing a product in the admin UI.
 import { useState } from "react";
 import "./ProductModal.css";
 
 
 function ProductModal({isOpen, onClose, onSave, initialData})
 {
+    // Render nothing when the modal is closed.
     if(!isOpen) return null;
 
+    // Local form state, seeded from initialData when editing.
     const [form, setForm] = useState(
         initialData || {
             name : "",

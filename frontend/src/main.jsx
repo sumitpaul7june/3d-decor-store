@@ -1,3 +1,4 @@
+// App entry point: mounts React and wires Redux.
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import {Provider} from 'react-redux';

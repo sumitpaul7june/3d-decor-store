@@ -1,3 +1,4 @@
+// Signup page with client-side validation and mock auth flow.
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, Link } from "react-router-dom";

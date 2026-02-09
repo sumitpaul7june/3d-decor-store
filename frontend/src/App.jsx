@@ -1,3 +1,4 @@
+// App route configuration using React Router data APIs.
 import {
   createBrowserRouter,
   RouterProvider,
@@ -23,6 +24,7 @@ import AdminLayout from "./layouts/AdminLayout";
 import AdminOrders from "./pages/admin/AdminOrders";
 import AdminRoute from "./routes/AdminRoute";
 
+// Central route tree for public + admin sections.
 const router = createBrowserRouter([
   {
     path: "/",

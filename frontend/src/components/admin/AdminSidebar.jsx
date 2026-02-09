@@ -1,3 +1,4 @@
+// Admin sidebar navigation with active states and logout.
 import { NavLink, useNavigate } from "react-router-dom";
 import "./AdminSidebar.css";
 import { useDispatch } from "react-redux";

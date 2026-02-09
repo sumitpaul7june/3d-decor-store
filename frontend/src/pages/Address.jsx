@@ -1,3 +1,4 @@
+// Checkout address selection page with inline add-new form.
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
@@ -48,6 +49,7 @@ function Address() {
   };
 
   const handleSubmit = (e) => {
+    // Validate required fields before saving.
     e.preventDefault();
 
     const newErrors = {};

@@ -1,3 +1,4 @@
+// Product details page (STL or physical), derived from URL params.
 import { useParams } from "react-router-dom";
 import { useState } from "react";
 import physicalProducts from "../data/physicalProducts";
@@ -15,6 +16,7 @@ function ProductDetail() {
       ? physicalProducts
       : [];
 
+  // Find the product by id; show "not found" if missing.
   const product = products.find((p) => p.id === id);
 
   if (!product) {

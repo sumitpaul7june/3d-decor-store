@@ -1,3 +1,4 @@
+// Site footer with static links and contact info.
 import "./Footer.css";
 
 function Footer() {

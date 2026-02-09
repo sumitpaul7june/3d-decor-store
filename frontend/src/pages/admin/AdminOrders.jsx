@@ -1,3 +1,4 @@
+// Admin orders list with inline status updates (mock state).
 import { useState } from "react";
 import "./AdminOrders.css";
 
@@ -20,6 +21,7 @@ function AdminOrders() {
   const [orders, setOrders] = useState(initialOrders);
 
   const handleStatusChange = (id, newStatus) => {
+    // Update order status in local state.
     setOrders((prevOrders) =>
       prevOrders.map((order) =>
         order.id === id

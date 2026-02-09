@@ -1,3 +1,4 @@
+// Login page with basic validation and mock authentication.
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useLocation, Link } from "react-router-dom";
@@ -22,7 +23,7 @@ function Login() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Where to redirect after login
+  // Where to redirect after login (protected page or home).
   let redirectTo;
 
   if (location.state && location.state.from) {

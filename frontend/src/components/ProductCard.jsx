@@ -1,3 +1,4 @@
+// Product tile with image, price, and add-to-cart action.
 import { useNavigate } from "react-router-dom";
 import "./ProductCard.css";
 import { useDispatch } from "react-redux";
@@ -13,6 +14,7 @@ function ProductCard({ product, type }) {
   };
 
   const handleAddToCart = (e) => {
+    // Prevent card click navigation when adding to cart.
     e.stopPropagation();
     dispatch(addToCart(
       {

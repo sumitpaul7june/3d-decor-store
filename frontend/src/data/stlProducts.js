@@ -1,3 +1,4 @@
+// Mock data for STL products.
 import table from "../assets/table_lamp.png";
 
 const stlProducts = [

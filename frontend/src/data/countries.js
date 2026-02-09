@@ -1,3 +1,4 @@
+// Country list for address form dropdown.
 const countries = [
     "India",
     "United States",

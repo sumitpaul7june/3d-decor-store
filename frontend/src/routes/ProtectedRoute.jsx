@@ -1,3 +1,4 @@
+// Guard for authenticated-only routes, preserves intended destination.
 import {Navigate, Outlet, useLocation} from "react-router-dom"
 import {useSelector } from "react-redux";
 

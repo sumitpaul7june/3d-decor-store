@@ -1,3 +1,4 @@
+// Admin overview with summary stats.
 import "./AdminDashboard.css";
 
 

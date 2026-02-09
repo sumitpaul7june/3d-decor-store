@@ -1,3 +1,4 @@
+// Mock data for physical products.
 import table from "../assets/table_lamp.png";
 
 const physicalProducts = [

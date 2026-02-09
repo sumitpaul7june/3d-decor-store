@@ -1,3 +1,4 @@
+// Reusable Google auth button (stub click handler for now).
 import "./GoogleAuthButton.css";
 
 function GoogleAuthButton({text = 'Continue with Google'}) {

@@ -1,3 +1,4 @@
+// Top navigation with cart and profile controls.
 import { Link, useNavigate } from "react-router-dom";
 import "./NavBar.css";
 import { useEffect, useState, useRef } from "react";
@@ -29,6 +30,7 @@ function NavBar() {
 
   // Close profile dropdown on outside click
   useEffect(() => {
+    // Close profile dropdown when clicking outside.
     const handleClickOutside = (e) => {
       if (
         profileRef.current &&
@@ -101,7 +103,7 @@ function NavBar() {
                     My Profile
                   </li>
 
-                  {/* ADMIN LINK (explicit checks, no shortcuts) */}
+                  {/* ADMIN LINK (explicit checks) */}
                   {auth.user !== null &&
                     auth.user.role === "admin" && (
                       <li onClick={() => navigate("/admin")}>

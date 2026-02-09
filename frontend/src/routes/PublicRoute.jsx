@@ -1,3 +1,4 @@
+// Guard for routes that should be hidden from logged-in users.
 import {Navigate, Outlet, useLocation} from "react-router-dom"
 import {useSelector } from "react-redux";
 

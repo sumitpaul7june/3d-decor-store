@@ -1,3 +1,4 @@
+// Simple profile summary page (static data for now).
 import "./Profile.css";
 
 function Profile() {

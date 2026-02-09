@@ -1,3 +1,4 @@
+// Home page showing featured products for each category.
 import ProductCard from "../components/ProductCard";
 import { useNavigate } from "react-router-dom";
 import "./Home.css";
@@ -8,6 +9,7 @@ function Home() {
   const navigate = useNavigate();
 
   const handleSeeMore = (type) => {
+    // Route to category listing page.
     navigate(`/products/${type}`);
   };
 

@@ -1,3 +1,4 @@
+// Admin products table with add/edit/delete using local state.
 import { useState } from "react";
 import stlProducts from "../../data/stlProducts";
 import physicalProducts from "../../data/physicalProducts";
@@ -5,7 +6,7 @@ import ProductModal from "../../components/admin/ProductModal";
 import "./AdminProducts.css";
 
 function AdminProducts() {
-  // ✅ Products MUST be state (so UI updates)
+  // Products live in local state so the table updates immediately.
   const [products, setProducts] = useState([
     ...stlProducts,
     ...physicalProducts,
@@ -31,7 +32,7 @@ function AdminProducts() {
     setProducts((previousProducts) => previousProducts.filter((myProduct) => myProduct.id !== id));
   };
   
-  // 💾 Save (Add OR Edit)
+  // Save (Add OR Edit)
   const handleSave = (product) => {
     // EDIT
     if (editingProduct !== null) {

@@ -1,3 +1,4 @@
+// Slide-in cart drawer with quantity controls and checkout CTA.
 import { useSelector, useDispatch } from "react-redux";
 import { increaseQty, decreaseQty } from "../store/cartSlice";
 import { removeCart } from "../store/cartSlice";
@@ -13,6 +14,7 @@ function CartDrawer({ isOpen, onClose }) {
 
 
   const handleCheckout = () => {
+    // Gate checkout: redirect to login if user is not authenticated.
     if (items.length === 0) {
       return; 
     }

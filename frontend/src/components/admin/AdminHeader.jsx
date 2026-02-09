@@ -1,3 +1,4 @@
+// Admin top bar with quick navigation and logout.
 import "./AdminHeader.css";
 import { useDispatch } from "react-redux";
 import { logout } from "../../store/authSlice";
@@ -8,6 +9,7 @@ function AdminHeader() {
   const navigate = useNavigate();
 
   const handleLogout = () => {
+    // Clear auth state and return to public home.
     dispatch(logout());
     navigate("/", { replace: true });
   };

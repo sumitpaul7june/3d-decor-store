@@ -1,3 +1,4 @@
+// Cart slice with add/remove and quantity controls.
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
@@ -9,6 +10,7 @@ const cartSlice = createSlice({
     initialState,
     reducers: {
         addToCart(state, action) {
+            // If item exists, increment quantity; otherwise add new entry.
             const item = action.payload;
             const existing = state.items.find(i => i.id === item.id)
             if (existing) {
