@@ -33,15 +33,15 @@ export const createOrder = async (req, res) => {
     let totalAmount = 0;
 
     const orderItems = user.cart.map(item => {
-  totalAmount += item.product.price * item.quantity;
+      totalAmount += item.product.price * item.quantity;
 
-  return {
-    product: item.product._id,
-    type: item.product.productType === "STL" ? "stl" : "physical",
-    quantity: item.quantity,
-    price: item.product.price
-  };
-});
+      return {
+        product: item.product._id,
+        type: item.product.type,
+        quantity: item.quantity,
+        price: item.product.price
+      };
+    });
 
 
     const newOrder = await Order.create({
@@ -59,9 +59,9 @@ export const createOrder = async (req, res) => {
     });
 
   } catch (error) {
-  console.log(error);
-  res.status(500).json({ message: "Server Error" });
-}
+    console.log(error);
+    res.status(500).json({ message: "Server Error" });
+  }
 };
 
 
