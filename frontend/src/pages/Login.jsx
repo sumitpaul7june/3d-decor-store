@@ -3,7 +3,8 @@ import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import GoogleAuthButton from "../components/GoogleAuthButton";
-import { loginStart, loginSuccess } from "../store/authSlice";
+import { loginFailure, loginStart, loginSuccess } from "../store/authSlice";
+import axios from "../api/axios";  
 import "./Auth.css";
 
 function Login() {
@@ -44,35 +45,28 @@ function Login() {
   };
 
   // Handle login submit
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!form.email.includes("@")) {
-      setError("Please enter a valid email");
-      return;
+    try{
+      dispatch(loginStart());
+      const {data} = await axios.post("/auth/login", {
+        email : form.email,
+        password: form.password
+
+      })
+
+      dispatch(loginSuccess(data));
+      navigate("/", {replace});
+
     }
-
-    if (form.password.length < 6) {
-      setError("Password must be at least 6 characters");
-      return;
+    catch(err)
+    {
+      const message = err.response?.data?.message  || "Login Failed";
+      dispatch(loginFailure(message));
+      setError(message);
     }
-
-    setError("");
-
-    dispatch(loginStart());
-
-    setTimeout(() => {
-      dispatch(
-        loginSuccess({
-          id: Date.now(),
-          name: "Demo User",
-          email: form.email,
-          role : "admin"
-        })
-      );
-
-      navigate(redirectTo, { replace: true });
-    }, 500);
+   
   };
 
   return (

@@ -3,28 +3,25 @@ import { useParams } from "react-router-dom";
 import { useState } from "react";
 import physicalProducts from "../data/physicalProducts";
 import stlProducts from "../data/stlProducts";
+import { useDispatch } from "react-redux";
+import { addToCart } from "../store/cartSlice";
+
 import "./ProductDetail.css";
 
 function ProductDetail() {
   const { type, id } = useParams();
   const [openSection, setOpenSection] = useState(null);
+  const dispatch = useDispatch();
+
 
   const products =
-    type === "stl"
-      ? stlProducts
-      : type === "physical"
-      ? physicalProducts
-      : [];
+    type === "stl" ? stlProducts : type === "physical" ? physicalProducts : [];
 
   // Find the product by id; show "not found" if missing.
   const product = products.find((p) => p.id === id);
 
   if (!product) {
-    return (
-      <section className="product-not-found">
-        Product not found
-      </section>
-    );
+    return <section className="product-not-found">Product not found</section>;
   }
 
   const isSTL = type === "stl";
@@ -33,10 +30,18 @@ function ProductDetail() {
     setOpenSection(openSection === section ? null : section);
   };
 
+  const handleAddToCart = () => {
+    dispatch(addToCart({
+      ...product,
+      type
+    }));
+  };
+  
+  
+
   return (
     <section className="product-detail">
       <div className="pd-grid">
-
         {/* IMAGE */}
         <div className="pd-images">
           <img
@@ -61,15 +66,18 @@ function ProductDetail() {
               : "Premium physical decor product crafted for modern spaces."}
           </p>
 
-          <button className="pd-primary-btn">
-            {isSTL ? "Download STL" : "Add to Cart"}
+          <button className="pd-primary-btn" onClick={handleAddToCart}>
+            Add to Cart
           </button>
 
           {/* ACCORDION */}
           <div className="pd-accordion">
-
             {/* DESCRIPTION */}
-            <div className={`pd-accordion-item ${openSection === "description" ? "open" : ""}`}>
+            <div
+              className={`pd-accordion-item ${
+                openSection === "description" ? "open" : ""
+              }`}
+            >
               <button onClick={() => toggle("description")}>
                 Description
                 <span>{openSection === "description" ? "−" : "+"}</span>
@@ -84,7 +92,11 @@ function ProductDetail() {
             </div>
 
             {/* SHIPPING */}
-            <div className={`pd-accordion-item ${openSection === "shipping" ? "open" : ""}`}>
+            <div
+              className={`pd-accordion-item ${
+                openSection === "shipping" ? "open" : ""
+              }`}
+            >
               <button onClick={() => toggle("shipping")}>
                 Shipping
                 <span>{openSection === "shipping" ? "−" : "+"}</span>
@@ -100,7 +112,11 @@ function ProductDetail() {
             </div>
 
             {/* RETURNS */}
-            <div className={`pd-accordion-item ${openSection === "returns" ? "open" : ""}`}>
+            <div
+              className={`pd-accordion-item ${
+                openSection === "returns" ? "open" : ""
+              }`}
+            >
               <button onClick={() => toggle("returns")}>
                 Returns
                 <span>{openSection === "returns" ? "−" : "+"}</span>
@@ -114,10 +130,8 @@ function ProductDetail() {
                 </p>
               </div>
             </div>
-
           </div>
         </div>
-
       </div>
     </section>
   );

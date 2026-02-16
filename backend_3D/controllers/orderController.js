@@ -107,10 +107,12 @@ export const cancelOrder = async (req, res) => {
     if (!order)
       return res.status(404).json({ message: "Order not found" });
 
+    // Ensure user owns the order
     if (order.user.toString() !== req.user._id.toString())
       return res.status(403).json({ message: "Not authorized" });
 
-    if (order.orderStatus !== "Placed")
+    // Only allow cancellation if order is still Pending
+    if (order.orderStatus !== "Pending")
       return res.status(400).json({ message: "Order cannot be cancelled" });
 
     order.orderStatus = "Cancelled";
@@ -119,9 +121,11 @@ export const cancelOrder = async (req, res) => {
     res.json({ message: "Order cancelled successfully" });
 
   } catch (error) {
+    console.log(error);
     res.status(500).json({ message: "Server Error" });
   }
 };
+
 
 
 /* ------------------ GET USER ORDERS ------------------ */

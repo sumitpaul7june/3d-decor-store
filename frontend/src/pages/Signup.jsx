@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, Link } from "react-router-dom";
 import GoogleAuthButton from "../components/GoogleAuthButton";
 import { loginStart, loginSuccess } from "../store/authSlice";
+import axios from "../api/axios";
 import "./Auth.css";
 
 function Signup() {
@@ -28,41 +29,25 @@ function Signup() {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
-    const newErrors = {};
-
-    if (form.fullName.trim().length < 2)
-      newErrors.fullName = "Please enter your full name";
-
-    if (!form.email.includes("@"))
-      newErrors.email = "Please enter a valid email";
-
-    if (form.password.length < 6)
-      newErrors.password = "Password must be at least 6 characters";
-
-    if (form.password !== form.confirmPassword)
-      newErrors.confirmPassword = "Passwords do not match";
-
-    setErrors(newErrors);
-    if (Object.keys(newErrors).length > 0) return;
-
-    
-    dispatch(loginStart());
-
-   
-    setTimeout(() => {
-      dispatch(
-        loginSuccess({
-          id: Date.now(),
-          name: form.fullName,
-          email: form.email,
-        })
-      );
-
-      navigate("/", { replace: true });
-    }, 600);
+  
+    try {
+      const { data } = await axios.post("/auth/register", {
+        name: form.fullName,
+        email: form.email,
+        password: form.password
+      });
+  
+      console.log("Registered:", data);
+  
+      // Optionally auto login
+      dispatch(loginSuccess(data));
+      navigate("/");
+      
+    } catch (err) {
+      console.log(err.response?.data?.message);
+    }
   };
 
   return (
