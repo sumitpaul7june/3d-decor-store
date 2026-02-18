@@ -1,12 +1,16 @@
 // Top navigation with cart and profile controls.
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import "./NavBar.css";
 import { useEffect, useState, useRef } from "react";
 import CartDrawer from "./CartDrawer";
 import { useSelector, useDispatch } from "react-redux";
 import { logout } from "../store/authSlice";
+import { setCartFromServer, clearCart } from "../store/cartSlice";
+import axios from "../api/axios";
+import { normalizeServerCart } from "../utils/cartHelpers";
 
 function NavBar() {
+  // UI state for cart drawer and profile dropdown.
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
 
@@ -18,19 +22,58 @@ function NavBar() {
   const auth = useSelector((state) => state.auth);
   const isLoggedIn = auth.isAuthenticated;
 
+  const location = useLocation();
+  const isCheckoutRoute = location.pathname.startsWith("/checkout");
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const profileRef = useRef(null);
 
   const handleLogout = () => {
-    setIsProfileOpen(false);
-    dispatch(logout());
-    navigate("/");
+    const performLogout = async () => {
+      // Close dropdown immediately for responsive UI.
+      setIsProfileOpen(false);
+
+      try {
+        // Clear auth cookie on backend.
+        await axios.post("/auth/logout");
+      } catch (error) {
+        // Continue local logout even if API fails.
+      } finally {
+        // Always clear local auth/cart state and redirect.
+        dispatch(logout());
+        dispatch(clearCart());
+        navigate("/", { replace: true });
+      }
+    };
+
+    performLogout();
   };
 
-  // Close profile dropdown on outside click
   useEffect(() => {
-    // Close profile dropdown when clicking outside.
+    // On login, validate session and load server cart into Redux.
+    const validateSessionAndFetchCart = async () => {
+      if (!isLoggedIn) {
+        dispatch(clearCart());
+        return;
+      }
+
+      try {
+        await axios.get("/users/profile");
+
+        const { data } = await axios.get("/cart");
+        dispatch(setCartFromServer(normalizeServerCart(data)));
+      } catch (error) {
+        console.error("Session/cart sync failed:", error.response?.data?.message || error.message);
+        dispatch(logout());
+        dispatch(clearCart());
+      }
+    };
+
+    validateSessionAndFetchCart();
+  }, [isLoggedIn, dispatch]);
+
+  // Close profile dropdown on outside click.
+  useEffect(() => {
     const handleClickOutside = (e) => {
       if (
         profileRef.current &&
@@ -47,9 +90,17 @@ function NavBar() {
     };
   }, []);
 
+  useEffect(() => {
+    // Keep checkout focused: close cart drawer if user reaches checkout.
+    if (isCheckoutRoute) {
+      setIsCartOpen(false);
+    }
+  }, [isCheckoutRoute]);
+
   return (
     <>
-      <nav className="navbar">
+      {/* Main top nav */}
+      <nav className={`navbar ${isCheckoutRoute ? "navbar-checkout" : ""}`}>
         {/* Logo */}
         <div className="navbar-logo">
           <Link to="/">Logo</Link>
@@ -57,29 +108,37 @@ function NavBar() {
 
         {/* Center links */}
         <ul className="nav-links nav-center">
-          <li>
-            <Link to="/">Home</Link>
-          </li>
-          <li>
-            <Link to="/products/stl">STL Files</Link>
-          </li>
-          <li>
-            <Link to="/products/physical">Products</Link>
-          </li>
+          {isCheckoutRoute ? (
+            <li className="checkout-pill">Secure Checkout</li>
+          ) : (
+            <>
+              <li>
+                <Link to="/">Home</Link>
+              </li>
+              <li>
+                <Link to="/products/stl">STL Files</Link>
+              </li>
+              <li>
+                <Link to="/products/physical">Products</Link>
+              </li>
+            </>
+          )}
         </ul>
 
         {/* Right side */}
         <ul className="nav-links nav-right">
           {/* Cart */}
-          <li
-            className="cart-btn"
-            onClick={() => setIsCartOpen(true)}
-          >
-            Cart
-            {cartCount > 0 && (
-              <span className="cart-badge">{cartCount}</span>
-            )}
-          </li>
+          {!isCheckoutRoute && (
+            <li
+              className="cart-btn"
+              onClick={() => setIsCartOpen(true)}
+            >
+              Cart
+              {cartCount > 0 && (
+                <span className="cart-badge">{cartCount}</span>
+              )}
+            </li>
+          )}
 
           {/* Auth */}
           {!isLoggedIn ? (
@@ -98,9 +157,13 @@ function NavBar() {
               </button>
 
               {isProfileOpen && (
+                // Dropdown menu for authenticated users.
                 <ul className="profile-dropdown">
                   <li onClick={() => navigate("/profile")}>
                     My Profile
+                  </li>
+                  <li onClick={() => navigate("/orders/my")}>
+                    My Orders
                   </li>
 
                   {/* ADMIN LINK (explicit checks) */}

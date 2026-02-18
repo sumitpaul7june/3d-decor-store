@@ -84,13 +84,34 @@
     border-radius: var(--radius-sm);
 
     cursor: pointer;
-    transition: background 0.2s ease, color 0.2s ease;
+    transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
 
 }
 
 .btn-primary:hover {
     background: var(--color-accent);
     color: #fff;
+}
+
+.btn-primary.added {
+    background: #111;
+    color: #fff;
+    border-color: #111;
+    animation: addToCartPulse 0.45s ease;
+}
+
+@keyframes addToCartPulse {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+
+    100% {
+        transform: scale(1);
+    }
 }
 
 .product-image img {

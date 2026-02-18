@@ -1,15 +1,32 @@
 .admin-container {
     display: grid;
-    grid-template-columns: 240px 1fr;
+    grid-template-columns: 252px minmax(0, 1fr);
     min-height: 100vh;
-    background-color: #f9fafb;
+    background: #f6f6f7;
 }
 
 .admin-main {
     display: flex;
     flex-direction: column;
+    min-width: 0;
 }
 
 .admin-content {
-    padding: 24px;
+    padding: 24px 28px 32px;
+}
+
+@media (max-width: 1080px) {
+    .admin-container {
+        grid-template-columns: 220px minmax(0, 1fr);
+    }
+
+    .admin-content {
+        padding: 18px 16px 24px;
+    }
+}
+
+@media (max-width: 860px) {
+    .admin-container {
+        grid-template-columns: 1fr;
+    }
 }

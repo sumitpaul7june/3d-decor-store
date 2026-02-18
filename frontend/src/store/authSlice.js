@@ -28,11 +28,13 @@ const authSlice = createSlice({
     initialState,
     reducers: {
         loginStart(state) {
+            // Start loading state before login/register API call.
             state.loading = true;
             state.error = null;
         },
 
         loginSuccess(state, action) {
+            // Save authenticated user in Redux.
             state.loading = false;
             state.isAuthenticated = true;
             state.user = action.payload;
@@ -48,11 +50,13 @@ const authSlice = createSlice({
         },
 
         loginFailure(state, action) {
+            // Stop loading and keep backend/frontend error message.
             state.loading = false;
             state.error = action.payload;
         },
 
         logout(state) {
+            // Reset auth state to logged-out defaults.
             state.isAuthenticated = false;
             state.user = null;
             // Clear persisted auth on logout.

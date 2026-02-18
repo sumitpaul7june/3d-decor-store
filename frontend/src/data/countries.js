@@ -11,4 +11,5 @@ const countries = [
     "Japan",
 ];
 
+// Exported for checkout address country dropdown.
 export default countries;

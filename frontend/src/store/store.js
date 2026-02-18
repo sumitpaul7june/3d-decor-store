@@ -5,7 +5,9 @@ import authReducer from "./authSlice";
 
 export const store = configureStore({
     reducer: {
+        // Customer cart state.
         cart: cartReducer,
+        // Authentication/session state.
         auth: authReducer,
     },
 });

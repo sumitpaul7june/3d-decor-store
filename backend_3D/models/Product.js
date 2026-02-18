@@ -36,7 +36,13 @@ const productSchema = new mongoose.Schema(
 
     images: {
       type: [String],
-      required: true
+      required: true,
+      validate: {
+        validator: function (value) {
+          return Array.isArray(value) && value.length > 0 && value.length <= 4;
+        },
+        message: "Product must have between 1 and 4 images"
+      }
     },
 
     stlFile: {
@@ -50,6 +56,14 @@ const productSchema = new mongoose.Schema(
         },
         message: "STL file required for STL products"
       }
+    },
+
+    stlFilePublicId: {
+      type: String
+    },
+
+    stlFileOriginalName: {
+      type: String
     }
   },
   { timestamps: true }

@@ -1,57 +1,105 @@
-// Product details page (STL or physical), derived from URL params.
+// Product details page with add-to-cart and accordion sections.
 import { useParams } from "react-router-dom";
-import { useState } from "react";
-import physicalProducts from "../data/physicalProducts";
-import stlProducts from "../data/stlProducts";
-import { useDispatch } from "react-redux";
-import { addToCart } from "../store/cartSlice";
-
+import { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { addToCart, setCartFromServer } from "../store/cartSlice";
+import axios from "../api/axios";
+import {
+  buildCartItemFromProduct,
+  normalizeServerCart
+} from "../utils/cartHelpers";
 import "./ProductDetail.css";
 
 function ProductDetail() {
-  const { type, id } = useParams();
+  // Product id from route /products/:type/:id.
+  const { id } = useParams();
   const [openSection, setOpenSection] = useState(null);
+  const [addedFeedback, setAddedFeedback] = useState(false);
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const dispatch = useDispatch();
+  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
 
+  const showAddedFeedback = () => {
+    setAddedFeedback(true);
+    window.setTimeout(() => setAddedFeedback(false), 900);
+  };
 
-  const products =
-    type === "stl" ? stlProducts : type === "physical" ? physicalProducts : [];
+  useEffect(() => {
+    // Load selected product details from backend.
+    const fetchProduct = async () => {
+      try {
+        setLoading(true);
+        setError("");
 
-  // Find the product by id; show "not found" if missing.
-  const product = products.find((p) => p.id === id);
+        const { data } = await axios.get(`/products/${id}`);
+        setProduct(data);
+      } catch (err) {
+        setError(err.response?.data?.message || "Failed to load product");
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  if (!product) {
-    return <section className="product-not-found">Product not found</section>;
-  }
-
-  const isSTL = type === "stl";
+    fetchProduct();
+  }, [id]);
 
   const toggle = (section) => {
+    // Open/close accordion section.
     setOpenSection(openSection === section ? null : section);
   };
 
-  const handleAddToCart = () => {
-    dispatch(addToCart({
-      ...product,
-      type
-    }));
+  if (loading) {
+    return <section className="product-not-found">Loading product...</section>;
+  }
+
+  if (error || !product) {
+    return (
+      <section className="product-not-found">
+        {error || "Product not found"}
+      </section>
+    );
+  }
+
+  const isSTL = product.type === "stl";
+  const productImage = product.image || product.images?.[0] || "";
+
+  const handleAddToCart = async () => {
+    // Guests use local cart, logged-in users use backend cart.
+    if (!isAuthenticated) {
+      dispatch(addToCart(buildCartItemFromProduct(product)));
+      showAddedFeedback();
+      return;
+    }
+
+    try {
+      await axios.post("/cart/add", {
+        productId: product._id,
+        quantity: 1
+      });
+
+      const { data } = await axios.get("/cart");
+      dispatch(setCartFromServer(normalizeServerCart(data)));
+      showAddedFeedback();
+    } catch (err) {
+      console.error("Add to cart failed:", err.response?.data?.message || err.message);
+    }
   };
-  
-  
 
   return (
     <section className="product-detail">
       <div className="pd-grid">
-        {/* IMAGE */}
+        {/* Left column: product image */}
         <div className="pd-images">
           <img
-            src={product.image}
+            src={productImage}
             alt={product.name}
             className="pd-main-image"
           />
         </div>
 
-        {/* INFO */}
+        {/* Right column: details + CTA + accordion */}
         <div className="pd-info">
           <h1 className="pd-title">{product.name}</h1>
 
@@ -61,18 +109,21 @@ function ProductDetail() {
           </div>
 
           <p className="pd-description">
-            {isSTL
-              ? "High‑quality STL file for clean 3D prints and modern interiors."
-              : "Premium physical decor product crafted for modern spaces."}
+            {product.description ||
+              (isSTL
+                ? "High-quality STL file for clean 3D prints and modern interiors."
+                : "Premium physical decor product crafted for modern spaces.")}
           </p>
 
-          <button className="pd-primary-btn" onClick={handleAddToCart}>
-            Add to Cart
+          <button
+            className={`pd-primary-btn ${addedFeedback ? "added" : ""}`}
+            onClick={handleAddToCart}
+          >
+            {addedFeedback ? "Added to Cart ✓" : "Add to Cart"}
           </button>
 
-          {/* ACCORDION */}
           <div className="pd-accordion">
-            {/* DESCRIPTION */}
+            {/* Description accordion item */}
             <div
               className={`pd-accordion-item ${
                 openSection === "description" ? "open" : ""
@@ -80,18 +131,15 @@ function ProductDetail() {
             >
               <button onClick={() => toggle("description")}>
                 Description
-                <span>{openSection === "description" ? "−" : "+"}</span>
+                <span>{openSection === "description" ? "-" : "+"}</span>
               </button>
 
               <div className="pd-accordion-content">
-                <p>
-                  This product is designed with a minimal aesthetic and premium
-                  attention to detail.
-                </p>
+                <p>{product.description || "No description available."}</p>
               </div>
             </div>
 
-            {/* SHIPPING */}
+            {/* Shipping accordion item */}
             <div
               className={`pd-accordion-item ${
                 openSection === "shipping" ? "open" : ""
@@ -99,19 +147,19 @@ function ProductDetail() {
             >
               <button onClick={() => toggle("shipping")}>
                 Shipping
-                <span>{openSection === "shipping" ? "−" : "+"}</span>
+                <span>{openSection === "shipping" ? "-" : "+"}</span>
               </button>
 
               <div className="pd-accordion-content">
                 <p>
                   {isSTL
                     ? "No shipping required. Download available immediately."
-                    : "Ships within 3–5 business days."}
+                    : "Ships within 3-5 business days."}
                 </p>
               </div>
             </div>
 
-            {/* RETURNS */}
+            {/* Returns accordion item */}
             <div
               className={`pd-accordion-item ${
                 openSection === "returns" ? "open" : ""
@@ -119,14 +167,14 @@ function ProductDetail() {
             >
               <button onClick={() => toggle("returns")}>
                 Returns
-                <span>{openSection === "returns" ? "−" : "+"}</span>
+                <span>{openSection === "returns" ? "-" : "+"}</span>
               </button>
 
               <div className="pd-accordion-content">
                 <p>
                   {isSTL
-                    ? "Digital products are non‑refundable."
-                    : "7‑day return policy on unused items."}
+                    ? "Digital products are non-refundable."
+                    : "7-day return policy on unused items."}
                 </p>
               </div>
             </div>

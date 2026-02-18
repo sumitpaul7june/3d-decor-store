@@ -1,24 +1,48 @@
 import Product from "../models/Product.js";
 
+const buildTypeFilter = (type) => {
+  const filter = {};
+  if (type) {
+    filter.type = type;
+  }
+  return filter;
+};
+
 /*ALL PRODUCT */
 export const getAllProducts=async(req,res)=>{
     try {
         const {type}=req.query;
-        let filter={};
-        if(type){
-            filter.type=type;
-        }
-        const products=await Product.find(filter);
+        const filter = buildTypeFilter(type);
+
+        // Keep STL download fields private on public product APIs.
+        const products = await Product.find(filter).select(
+          "-stlFile -stlFilePublicId -stlFileOriginalName"
+        );
         res.json(products);
     } catch (error) {
         res.status(500).json({message:"server error"});
     }
 }
 
+/* ---------- GET ALL PRODUCTS FOR ADMIN ---------- */
+export const getAllProductsAdmin = async (req, res) => {
+  try {
+    const { type } = req.query;
+    const filter = buildTypeFilter(type);
+    const products = await Product.find(filter);
+    res.json(products);
+  } catch (error) {
+    res.status(500).json({ message: "Server Error" });
+  }
+};
+
 /* ---------- GET PRODUCT BY ID ---------- */
 export const getProductById = async (req, res) => {
   try {
-    const product = await Product.findById(req.params.id);
+    // Public product detail should not expose STL direct file metadata.
+    const product = await Product.findById(req.params.id).select(
+      "-stlFile -stlFilePublicId -stlFileOriginalName"
+    );
 
     if (!product) {
       return res.status(404).json({ message: "Product not found" });
@@ -35,7 +59,24 @@ export const getProductById = async (req, res) => {
 
 export const createProduct = async (req, res) => {
   try {
-    const product = await Product.create(req.body);
+    const payload = { ...req.body };
+
+    if (!Array.isArray(payload.images) || payload.images.length === 0) {
+      return res.status(400).json({ message: "At least 1 product image is required" });
+    }
+
+    if (payload.images.length > 4) {
+      return res.status(400).json({ message: "Maximum 4 images allowed per product" });
+    }
+
+    // Physical products should not persist STL metadata.
+    if (payload.type !== "stl") {
+      payload.stlFile = "";
+      payload.stlFilePublicId = "";
+      payload.stlFileOriginalName = "";
+    }
+
+    const product = await Product.create(payload);
     res.status(201).json(product);
 
   } catch (error) {
@@ -46,9 +87,28 @@ export const createProduct = async (req, res) => {
 /*UPDATE PRODUCT (ADMIN) */
 export const updateProduct = async (req, res) => {
   try {
+    const payload = { ...req.body };
+
+    if (payload.images) {
+      if (!Array.isArray(payload.images) || payload.images.length === 0) {
+        return res.status(400).json({ message: "At least 1 product image is required" });
+      }
+
+      if (payload.images.length > 4) {
+        return res.status(400).json({ message: "Maximum 4 images allowed per product" });
+      }
+    }
+
+    // Physical products should not persist STL metadata.
+    if (payload.type && payload.type !== "stl") {
+      payload.stlFile = "";
+      payload.stlFilePublicId = "";
+      payload.stlFileOriginalName = "";
+    }
+
     const product = await Product.findByIdAndUpdate(
       req.params.id,
-      req.body,
+      payload,
       { new: true }
     );
 

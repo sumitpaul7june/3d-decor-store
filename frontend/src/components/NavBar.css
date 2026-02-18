@@ -14,17 +14,33 @@
     font-family: var(--font-display);
 }
 
+.navbar-checkout {
+    background: #fff;
+}
+
 
 .nav-links {
     display: flex;
     list-style: none;
     gap: var(--space-lg);
+    align-items: center;
 }
 
 .nav-links li {
     cursor: pointer;
     white-space: nowrap;
     font-size: 1.3rem;
+}
+
+.checkout-pill {
+    font-size: 0.85rem !important;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 0.35rem 0.7rem;
+    border-radius: 999px;
+    border: 1px solid #e5e7eb;
+    color: #4b5563;
+    background: #f7f7f7;
 }
 
 .navbar-logo {
@@ -92,8 +108,10 @@
 .profile-btn {
     background: none;
     border: none;
-    font-family: var(--font-ui);
-    font-size: 0.9rem;
+    font-family: var(--font-display);
+    font-size: 1.3rem;
+    line-height: 1;
+    padding: 0;
     cursor: pointer;
     display: flex;
     align-items: center;

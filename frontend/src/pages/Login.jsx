@@ -7,6 +7,11 @@ import { loginFailure, loginStart, loginSuccess } from "../store/authSlice";
 import axios from "../api/axios";  
 import "./Auth.css";
 
+const mapAuthErrorMessage = (message) => {
+  // Keep backend auth errors readable in UI.
+  return message || "Login Failed";
+};
+
 function Login() {
   // Local form state
   const [form, setForm] = useState({
@@ -15,6 +20,8 @@ function Login() {
   });
 
   const [error, setError] = useState("");
+  // Toggle plain-text password visibility.
+  const [showPassword, setShowPassword] = useState(false);
 
   // Redux
   const dispatch = useDispatch();
@@ -45,24 +52,42 @@ function Login() {
   };
 
   // Handle login submit
+  const validate = () => {
+    // Return first validation error string (empty string means valid).
+    if (!form.email.trim()) return "Email is required";
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) {
+      return "Invalid email format";
+    }
+    if (!form.password) return "Password is required";
+    return "";
+  };
+
   const handleSubmit = async (e) => {
+    // Stop full-page refresh and run client-side validation first.
     e.preventDefault();
+    const validationError = validate();
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
 
     try{
       dispatch(loginStart());
+      setError("");
       const {data} = await axios.post("/auth/login", {
-        email : form.email,
+        email : form.email.trim().toLowerCase(),
         password: form.password
 
       })
 
       dispatch(loginSuccess(data));
-      navigate("/", {replace});
+      navigate(redirectTo, { replace: true });
 
     }
     catch(err)
     {
-      const message = err.response?.data?.message  || "Login Failed";
+      const rawMessage = err.response?.data?.message;
+      const message = mapAuthErrorMessage(rawMessage);
       dispatch(loginFailure(message));
       setError(message);
     }
@@ -74,6 +99,7 @@ function Login() {
       <div className="auth-card">
         <h1>Welcome back</h1>
 
+        {/* Login form */}
         <form className="auth-form" onSubmit={handleSubmit}>
           <label>
             Email
@@ -82,17 +108,29 @@ function Login() {
               name="email"
               value={form.email}
               onChange={handleChange}
+              required
             />
           </label>
 
           <label>
             Password
-            <input
-              type="password"
-              name="password"
-              value={form.password}
-              onChange={handleChange}
-            />
+            {/* Password input + show/hide button */}
+            <div className="password-field">
+              <input
+                type={showPassword ? "text" : "password"}
+                name="password"
+                value={form.password}
+                onChange={handleChange}
+                required
+              />
+              <button
+                type="button"
+                className="password-toggle-btn"
+                onClick={() => setShowPassword((prev) => !prev)}
+              >
+                {showPassword ? "Hide" : "Show"}
+              </button>
+            </div>
           </label>
 
           {error && <span className="error">{error}</span>}
@@ -102,6 +140,7 @@ function Login() {
               {loading ? "Logging in..." : "Login"}
             </button>
 
+            {/* Divider + social auth option */}
             <div className="auth-divider">or</div>
 
             <GoogleAuthButton text="Login with Google" />

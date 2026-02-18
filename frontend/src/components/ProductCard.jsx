@@ -1,34 +1,77 @@
-// Product tile with image, price, and add-to-cart action.
+// Reusable product card used on home and product listing pages.
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 import "./ProductCard.css";
-import { useDispatch } from "react-redux";
-import { addToCart } from "../store/cartSlice";
+import { useDispatch, useSelector } from "react-redux";
+import axios from "../api/axios";
+import { addToCart, setCartFromServer } from "../store/cartSlice";
+import {
+  buildCartItemFromProduct,
+  normalizeServerCart
+} from "../utils/cartHelpers";
 
 function ProductCard({ product, type }) {
+  // Navigation + Redux helpers.
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
+  // Short UI feedback state for "Add to Cart" animation/text.
+  const [addedFeedback, setAddedFeedback] = useState(false);
 
+  // Support both Mongo `_id` and legacy `id` shapes.
+  const productId = product._id || product.id;
+  // Prefer backend image fields, fallback to empty string.
+  const productImage = product.image || product.images?.[0] || "";
 
-  const handleCardClick = () => {
-    navigate(`/products/${type}/${product.id}`);
+  const showAddedFeedback = () => {
+    setAddedFeedback(true);
+    window.setTimeout(() => setAddedFeedback(false), 900);
   };
 
-  const handleAddToCart = (e) => {
-    // Prevent card click navigation when adding to cart.
+  const handleCardClick = () => {
+    // Open product details page.
+    navigate(`/products/${type}/${productId}`);
+  };
+
+  const handleAddToCart = async (e) => {
+    // Stop parent click so Add to Cart doesn't open details page.
     e.stopPropagation();
-    dispatch(addToCart(
-      {
-        id: product.id,
-      name: product.name,
-      price: product.price,
-      }
-    ))
+
+    // Guest users use local Redux cart.
+    if (!isAuthenticated) {
+      dispatch(addToCart(buildCartItemFromProduct(product, type)));
+      showAddedFeedback();
+      return;
+    }
+
+    // Logged-in users sync cart with backend.
+    try {
+      await axios.post("/cart/add", {
+        productId,
+        quantity: 1
+      });
+
+      const { data } = await axios.get("/cart");
+      dispatch(setCartFromServer(normalizeServerCart(data)));
+      showAddedFeedback();
+    } catch (err) {
+      console.error("Add to cart failed:", err.response?.data?.message || err.message);
+    }
   };
 
   return (
+    // Entire card is clickable to open product details.
     <div className="product" onClick={handleCardClick}>
       <div className="product-image">
-        <img src={product.image} alt={product.name} />
+        <img
+          src={productImage || "https://via.placeholder.com/600x600?text=No+Image"}
+          alt={product.name}
+          onError={(e) => {
+            // If image URL fails, swap to fallback placeholder.
+            e.currentTarget.src =
+              "https://via.placeholder.com/600x600?text=Image+Unavailable";
+          }}
+        />
       </div>
 
       <div className="product-info">
@@ -39,8 +82,11 @@ function ProductCard({ product, type }) {
           <span className="original-price">₹{product.originalPrice}</span>
         </div>
 
-        <button className="btn-primary" onClick={handleAddToCart}>
-          Add to Cart
+        <button
+          className={`btn-primary ${addedFeedback ? "added" : ""}`}
+          onClick={handleAddToCart}
+        >
+          {addedFeedback ? "Added to Cart ✓" : "Add to Cart"}
         </button>
       </div>
     </div>

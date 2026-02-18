@@ -10,6 +10,7 @@ import productRoutes from "./routes/productRoutes.js";
 import cartRoutes from "./routes/cartRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
+import uploadRoutes from "./routes/uploadRoutes.js";
 
 import { protect } from "./middleware/authMiddleware.js";
 import { adminOnly } from "./middleware/adminMiddleware.js";
@@ -29,7 +30,8 @@ app.use(cors({
   credentials: true
 }));
 
-app.use(express.json());
+// Larger limit allows base64 file payloads for image/STL uploads.
+app.use(express.json({ limit: "50mb" }));
 app.use(cookieParser());
 
 /* -------- ROUTES -------- */
@@ -39,6 +41,7 @@ app.use("/api/products", productRoutes);
 app.use("/api/cart", cartRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/upload", uploadRoutes);
 
 /* -------- TEST ROUTES -------- */
 

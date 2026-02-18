@@ -1,66 +1,130 @@
-import User from '../models/User.js'
-import bcrypt from 'bcryptjs'
-import generateToken from '../utils/generateToken.js'
+import User from "../models/User.js";
+import bcrypt from "bcryptjs";
+import generateToken from "../utils/generateToken.js";
+
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const passwordRegex =
+  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#^()\-_=+[\]{};:'",.<>/\\|`~]).{8,}$/;
+
+const cookieOptions = {
+  httpOnly: true,
+  secure: false, // true in production with HTTPS
+  sameSite: "strict",
+  maxAge: 7 * 24 * 60 * 60 * 1000
+};
 
 export const registerUser = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    let { name, email, password } = req.body;
+
+    name = (name || "").trim();
+    email = (email || "").trim().toLowerCase();
+    password = password || "";
+
+    if (!name) {
+      return res.status(400).json({ message: "Name is required" });
+    }
+
+    if (!email) {
+      return res.status(400).json({ message: "Email is required" });
+    }
+
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ message: "Invalid email format" });
+    }
+
+    if (!password) {
+      return res.status(400).json({ message: "Password is required" });
+    }
+
+    if (!passwordRegex.test(password)) {
+      return res.status(400).json({
+        message:
+          "Password must be at least 8 chars and include uppercase, lowercase, number, and special character"
+      });
+    }
+
     const userExists = await User.findOne({ email });
     if (userExists) {
       return res.status(400).json({ message: "User already exists" });
-
     }
+
     const hashedPassword = await bcrypt.hash(password, 10);
+
     const user = await User.create({
       name,
       email,
       password: hashedPassword
     });
+
     const token = generateToken(user._id);
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: false, // true in production with HTTPS
-      sameSite: "strict",
-      maxAge: 7 * 24 * 60 * 60 * 1000
-    });
-    res.status(201).json({
+
+    res.cookie("token", token, cookieOptions);
+
+    return res.status(201).json({
       id: user._id,
       name: user.name,
       email: user.email,
       role: user.role
     });
-
   } catch (error) {
     console.error("REGISTER ERROR:", error);
-    res.status(500).json({ message: "Server Error" });
+    return res.status(500).json({ message: "Server Error" });
   }
-}
+};
 
 export const loginUser = async (req, res) => {
   try {
-    const { email, password } = req.body;
-    const user = await User.findOne({ email });
-    if (!user) return res.status(400).json({ message: "invalid credentials" });
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
-    const token = generateToken(user._id);
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: false,
-      sameSite: "strict",
-      maxAge: 7 * 24 * 60 * 60 * 1000
-    });
+    let { email, password } = req.body;
 
-    res.json({
+    email = (email || "").trim().toLowerCase();
+    password = password || "";
+
+    if (!email) {
+      return res.status(400).json({ message: "Email is required" });
+    }
+
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ message: "Invalid email format" });
+    }
+
+    if (!password) {
+      return res.status(400).json({ message: "Password is required" });
+    }
+
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(400).json({ message: "Invalid credentials" });
+    }
+
+    // Prevent bcrypt compare crash when account has no password.
+    if (!user.password) {
+      return res.status(400).json({
+        message: "Invalid credentials"
+      });
+    }
+
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ message: "Invalid credentials" });
+    }
+
+    const token = generateToken(user._id);
+
+    res.cookie("token", token, cookieOptions);
+
+    return res.json({
       id: user._id,
       name: user.name,
       email: user.email,
       role: user.role
     });
   } catch (error) {
-    res.status(500).json({ message: "server error" });
+    return res.status(500).json({ message: "Server Error" });
   }
-}
+};
 
 export const logoutUser = (req, res) => {
   res.cookie("token", "", {
@@ -71,17 +135,21 @@ export const logoutUser = (req, res) => {
   res.json({ message: "Logged out successfully" });
 };
 
-/* ---------- GOOGLE LOGIN ---------- */
 export const googleLogin = async (req, res) => {
   try {
-    const { name, email, googleId, photo } = req.body;
+    let { name, email, googleId, photo } = req.body;
+    email = (email || "").trim().toLowerCase();
 
-    if (!email)
+    if (!email) {
       return res.status(400).json({ message: "Email is required" });
+    }
+
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ message: "Invalid email format" });
+    }
 
     let user = await User.findOne({ email });
 
-    // If user does not exist → create
     if (!user) {
       user = await User.create({
         name,
@@ -93,21 +161,15 @@ export const googleLogin = async (req, res) => {
 
     const token = generateToken(user._id);
 
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: false, // true in production
-      sameSite: "strict",
-      maxAge: 7 * 24 * 60 * 60 * 1000
-    });
+    res.cookie("token", token, cookieOptions);
 
-    res.json({
+    return res.json({
       id: user._id,
       name: user.name,
       email: user.email,
       role: user.role
     });
-
   } catch (error) {
-    res.status(500).json({ message: "Server Error" });
+    return res.status(500).json({ message: "Server Error" });
   }
 };

@@ -2,6 +2,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
+    // Unified cart item shape: { id, name, price, originalPrice, type, image, qty }
     items: [],
 }
 
@@ -9,6 +10,12 @@ const cartSlice = createSlice({
     name: "cart",
     initialState,
     reducers: {
+
+        setCartFromServer(state, action) {
+            // Replace local cart with normalized server cart.
+            state.items = action.payload || [];
+
+        },
         addToCart(state, action) {
             // If item exists, increment quantity; otherwise add new entry.
             const item = action.payload;
@@ -24,10 +31,12 @@ const cartSlice = createSlice({
         },
 
         removeCart(state, action) {
+            // Remove one cart line completely by product id.
             state.items = state.items.filter(i => i.id !== action.payload);
         },
 
         increaseQty(state, action) {
+            // Increase quantity of one item by id.
             const item = state.items.find(i => i.id === action.payload);
             if (item) {
                 item.qty += 1;
@@ -35,6 +44,7 @@ const cartSlice = createSlice({
         },
 
         decreaseQty(state, action) {
+            // Decrease quantity; remove item if it reaches 0.
             const itemIndex = state.items.findIndex(
                 i => i.id === action.payload
             );
@@ -52,6 +62,7 @@ const cartSlice = createSlice({
         },
 
         clearCart(state) {
+            // Used after logout/order success.
             state.items = [];
         }
 
@@ -59,6 +70,7 @@ const cartSlice = createSlice({
 });
 
 export const {
+    setCartFromServer,
     addToCart,
     removeCart,
     increaseQty,

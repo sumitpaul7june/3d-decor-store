@@ -12,8 +12,14 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Profile from "./pages/Profile";
 import Address from "./pages/Address";
+import CheckoutSuccess from "./pages/CheckoutSuccess";
+import MyOrders from "./pages/MyOrders";
 import Products from "./pages/Products";
 import ProductDetail from "./pages/ProductDetail"
+import AboutUs from "./pages/AboutUs";
+import Contact from "./pages/Contact";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TrackOrder from "./pages/TrackOrder";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminProducts from "./pages/admin/AdminProducts";
 
@@ -24,15 +30,17 @@ import AdminLayout from "./layouts/AdminLayout";
 import AdminOrders from "./pages/admin/AdminOrders";
 import AdminRoute from "./routes/AdminRoute";
 
-// Central route tree for public + admin sections.
+// Central route tree for public + protected + admin sections.
 const router = createBrowserRouter([
   {
+    // Public storefront layout.
     path: "/",
     element: <MainLayout />,
     children: [
+      // Home page.
       { index: true, element: <Home /> },
 
-      // 🔓 PUBLIC (but blocked when logged IN)
+      // Routes only for guests. If already logged in, these redirect to home.
       {
         element: <PublicRoute />,
         children: [
@@ -41,26 +49,34 @@ const router = createBrowserRouter([
         ],
       },
 
-      // ✅ ALWAYS PUBLIC
+      // Product browsing pages are always public.
       { path: "products/:type", element: <Products /> },
       { path: "products/:type/:id", element: <ProductDetail /> },
+      { path: "about", element: <AboutUs /> },
+      { path: "contact", element: <Contact /> },
+      { path: "privacy-policy", element: <PrivacyPolicy /> },
+      { path: "track-order", element: <TrackOrder /> },
 
-      // 🔒 PROTECTED
+      // Checkout/account routes require login.
       {
         element: <ProtectedRoute />,
         children: [
           { path: "profile", element: <Profile /> },
+          { path: "orders/my", element: <MyOrders /> },
           { path: "checkout/address", element: <Address /> },
+          { path: "checkout/success/:orderId", element: <CheckoutSuccess /> },
         ],
       },
 
 
+      // Fallback for unknown storefront routes.
       { path: "*", element: <section>Page Not Found</section> },
     ],
   },
 
   {
-    element: <AdminRoute />, // 👈 GUARD FIRST
+    // Admin guard wraps all `/admin` routes.
+    element: <AdminRoute />,
     children: [
       {
         path: "/admin",
@@ -77,6 +93,7 @@ const router = createBrowserRouter([
 ]);
 
 function App() {
+  // RouterProvider renders the full route tree.
   return <RouterProvider router={router} />;
 }
 
