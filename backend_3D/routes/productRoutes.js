@@ -13,11 +13,9 @@ const router=express.Router();
 
 /*Public Routes */
 router.get('/',getAllProducts);
-
+router.get('/:id',getProductById);
 /*Admin Read Route */
 router.get('/admin/all',protect,adminOnly,getAllProductsAdmin);
-
-router.get('/:id',getProductById);
 
 /*admin routes */
 
