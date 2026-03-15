@@ -25,8 +25,8 @@ const productSchema = new mongoose.Schema(
 
     type: {
       type: String,
-      enum: ["stl", "physical"],
-      required: true
+      enum: ["physical"],
+      default: "physical"
     },
 
     category: {
@@ -43,27 +43,6 @@ const productSchema = new mongoose.Schema(
         },
         message: "Product must have between 1 and 4 images"
       }
-    },
-
-    stlFile: {
-      type: String,
-      validate: {
-        validator: function (value) {
-          if (this.type === "stl") {
-            return !!value;
-          }
-          return true;
-        },
-        message: "STL file required for STL products"
-      }
-    },
-
-    stlFilePublicId: {
-      type: String
-    },
-
-    stlFileOriginalName: {
-      type: String
     }
   },
   { timestamps: true }

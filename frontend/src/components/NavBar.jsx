@@ -116,10 +116,7 @@ function NavBar() {
                 <Link to="/">Home</Link>
               </li>
               <li>
-                <Link to="/products/stl">STL Files</Link>
-              </li>
-              <li>
-                <Link to="/products/physical">Products</Link>
+                <Link to="/products">Products</Link>
               </li>
             </>
           )}

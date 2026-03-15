@@ -10,6 +10,8 @@ import MainLayout from "./layouts/MainLayout";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 import Profile from "./pages/Profile";
 import Address from "./pages/Address";
 import CheckoutSuccess from "./pages/CheckoutSuccess";
@@ -49,9 +51,13 @@ const router = createBrowserRouter([
         ],
       },
 
+      // Password reset pages stay public so email links work without auth state issues.
+      { path: "forgot-password", element: <ForgotPassword /> },
+      { path: "reset-password/:token", element: <ResetPassword /> },
+
       // Product browsing pages are always public.
-      { path: "products/:type", element: <Products /> },
-      { path: "products/:type/:id", element: <ProductDetail /> },
+      { path: "products", element: <Products /> },
+      { path: "product/:id", element: <ProductDetail /> },
       { path: "about", element: <AboutUs /> },
       { path: "contact", element: <Contact /> },
       { path: "privacy-policy", element: <PrivacyPolicy /> },

@@ -1,18 +1,5 @@
 import Order from "../models/Order.js";
 import User from "../models/User.js";
-import { Readable } from "stream";
-
-const sanitizeDownloadFilename = (value) => {
-  const safe = (value || "stl-model")
-    .replace(/[^a-zA-Z0-9._-]/g, "_")
-    .replace(/_+/g, "_");
-
-  if (safe.toLowerCase().endsWith(".stl")) {
-    return safe;
-  }
-
-  return `${safe}.stl`;
-};
 
 /* ------------------ CREATE ORDER ------------------ */
 
@@ -35,24 +22,25 @@ export const createOrder = async (req, res) => {
       return res.status(400).json({ message: "Invalid address selected" });
     }
 
+    const validCartItems = user.cart.filter(
+      (item) => item.product && item.product.type === "physical"
+    );
+
+    if (validCartItems.length === 0) {
+      return res.status(400).json({ message: "Cart does not contain valid physical products" });
+    }
+
     let totalAmount = 0;
 
-    const orderItems = user.cart.map(item => {
+    const orderItems = validCartItems.map(item => {
       totalAmount += item.product.price * item.quantity;
-
-      const isStlProduct = item.product.type === "stl";
 
       return {
         product: item.product._id,
         name: item.product.name,
-        type: item.product.type,
+        type: "physical",
         quantity: item.quantity,
-        price: item.product.price,
-        stlFile: isStlProduct ? item.product.stlFile || "" : "",
-        stlFilePublicId: isStlProduct ? item.product.stlFilePublicId || "" : "",
-        stlFileOriginalName: isStlProduct
-          ? item.product.stlFileOriginalName || ""
-          : ""
+        price: item.product.price
       };
     });
 
@@ -150,63 +138,6 @@ export const getMyOrders = async (req, res) => {
 
     res.json(orders);
 
-  } catch (error) {
-    res.status(500).json({ message: "Server Error" });
-  }
-};
-
-/* ------------------ USER: DOWNLOAD STL ------------------ */
-
-export const downloadOrderStl = async (req, res) => {
-  try {
-    const { orderId, itemId } = req.params;
-
-    const order = await Order.findById(orderId);
-
-    if (!order) {
-      return res.status(404).json({ message: "Order not found" });
-    }
-
-    // Ensure user owns the order.
-    if (order.user.toString() !== req.user._id.toString()) {
-      return res.status(403).json({ message: "Not authorized" });
-    }
-
-    if (order.orderStatus === "Cancelled") {
-      return res.status(400).json({ message: "Cancelled orders cannot be downloaded" });
-    }
-
-    const orderItem = order.items.id(itemId);
-
-    if (!orderItem) {
-      return res.status(404).json({ message: "Order item not found" });
-    }
-
-    if (orderItem.type !== "stl") {
-      return res.status(400).json({ message: "Download available only for STL items" });
-    }
-
-    if (!orderItem.stlFile) {
-      return res.status(404).json({ message: "STL file not available for this item" });
-    }
-
-    const cloudResponse = await fetch(orderItem.stlFile);
-
-    if (!cloudResponse.ok || !cloudResponse.body) {
-      return res.status(502).json({ message: "Failed to fetch STL file" });
-    }
-
-    const fileName = sanitizeDownloadFilename(
-      orderItem.stlFileOriginalName || orderItem.name || "stl-model"
-    );
-
-    res.setHeader(
-      "Content-Type",
-      cloudResponse.headers.get("content-type") || "application/octet-stream"
-    );
-    res.setHeader("Content-Disposition", `attachment; filename="${fileName}"`);
-
-    Readable.fromWeb(cloudResponse.body).pipe(res);
   } catch (error) {
     res.status(500).json({ message: "Server Error" });
   }

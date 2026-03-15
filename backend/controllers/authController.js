@@ -178,7 +178,15 @@ export const googleLogin = async (req, res) => {
 
 export const forgotPassword = async (req, res) => {
   try {
-    const { email } = req.body;
+    const email = (req.body.email || "").trim().toLowerCase();
+
+    if (!email) {
+      return res.status(400).json({ message: "Email is required" });
+    }
+
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ message: "Invalid email format" });
+    }
 
     const user = await User.findOne({ email });
 
@@ -200,14 +208,26 @@ export const forgotPassword = async (req, res) => {
 
     await user.save();
 
-    const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
+    const frontendUrl = (process.env.FRONTEND_URL || "").trim();
+    const emailUser = (process.env.EMAIL || "").trim();
+    const emailPass = (process.env.EMAIL_PASS || "").trim();
+
+    if (!frontendUrl) {
+      return res.status(500).json({ message: "FRONTEND_URL is not configured" });
+    }
+
+    if (!emailUser || !emailPass) {
+      return res.status(500).json({ message: "Email service is not configured" });
+    }
+
+    const resetUrl = `${frontendUrl}/reset-password/${resetToken}`;
 
     // Setup mail transporter
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
-        user: process.env.EMAIL,
-        pass: process.env.EMAIL_PASS,
+        user: emailUser,
+        pass: emailPass,
       },
     });
 
@@ -223,13 +243,27 @@ export const forgotPassword = async (req, res) => {
     res.status(200).json({ message: "Reset link sent to email" });
 
   } catch (error) {
-    res.status(500).json({ message: "Server error" });
+    console.error("FORGOT PASSWORD ERROR:", error);
+    res.status(500).json({
+      message: error.message || "Failed to send reset link"
+    });
   }
 };
 
 export const resetPassword = async (req, res) => {
   try {
-    const { password } = req.body;
+    const password = req.body.password || "";
+
+    if (!password) {
+      return res.status(400).json({ message: "Password is required" });
+    }
+
+    if (!passwordRegex.test(password)) {
+      return res.status(400).json({
+        message:
+          "Password must be at least 8 chars and include uppercase, lowercase, number, and special character"
+      });
+    }
 
     const hashedToken = crypto
       .createHash("sha256")
@@ -245,7 +279,7 @@ export const resetPassword = async (req, res) => {
       return res.status(400).json({ message: "Token invalid or expired" });
     }
 
-    user.password = password;
+    user.password = await bcrypt.hash(password, 10);
     user.resetPasswordToken = undefined;
     user.resetPasswordExpire = undefined;
 
@@ -254,6 +288,7 @@ export const resetPassword = async (req, res) => {
     res.status(200).json({ message: "Password reset successful" });
 
   } catch (error) {
-    res.status(500).json({ message: "Server error" });
+    console.error("RESET PASSWORD ERROR:", error);
+    res.status(500).json({ message: error.message || "Failed to reset password" });
   }
 };

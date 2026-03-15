@@ -6,7 +6,19 @@ export const getCart = async (req, res) => {
     const user = await User.findById(req.user._id)
       .populate("cart.product");
 
-    res.json(user.cart);
+    const filteredCart = user.cart.filter(
+      (item) => item.product && item.product.type === "physical"
+    );
+
+    if (filteredCart.length !== user.cart.length) {
+      user.cart = filteredCart.map((item) => ({
+        product: item.product._id,
+        quantity: item.quantity
+      }));
+      await user.save();
+    }
+
+    res.json(filteredCart);
 
   } catch (error) {
     res.status(500).json({ message: "Server Error" });
@@ -21,6 +33,10 @@ export const addToCart = async (req, res) => {
     const product = await Product.findById(productId);
     if (!product)
       return res.status(404).json({ message: "Product not found" });
+
+    if (product.type !== "physical") {
+      return res.status(400).json({ message: "Only physical products are available" });
+    }
 
     const user = await User.findById(req.user._id);
 

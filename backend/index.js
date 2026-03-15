@@ -30,7 +30,7 @@ app.use(cors({
   credentials: true
 }));
 
-// Larger limit allows base64 file payloads for image/STL uploads.
+// Larger limit allows base64 payloads for product image uploads.
 app.use(express.json({ limit: "50mb" }));
 app.use(cookieParser());
 

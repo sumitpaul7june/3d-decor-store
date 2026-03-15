@@ -10,7 +10,7 @@ import {
   normalizeServerCart
 } from "../utils/cartHelpers";
 
-function ProductCard({ product, type }) {
+function ProductCard({ product }) {
   // Navigation + Redux helpers.
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -30,7 +30,7 @@ function ProductCard({ product, type }) {
 
   const handleCardClick = () => {
     // Open product details page.
-    navigate(`/products/${type}/${productId}`);
+    navigate(`/product/${productId}`);
   };
 
   const handleAddToCart = async (e) => {
@@ -39,7 +39,7 @@ function ProductCard({ product, type }) {
 
     // Guest users use local Redux cart.
     if (!isAuthenticated) {
-      dispatch(addToCart(buildCartItemFromProduct(product, type)));
+      dispatch(addToCart(buildCartItemFromProduct(product)));
       showAddedFeedback();
       return;
     }

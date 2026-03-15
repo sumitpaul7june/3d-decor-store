@@ -88,36 +88,3 @@ export const uploadProductImage = async (req, res) => {
     return res.status(500).json({ message: error.message || "Upload failed" });
   }
 };
-
-// Upload STL file (admin-only route).
-export const uploadStlFile = async (req, res) => {
-  try {
-    if (!hasCloudinaryEnv()) {
-      return res.status(500).json({ message: "Cloudinary env variables are missing" });
-    }
-
-    const { fileDataUrl, fileName } = req.body;
-
-    // Must be base64 data URL.
-    if (!fileDataUrl || !/^data:[^;]+;base64,/.test(fileDataUrl)) {
-      return res.status(400).json({ message: "Valid STL file data is required" });
-    }
-
-    // Must be .stl extension if name is provided.
-    const lowerName = (fileName || "").toLowerCase();
-    if (lowerName && !lowerName.endsWith(".stl")) {
-      return res.status(400).json({ message: "Only .stl files are allowed" });
-    }
-
-    const uploaded = await uploadToCloudinary(
-      fileDataUrl,
-      fileName,
-      "products/stl",
-      "raw"
-    );
-
-    return res.status(201).json(uploaded);
-  } catch (error) {
-    return res.status(500).json({ message: error.message || "Upload failed" });
-  }
-};

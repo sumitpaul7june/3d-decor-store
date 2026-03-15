@@ -1,4 +1,4 @@
-// Modal form for adding or editing a product in the admin UI.
+// Modal form for adding or editing a physical product in the admin UI.
 import { useEffect, useState } from "react";
 import axios from "../../api/axios";
 import "./ProductModal.css";
@@ -16,13 +16,10 @@ function ProductModal({ isOpen, onClose, onSave, initialData }) {
   const [form, setForm] = useState({
     name: "",
     description: "",
-    type: "stl",
     category: "lighting",
     price: "",
     originalPrice: "",
-    imageUrls: [],
-    stlImageUrl: "",
-    stlFile: ""
+    imageUrls: []
   });
   // Form-level error message shown near inputs.
   const [formError, setFormError] = useState("");
@@ -40,15 +37,10 @@ function ProductModal({ isOpen, onClose, onSave, initialData }) {
     setForm({
       name: initialData?.name || "",
       description: initialData?.description || "",
-      type: initialData?.type || "stl",
       category: initialData?.category || "lighting",
       price: initialData?.price || "",
       originalPrice: initialData?.originalPrice || "",
-      imageUrls:
-        (initialData?.type || "stl") === "physical" ? initialImages.slice(0, 4) : [],
-      stlImageUrl:
-        (initialData?.type || "stl") === "stl" ? initialImages[0] || "" : "",
-      stlFile: initialData?.stlFile || ""
+      imageUrls: initialImages.slice(0, 4)
     });
     setFormError("");
     setImageUploading(false);
@@ -57,37 +49,14 @@ function ProductModal({ isOpen, onClose, onSave, initialData }) {
   if (!isOpen) return null;
 
   const handleChange = (e) => {
-    // Generic handler for text/select/number inputs.
+    // Generic handler for text/number inputs.
     const { name, value } = e.target;
-    setForm((prev) => {
-      if (name === "type" && value === "physical") {
-        return {
-          ...prev,
-          type: value,
-          imageUrls:
-            prev.imageUrls.length > 0
-              ? prev.imageUrls
-              : prev.stlImageUrl.trim()
-                ? [prev.stlImageUrl.trim()]
-                : []
-        };
-      }
-
-      if (name === "type" && value === "stl") {
-        return {
-          ...prev,
-          type: value,
-          imageUrls: []
-        };
-      }
-
-      return { ...prev, [name]: value };
-    });
+    setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const uploadFileToBackend = async (file, endpoint) => {
+  const uploadFileToBackend = async (file) => {
     const fileDataUrl = await readFileAsDataUrl(file);
-    const { data } = await axios.post(endpoint, {
+    const { data } = await axios.post("/upload/image", {
       fileDataUrl,
       fileName: file.name
     });
@@ -122,7 +91,7 @@ function ProductModal({ isOpen, onClose, onSave, initialData }) {
         const filesToUpload = validImageFiles.slice(0, remainingSlots);
 
         const uploadedResults = await Promise.all(
-          filesToUpload.map((file) => uploadFileToBackend(file, "/upload/image"))
+          filesToUpload.map((file) => uploadFileToBackend(file))
         );
 
         const uploadedUrls = uploadedResults
@@ -159,50 +128,26 @@ function ProductModal({ isOpen, onClose, onSave, initialData }) {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (form.type === "physical") {
-      if (!Array.isArray(form.imageUrls) || form.imageUrls.length === 0) {
-        setFormError("At least one product image is required");
-        return;
-      }
-
-      if (form.imageUrls.length > 4) {
-        setFormError("Maximum 4 images allowed");
-        return;
-      }
+    if (!Array.isArray(form.imageUrls) || form.imageUrls.length === 0) {
+      setFormError("At least one product image is required");
+      return;
     }
 
-    if (form.type === "stl") {
-      if (!form.stlImageUrl.trim()) {
-        setFormError("Cover image URL is required for STL product");
-        return;
-      }
-
-      if (!form.stlFile.trim()) {
-        setFormError("STL file URL is required for STL product");
-        return;
-      }
+    if (form.imageUrls.length > 4) {
+      setFormError("Maximum 4 images allowed");
+      return;
     }
 
     const payload = {
       // Build payload in backend product schema.
       name: form.name.trim(),
       description: form.description.trim(),
-      type: form.type,
+      type: "physical",
       category: form.category.trim(),
       price: Number(form.price),
       originalPrice: Number(form.originalPrice),
-      images:
-        form.type === "physical"
-          ? form.imageUrls
-          : [form.stlImageUrl.trim()]
+      images: form.imageUrls
     };
-
-    if (form.type === "stl") {
-      // STL products use manual file URL for now.
-      payload.stlFile = form.stlFile.trim();
-      payload.stlFilePublicId = "";
-      payload.stlFileOriginalName = "";
-    }
 
     onSave(payload);
     onClose();
@@ -274,49 +219,27 @@ function ProductModal({ isOpen, onClose, onSave, initialData }) {
           </label>
 
           <div className="modal-grid modal-grid-2">
-            <label htmlFor="type">
+            <label htmlFor="productType">
               Type
-              <select
-                name="type"
-                id="type"
-                value={form.type}
-                onChange={handleChange}
-              >
-                <option value="stl">STL</option>
-                <option value="physical">Physical</option>
-              </select>
+              <input id="productType" value="Physical" disabled />
             </label>
 
-            {form.type === "physical" ? (
-              <label htmlFor="imageFile">
-                Product Images (max 4)
-                <input
-                  id="imageFile"
-                  name="imageFile"
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  onChange={handleImageFileChange}
-                />
-                <span className="modal-helper-text">
-                  {imageUploading
-                    ? "Uploading image(s)..."
-                    : `${form.imageUrls.length}/4 uploaded`}
-                </span>
-              </label>
-            ) : (
-              <label htmlFor="stlImageUrl">
-                Cover Image URL
-                <input
-                  id="stlImageUrl"
-                  name="stlImageUrl"
-                  value={form.stlImageUrl}
-                  onChange={handleChange}
-                  placeholder="https://..."
-                  required
-                />
-              </label>
-            )}
+            <label htmlFor="imageFile">
+              Product Images (max 4)
+              <input
+                id="imageFile"
+                name="imageFile"
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={handleImageFileChange}
+              />
+              <span className="modal-helper-text">
+                {imageUploading
+                  ? "Uploading image(s)..."
+                  : `${form.imageUrls.length}/4 uploaded`}
+              </span>
+            </label>
           </div>
 
           {formError && <p className="modal-form-error">{formError}</p>}
@@ -354,24 +277,7 @@ function ProductModal({ isOpen, onClose, onSave, initialData }) {
             </p>
           )}
 
-          {form.type === "stl" && (
-            <label htmlFor="stlFile">
-              STL File URL
-              <input
-                id="stlFile"
-                name="stlFile"
-                value={form.stlFile}
-                onChange={handleChange}
-                placeholder="https://..."
-                required
-              />
-              <span className="modal-helper-text">
-                STL upload will be added later. Use hosted URL for now.
-              </span>
-            </label>
-          )}
-
-          {form.type === "physical" && form.imageUrls.length > 0 && (
+          {form.imageUrls.length > 0 && (
             // Image preview grid to manage multiple product images.
             <div className="modal-preview">
               <p>Image Preview ({form.imageUrls.length}/4)</p>
@@ -395,19 +301,6 @@ function ProductModal({ isOpen, onClose, onSave, initialData }) {
                   </div>
                 ))}
               </div>
-            </div>
-          )}
-
-          {form.type === "stl" && form.stlImageUrl.trim() && (
-            <div className="modal-preview">
-              <p>Cover Image Preview</p>
-              <img
-                src={form.stlImageUrl}
-                alt="STL cover preview"
-                onError={(e) => {
-                  e.currentTarget.style.display = "none";
-                }}
-              />
             </div>
           )}
 

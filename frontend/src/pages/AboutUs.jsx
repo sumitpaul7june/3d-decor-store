@@ -8,8 +8,8 @@ function AboutUs() {
         <p className="store-info-kicker">About</p>
         <h1 className="store-info-title">About Us</h1>
         <p className="store-info-subtitle">
-          3D Decor Store is built to offer modern digital and physical decor products
-          for creators and homes.
+          3D Decor Store is built to offer modern physical decor products
+          for thoughtful homes.
         </p>
 
         <div className="store-info-grid">
@@ -24,17 +24,17 @@ function AboutUs() {
           <div className="store-info-block">
             <h3>What We Sell</h3>
             <ul>
-              <li>Printable STL files for 3D printing</li>
               <li>Ready-to-use premium physical decor products</li>
               <li>Modern collections for living spaces</li>
+              <li>Statement pieces for shelves, consoles and corners</li>
             </ul>
           </div>
 
           <div className="store-info-block">
             <h3>Our Mission</h3>
             <p>
-              Make beautiful, practical 3D decor accessible to both makers and
-              non-makers through one simple storefront experience.
+              Make beautiful, practical decor accessible through one simple
+              storefront experience.
             </p>
           </div>
         </div>

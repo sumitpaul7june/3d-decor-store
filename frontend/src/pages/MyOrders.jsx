@@ -10,7 +10,6 @@ function MyOrders() {
   const [expandedOrderId, setExpandedOrderId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [downloadingKey, setDownloadingKey] = useState("");
 
   const fetchOrders = async () => {
     // Load current user's orders.
@@ -63,48 +62,6 @@ function MyOrders() {
   const toggleDetails = (orderId) => {
     // Toggle expanded details panel for one order at a time.
     setExpandedOrderId((prev) => (prev === orderId ? null : orderId));
-  };
-
-  const extractDownloadFileName = (contentDisposition, fallbackName = "model.stl") => {
-    const match = /filename="?([^"]+)"?/i.exec(contentDisposition || "");
-    if (match?.[1]) return match[1];
-    return fallbackName;
-  };
-
-  const handleDownloadStl = async (orderId, item) => {
-    const itemId = item?._id;
-    if (!itemId) return;
-
-    const actionKey = `${orderId}-${itemId}`;
-
-    try {
-      setDownloadingKey(actionKey);
-      setError("");
-
-      const response = await axios.get(
-        `/orders/${orderId}/items/${itemId}/download`,
-        { responseType: "blob" }
-      );
-
-      const contentDisposition = response.headers["content-disposition"];
-      const fileName = extractDownloadFileName(
-        contentDisposition,
-        item.stlFileOriginalName || `${item.name || "stl-model"}.stl`
-      );
-
-      const downloadUrl = window.URL.createObjectURL(response.data);
-      const link = document.createElement("a");
-      link.href = downloadUrl;
-      link.download = fileName;
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      window.URL.revokeObjectURL(downloadUrl);
-    } catch (err) {
-      setError(err.response?.data?.message || "Failed to download STL file");
-    } finally {
-      setDownloadingKey("");
-    }
   };
 
   if (loading) {
@@ -224,21 +181,8 @@ function MyOrders() {
                           <div key={`${order._id}-${index}`} className="my-order-item-row">
                             <div className="my-order-item-meta">
                               <span>
-                                {item.name || (item.type || "product").toUpperCase()} • Qty {item.quantity}
+                                {item.name || "Product"} • Qty {item.quantity}
                               </span>
-
-                              {item.type === "stl" && item._id && (
-                                <button
-                                  type="button"
-                                  className="my-order-download-btn"
-                                  onClick={() => handleDownloadStl(order._id, item)}
-                                  disabled={downloadingKey === `${order._id}-${item._id}`}
-                                >
-                                  {downloadingKey === `${order._id}-${item._id}`
-                                    ? "Downloading..."
-                                    : "Download STL"}
-                                </button>
-                              )}
                             </div>
                             <strong>
                               {formatCurrencyINR((item.price || 0) * (item.quantity || 0))}

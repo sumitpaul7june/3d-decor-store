@@ -30,6 +30,7 @@ function Login() {
   // Router helpers
   const navigate = useNavigate();
   const location = useLocation();
+  const successMessage = location.state?.message || "";
 
   // Where to redirect after login (protected page or home).
   let redirectTo;
@@ -99,6 +100,8 @@ function Login() {
       <div className="auth-card">
         <h1>Welcome back</h1>
 
+        {successMessage && <p className="success-message">{successMessage}</p>}
+
         {/* Login form */}
         <form className="auth-form" onSubmit={handleSubmit}>
           <label>
@@ -132,6 +135,12 @@ function Login() {
               </button>
             </div>
           </label>
+
+          <div className="auth-helper-row">
+            <Link to="/forgot-password" className="auth-inline-link">
+              Forgot password?
+            </Link>
+          </div>
 
           {error && <span className="error">{error}</span>}
 

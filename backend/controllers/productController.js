@@ -1,11 +1,9 @@
 import Product from "../models/Product.js";
 
 const buildTypeFilter = (type) => {
-  const filter = {};
-  if (type) {
-    filter.type = type;
-  }
-  return filter;
+  return {
+    type: "physical"
+  };
 };
 
 /*ALL PRODUCT */
@@ -14,10 +12,7 @@ export const getAllProducts=async(req,res)=>{
         const {type}=req.query;
         const filter = buildTypeFilter(type);
 
-        // Keep STL download fields private on public product APIs.
-        const products = await Product.find(filter).select(
-          "-stlFile -stlFilePublicId -stlFileOriginalName"
-        );
+        const products = await Product.find(filter);
         res.json(products);
     } catch (error) {
         res.status(500).json({message:"server error"});
@@ -39,10 +34,10 @@ export const getAllProductsAdmin = async (req, res) => {
 /* ---------- GET PRODUCT BY ID ---------- */
 export const getProductById = async (req, res) => {
   try {
-    // Public product detail should not expose STL direct file metadata.
-    const product = await Product.findById(req.params.id).select(
-      "-stlFile -stlFilePublicId -stlFileOriginalName"
-    );
+    const product = await Product.findOne({
+      _id: req.params.id,
+      type: "physical"
+    });
 
     if (!product) {
       return res.status(404).json({ message: "Product not found" });
@@ -69,12 +64,7 @@ export const createProduct = async (req, res) => {
       return res.status(400).json({ message: "Maximum 4 images allowed per product" });
     }
 
-    // Physical products should not persist STL metadata.
-    if (payload.type !== "stl") {
-      payload.stlFile = "";
-      payload.stlFilePublicId = "";
-      payload.stlFileOriginalName = "";
-    }
+    payload.type = "physical";
 
     const product = await Product.create(payload);
     res.status(201).json(product);
@@ -99,15 +89,13 @@ export const updateProduct = async (req, res) => {
       }
     }
 
-    // Physical products should not persist STL metadata.
-    if (payload.type && payload.type !== "stl") {
-      payload.stlFile = "";
-      payload.stlFilePublicId = "";
-      payload.stlFileOriginalName = "";
-    }
+    payload.type = "physical";
 
-    const product = await Product.findByIdAndUpdate(
-      req.params.id,
+    const product = await Product.findOneAndUpdate(
+      {
+        _id: req.params.id,
+        type: "physical"
+      },
       payload,
       { new: true }
     );

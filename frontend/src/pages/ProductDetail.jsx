@@ -11,7 +11,7 @@ import {
 import "./ProductDetail.css";
 
 function ProductDetail() {
-  // Product id from route /products/:type/:id.
+  // Product id from route /product/:id.
   const { id } = useParams();
   const [openSection, setOpenSection] = useState(null);
   const [addedFeedback, setAddedFeedback] = useState(false);
@@ -62,7 +62,6 @@ function ProductDetail() {
     );
   }
 
-  const isSTL = product.type === "stl";
   const productImage = product.image || product.images?.[0] || "";
 
   const handleAddToCart = async () => {
@@ -110,9 +109,7 @@ function ProductDetail() {
 
           <p className="pd-description">
             {product.description ||
-              (isSTL
-                ? "High-quality STL file for clean 3D prints and modern interiors."
-                : "Premium physical decor product crafted for modern spaces.")}
+              "Premium physical decor product crafted for modern spaces."}
           </p>
 
           <button
@@ -152,9 +149,7 @@ function ProductDetail() {
 
               <div className="pd-accordion-content">
                 <p>
-                  {isSTL
-                    ? "No shipping required. Download available immediately."
-                    : "Ships within 3-5 business days."}
+                  Ships within 3-5 business days.
                 </p>
               </div>
             </div>
@@ -172,9 +167,7 @@ function ProductDetail() {
 
               <div className="pd-accordion-content">
                 <p>
-                  {isSTL
-                    ? "Digital products are non-refundable."
-                    : "7-day return policy on unused items."}
+                  7-day return policy on unused items.
                 </p>
               </div>
             </div>

@@ -22,8 +22,8 @@ const orderSchema = new mongoose.Schema(
 
         type: {
           type: String,
-          enum: ["stl", "physical"],
-          required: true
+          enum: ["physical"],
+          default: "physical"
         },
 
         quantity: {
@@ -34,20 +34,6 @@ const orderSchema = new mongoose.Schema(
         price: {
           type: Number,
           required: true
-        },
-
-        // Snapshot of STL download metadata at purchase time.
-        // This keeps customer downloads stable even if product changes later.
-        stlFile: {
-          type: String
-        },
-
-        stlFilePublicId: {
-          type: String
-        },
-
-        stlFileOriginalName: {
-          type: String
         }
       }
     ],

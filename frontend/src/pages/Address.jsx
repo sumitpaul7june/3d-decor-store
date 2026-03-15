@@ -650,7 +650,7 @@ function Address() {
 
                 <div className="summary-item-meta">
                   <p className="summary-item-name">{item.name}</p>
-                  <p className="summary-item-type">{item.type === "stl" ? "STL File" : "Physical"}</p>
+                  <p className="summary-item-type">Physical Product</p>
                 </div>
 
                 <p className="summary-item-price">
