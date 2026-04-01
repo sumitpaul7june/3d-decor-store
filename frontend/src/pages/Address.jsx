@@ -382,8 +382,11 @@ function Address() {
         {/* Left pane: contact + delivery + payment mock section */}
         <div className="checkout-main-pane">
           <header className="checkout-head">
-            <p className="checkout-breadcrumb">Cart / Checkout / Payment</p>
-            <h2>Checkout</h2>
+            <p className="checkout-breadcrumb">QALARAHI / Secure Checkout</p>
+            <h2>Secure checkout</h2>
+            <p className="checkout-head-copy">
+              Finalize delivery, payment, and your order summary in one calm flow.
+            </p>
           </header>
 
           {/* Global API error */}
@@ -628,12 +631,20 @@ function Address() {
             onClick={handlePlaceOrder}
             disabled={!selectedAddressId || placingOrder}
           >
-            {placingOrder ? "Placing order..." : "Review order"}
+            {placingOrder ? "Placing order..." : "Place secure order"}
           </button>
         </div>
 
         {/* Right pane: order summary */}
         <aside className="checkout-summary-pane">
+          <div className="summary-head">
+            <p className="summary-kicker">Order Summary</p>
+            <h3>Review your selection</h3>
+            <p className="summary-head-copy">
+              Taxes are included. Complimentary delivery is shown once you confirm the address.
+            </p>
+          </div>
+
           <div className="summary-items">
             {cartItems.map((item) => (
               <div key={item.id} className="summary-item-row">
@@ -693,6 +704,12 @@ function Address() {
               <span>{formatCurrencyINR(priceSummary.finalTotal)}</span>
             </div>
           </div>
+
+          <p className="summary-support-note">
+            Need help before you place the order? Our concierge can guide you at
+            {" "}
+            <a href="mailto:hello@qalarahi.com">hello@qalarahi.com</a>.
+          </p>
         </aside>
       </div>
     </section>

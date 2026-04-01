@@ -11,13 +11,16 @@ import {
   removeCart
 } from "../store/cartSlice";
 import { normalizeServerCart } from "../utils/cartHelpers";
+import { formatCurrencyINR } from "../utils/formatters";
 
 function CartDrawer({ isOpen, onClose }) {
+  const MAX_CART_ITEM_QUANTITY = 10;
   // Cart and auth data from Redux.
   const items = useSelector((state) => state.cart.items);
   const isLoggedIn = useSelector((state) => state.auth.isAuthenticated);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const totalItems = items.reduce((sum, item) => sum + item.qty, 0);
 
   const fetchCart = async () => {
     // Fetch server cart when drawer opens for logged-in users.
@@ -105,7 +108,7 @@ function CartDrawer({ isOpen, onClose }) {
         <div className="cart-header">
           <div>
             <h3>My Cart</h3>
-            <span className="cart-subtext">{items.length} items</span>
+            <span className="cart-subtext">{totalItems} pieces selected</span>
           </div>
           <button className="close-btn" onClick={onClose}>
             ✕
@@ -118,9 +121,15 @@ function CartDrawer({ isOpen, onClose }) {
             <div className="empty-cart">
               <p className="empty-title">Your cart is empty</p>
               <p className="empty-subtext">
-                Looks like you haven’t added anything yet
+                Start with a few pieces and we will hold them here while you edit your space.
               </p>
-              <button className="browse-btn" onClick={onClose}>
+              <button
+                className="browse-btn"
+                onClick={() => {
+                  onClose();
+                  navigate("/products");
+                }}
+              >
                 Continue shopping
               </button>
             </div>
@@ -128,9 +137,30 @@ function CartDrawer({ isOpen, onClose }) {
             items.map((item) => (
               // One cart line item
               <div key={item.id} className="cart-item">
+                <div className="cart-item-media">
+                  {item.image ? (
+                    <img
+                      src={item.image}
+                      alt={item.name}
+                      onError={(e) => {
+                        e.currentTarget.src =
+                          "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 300'><rect width='240' height='300' fill='%23f7f5f0'/><text x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%23777777' font-family='Arial' font-size='28'>Q</text></svg>";
+                      }}
+                    />
+                  ) : (
+                    <span className="cart-item-fallback">
+                      {(item.name || "Q").charAt(0).toUpperCase()}
+                    </span>
+                  )}
+                </div>
+
                 <div className="cart-item-info">
                   <p className="name">{item.name}</p>
-                  <p className="price">₹{item.price}</p>
+                  <p className="cart-item-meta">Selected for your QALARAHI home edit</p>
+                  <p className="price">{formatCurrencyINR(item.price * item.qty)}</p>
+                  <p className="cart-item-unit-price">
+                    {formatCurrencyINR(item.price)} each
+                  </p>
                   <button
                     className="remove-btn"
                     onClick={() => removeItem(item.id)}
@@ -142,7 +172,13 @@ function CartDrawer({ isOpen, onClose }) {
                 <div className="cart-qty">
                   <button onClick={() => updateQty(item.id, item.qty - 1)}>-</button>
                   <span>{item.qty}</span>
-                  <button onClick={() => updateQty(item.id, item.qty + 1)}>+</button>
+                  <button
+                    onClick={() => updateQty(item.id, item.qty + 1)}
+                    disabled={item.qty >= MAX_CART_ITEM_QUANTITY}
+                    title={item.qty >= MAX_CART_ITEM_QUANTITY ? "Maximum quantity reached" : "Increase quantity"}
+                  >
+                    +
+                  </button>
                 </div>
               </div>
             ))
@@ -153,9 +189,12 @@ function CartDrawer({ isOpen, onClose }) {
         <div className="cart-footer">
           <div className="subtotal">
             <span>Subtotal</span>
-            <strong>₹{subtotal}</strong>
+            <strong>{formatCurrencyINR(subtotal)}</strong>
           </div>
-          <button className="checkout-btn" onClick={handleCheckout}>
+          <p className="cart-footer-note">
+            Shipping, delivery windows, and payment review appear in the next step.
+          </p>
+          <button className="checkout-btn" onClick={handleCheckout} disabled={!items.length}>
             Proceed to Checkout
           </button>
         </div>

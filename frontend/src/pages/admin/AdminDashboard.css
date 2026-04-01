@@ -15,14 +15,16 @@
   font-size: 11px;
   color: #9ca3af;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.14em;
+  font-weight: 600;
 }
 
 .dashboard-title {
-  font-size: 28px;
+  font-size: 26px;
   font-weight: 600;
   color: #111827;
-  line-height: 1.05;
+  line-height: 1.08;
+  letter-spacing: -0.035em;
 }
 
 .dashboard-refresh-btn {
@@ -79,14 +81,16 @@
   font-size: 11px;
   color: #6b7280;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.12em;
+  font-weight: 600;
 }
 
 .card-value {
-  font-size: 24px;
+  font-size: 22px;
   font-weight: 600;
   color: #111827;
-  line-height: 1.2;
+  line-height: 1.15;
+  letter-spacing: -0.025em;
 }
 
 .dashboard-layout {
@@ -112,6 +116,7 @@
 .dashboard-panel-title {
   font-size: 15px;
   font-weight: 600;
+  letter-spacing: -0.02em;
 }
 
 .dashboard-panel-meta {
@@ -157,6 +162,7 @@
 .order-customer {
   font-size: 13px;
   color: #111827;
+  font-weight: 500;
 }
 
 .order-date {
@@ -212,7 +218,8 @@
 }
 
 .insight-row strong {
-  font-size: 14px;
+  font-size: 15px;
+  font-weight: 600;
   color: #111827;
 }
 

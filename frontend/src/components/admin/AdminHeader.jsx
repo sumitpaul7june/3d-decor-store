@@ -34,7 +34,7 @@ function AdminHeader() {
       <div className="admin-header-left">
         <p className="admin-header-kicker">Store Admin</p>
         <h1 className="admin-header-title">
-          <Link to="/admin">3D Decor Control</Link>
+          <Link to="/admin">QALARAHI Control</Link>
         </h1>
       </div>
 

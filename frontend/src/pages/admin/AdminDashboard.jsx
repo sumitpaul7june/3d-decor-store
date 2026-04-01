@@ -10,7 +10,8 @@ function AdminDashboard() {
     const [stats, setStats] = useState({
       totalOrders: 0,
       products: 0,
-      customers: 0,
+      users: 0,
+      loggedInUsers: 0,
       revenue: 0,
       pending: 0,
       paidOrders: 0,
@@ -26,16 +27,15 @@ function AdminDashboard() {
         try {
           setLoading(true);
           setError("");
-          const [ordersRes, productsRes] = await Promise.all([
+          const [ordersRes, productsRes, usersRes] = await Promise.all([
             axios.get("/orders"),
-            axios.get("/products")
+            axios.get("/products/admin/all"),
+            axios.get("/users/admin/all")
           ]);
 
           const orders = ordersRes.data || [];
           const products = productsRes.data || [];
-          const uniqueCustomers = new Set(
-            orders.map((order) => order.user?._id || order.user).filter(Boolean)
-          );
+          const users = usersRes.data || [];
           const nonCancelledOrders = orders.filter(
             (order) => order.orderStatus !== "Cancelled"
           );
@@ -58,7 +58,8 @@ function AdminDashboard() {
           setStats({
             totalOrders: orders.length,
             products: products.length,
-            customers: uniqueCustomers.size,
+            users: users.length,
+            loggedInUsers: users.filter((user) => Number(user.loginCount || 0) > 0).length,
             revenue,
             pending,
             paidOrders,
@@ -70,7 +71,8 @@ function AdminDashboard() {
           setStats({
             totalOrders: 0,
             products: 0,
-            customers: 0,
+            users: 0,
+            loggedInUsers: 0,
             revenue: 0,
             pending: 0,
             paidOrders: 0,
@@ -90,7 +92,8 @@ function AdminDashboard() {
       { label: "Revenue", value: formatCurrencyINR(stats.revenue), tone: "revenue" },
       { label: "Pending Orders", value: stats.pending, tone: "warning" },
       { label: "Products", value: stats.products, tone: "neutral" },
-      { label: "Customers", value: stats.customers, tone: "neutral" },
+      { label: "Users", value: stats.users, tone: "neutral" },
+      { label: "Logged In Users", value: stats.loggedInUsers, tone: "info" },
       { label: "Avg. Order Value", value: formatCurrencyINR(stats.avgOrderValue), tone: "info" }
     ];
 

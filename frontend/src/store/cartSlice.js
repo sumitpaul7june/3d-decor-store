@@ -1,6 +1,8 @@
 // Cart slice with add/remove and quantity controls.
 import { createSlice } from "@reduxjs/toolkit";
 
+const MAX_CART_ITEM_QUANTITY = 10;
+
 const initialState = {
     // Unified cart item shape: { id, name, price, originalPrice, type, image, qty }
     items: [],
@@ -13,18 +15,22 @@ const cartSlice = createSlice({
 
         setCartFromServer(state, action) {
             // Replace local cart with normalized server cart.
-            state.items = action.payload || [];
+            state.items = (action.payload || []).map((item) => ({
+                ...item,
+                qty: Math.min(Number(item.qty || 1), MAX_CART_ITEM_QUANTITY)
+            }));
 
         },
         addToCart(state, action) {
             // If item exists, increment quantity; otherwise add new entry.
             const item = action.payload;
+            const quantityToAdd = Math.min(Number(item.qty || 1), MAX_CART_ITEM_QUANTITY);
             const existing = state.items.find(i => i.id === item.id)
             if (existing) {
-                existing.qty += 1;
+                existing.qty = Math.min(existing.qty + quantityToAdd, MAX_CART_ITEM_QUANTITY);
             }
             else {
-                state.items.push({ ...item, qty: 1 });
+                state.items.push({ ...item, qty: quantityToAdd });
 
             }
 
@@ -38,7 +44,7 @@ const cartSlice = createSlice({
         increaseQty(state, action) {
             // Increase quantity of one item by id.
             const item = state.items.find(i => i.id === action.payload);
-            if (item) {
+            if (item && item.qty < MAX_CART_ITEM_QUANTITY) {
                 item.qty += 1;
             }
         },

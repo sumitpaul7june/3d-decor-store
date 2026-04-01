@@ -9,10 +9,11 @@ function CheckoutSuccess() {
   return (
     <section className="checkout-success-page">
       <article className="checkout-success-card">
-        <p className="checkout-success-kicker">Checkout</p>
-        <h2>Order placed successfully</h2>
+        <span className="checkout-success-badge">✓</span>
+        <p className="checkout-success-kicker">QALARAHI Checkout</p>
+        <h2>Your order is confirmed</h2>
         <p className="checkout-success-text">
-          Your order has been created and is awaiting payment confirmation.
+          Thank you for choosing QALARAHI. We have received your order and will share shipping updates as soon as it is prepared.
         </p>
         {/* Show order id only when present in URL */}
         {orderId && (

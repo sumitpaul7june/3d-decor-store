@@ -89,10 +89,30 @@ function Signup() {
     }
   };
 
+  const handleGoogleSignup = async (credential) => {
+    try {
+      dispatch(loginStart());
+      setErrors({});
+
+      const { data } = await axios.post("/auth/google", { credential });
+      dispatch(loginSuccess(data));
+      navigate("/", { replace: true });
+    } catch (err) {
+      const rawMessage = err.response?.data?.message;
+      const message = mapAuthErrorMessage(rawMessage);
+      dispatch(loginFailure(message));
+      setErrors({ api: message });
+    }
+  };
+
   return (
     <section className="auth-page">
       <div className="auth-card">
+        <p className="auth-kicker">QALARAHI</p>
         <h1>Create account</h1>
+        <p className="auth-helper-text">
+          Create your account.
+        </p>
 
         {/* Signup form */}
         <form className="auth-form" onSubmit={handleSubmit}>
@@ -176,7 +196,12 @@ function Signup() {
             </button>
             {/* Divider + social auth option */}
             <div className="auth-divider">or</div>
-            <GoogleAuthButton text="Sign up with Google" />
+            <GoogleAuthButton
+              text="Sign up with Google"
+              onSuccess={handleGoogleSignup}
+              onError={(message) => setErrors({ api: message })}
+              disabled={loading}
+            />
           </div>
         </form>
 

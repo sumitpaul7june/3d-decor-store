@@ -1,5 +1,5 @@
-// Product details page with add-to-cart and accordion sections.
-import { useParams } from "react-router-dom";
+// Product details page with image-first layout, cleaner purchase controls, and structured description content.
+import { Link, useParams, useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { addToCart, setCartFromServer } from "../store/cartSlice";
@@ -8,33 +8,102 @@ import {
   buildCartItemFromProduct,
   normalizeServerCart
 } from "../utils/cartHelpers";
+import { getProductPresentation } from "../utils/productPresentation";
+import {
+  buildProductPath,
+  getProductIdFromRouteParam
+} from "../utils/productRoutes";
 import "./ProductDetail.css";
 
+const toFinishClass = (finishName = "") =>
+  `swatch-${finishName.toLowerCase().replace(/\s+/g, "-")}`;
+
+const parseInfoBlocks = (content = "") => {
+  const lines = String(content)
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean);
+
+  const blocks = [];
+  let currentList = [];
+
+  lines.forEach((line) => {
+    const isBullet = /^[-*•]/.test(line);
+
+    if (isBullet) {
+      currentList.push(line.replace(/^[-*•]\s*/, ""));
+      return;
+    }
+
+    if (currentList.length > 0) {
+      blocks.push({ type: "list", items: currentList });
+      currentList = [];
+    }
+
+    blocks.push({ type: "paragraph", text: line });
+  });
+
+  if (currentList.length > 0) {
+    blocks.push({ type: "list", items: currentList });
+  }
+
+  return blocks;
+};
+
+const renderInfoBlocks = (content, fallback) => {
+  const blocks = parseInfoBlocks(content || fallback);
+
+  return blocks.map((block, index) =>
+    block.type === "list" ? (
+      <ul key={`list-${index}`}>
+        {block.items.map((item, itemIndex) => (
+          <li key={`${item}-${itemIndex}`}>{item}</li>
+        ))}
+      </ul>
+    ) : (
+      <p key={`paragraph-${index}`}>{block.text}</p>
+    )
+  );
+};
+
 function ProductDetail() {
-  // Product id from route /product/:id.
-  const { id } = useParams();
-  const [openSection, setOpenSection] = useState(null);
+  const MAX_CART_ITEM_QUANTITY = 10;
+  const { productSlug } = useParams();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [openSection, setOpenSection] = useState("description");
   const [addedFeedback, setAddedFeedback] = useState(false);
   const [product, setProduct] = useState(null);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [selectedFinish, setSelectedFinish] = useState("");
+  const [selectedStyle, setSelectedStyle] = useState("");
+  const [quantity, setQuantity] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [storePolicies, setStorePolicies] = useState({
+    shippingInfo: "",
+    returnPolicy: ""
+  });
   const dispatch = useDispatch();
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
 
-  const showAddedFeedback = () => {
-    setAddedFeedback(true);
-    window.setTimeout(() => setAddedFeedback(false), 900);
-  };
-
   useEffect(() => {
-    // Load selected product details from backend.
     const fetchProduct = async () => {
       try {
         setLoading(true);
         setError("");
 
-        const { data } = await axios.get(`/products/${id}`);
-        setProduct(data);
+        const productId = getProductIdFromRouteParam(productSlug);
+        const [productResponse, policiesResponse] = await Promise.all([
+          axios.get(`/products/${productId}`),
+          axios.get("/store-policies").catch(() => ({ data: null }))
+        ]);
+
+        setProduct(productResponse.data);
+        setStorePolicies({
+          shippingInfo: policiesResponse.data?.shippingInfo || "",
+          returnPolicy: policiesResponse.data?.returnPolicy || ""
+        });
       } catch (err) {
         setError(err.response?.data?.message || "Failed to load product");
       } finally {
@@ -43,10 +112,27 @@ function ProductDetail() {
     };
 
     fetchProduct();
-  }, [id]);
+  }, [productSlug]);
+
+  useEffect(() => {
+    if (!product) {
+      return;
+    }
+
+    const canonicalPath = buildProductPath(product);
+
+    if (location.pathname !== canonicalPath) {
+      navigate(canonicalPath, { replace: true });
+    }
+
+    const presentation = getProductPresentation(product);
+    setSelectedImageIndex(0);
+    setSelectedFinish(presentation.finishes[0]?.name || "");
+    setSelectedStyle(presentation.styleOptions[0] || "");
+    setQuantity(1);
+  }, [product, location.pathname, navigate]);
 
   const toggle = (section) => {
-    // Open/close accordion section.
     setOpenSection(openSection === section ? null : section);
   };
 
@@ -62,113 +148,259 @@ function ProductDetail() {
     );
   }
 
-  const productImage = product.image || product.images?.[0] || "";
+  const presentation = getProductPresentation(product);
+  const gallery = presentation.gallery;
+  const activeImage = gallery[selectedImageIndex] || presentation.featuredImage;
+  const originalPrice = product.originalPrice || product.price;
+  const savings = Math.max(originalPrice - product.price, 0);
+  const shippingInfo =
+    storePolicies.shippingInfo ||
+    "Ships within 3-5 business days with secure packaging for premium decor pieces.\n- Delivery available across India\n- Transit-safe packaging included\n- Delivery updates shared once your order is dispatched";
+  const returnPolicy =
+    storePolicies.returnPolicy ||
+    "Returns are accepted within 7 days for unused pieces in original condition.\n- Replacement support is available for transit damage\n- Custom or final-sale pieces can be marked non-returnable\n- Reach our concierge team for return assistance";
 
-  const handleAddToCart = async () => {
-    // Guests use local cart, logged-in users use backend cart.
+  const showAddedFeedback = () => {
+    setAddedFeedback(true);
+    window.setTimeout(() => setAddedFeedback(false), 900);
+  };
+
+  const syncCart = async () => {
     if (!isAuthenticated) {
-      dispatch(addToCart(buildCartItemFromProduct(product)));
+      dispatch(addToCart(buildCartItemFromProduct(product, quantity)));
       showAddedFeedback();
       return;
     }
 
-    try {
-      await axios.post("/cart/add", {
-        productId: product._id,
-        quantity: 1
-      });
+    await axios.post("/cart/add", {
+      productId: product._id,
+      quantity
+    });
 
-      const { data } = await axios.get("/cart");
-      dispatch(setCartFromServer(normalizeServerCart(data)));
-      showAddedFeedback();
+    const { data } = await axios.get("/cart");
+    dispatch(setCartFromServer(normalizeServerCart(data)));
+    showAddedFeedback();
+  };
+
+  const handleAddToCart = async () => {
+    try {
+      await syncCart();
     } catch (err) {
       console.error("Add to cart failed:", err.response?.data?.message || err.message);
     }
   };
 
+  const handleBuyNow = async () => {
+    try {
+      await syncCart();
+      navigate("/checkout/address");
+    } catch (err) {
+      console.error("Buy now failed:", err.response?.data?.message || err.message);
+    }
+  };
+
+  const handlePrevImage = () => {
+    setSelectedImageIndex((prev) => (prev - 1 + gallery.length) % gallery.length);
+  };
+
+  const handleNextImage = () => {
+    setSelectedImageIndex((prev) => (prev + 1) % gallery.length);
+  };
+
   return (
     <section className="product-detail">
+      <div className="pd-breadcrumb">
+        <Link to="/">Home</Link>
+        <span>/</span>
+        <Link to="/products">Products</Link>
+        <span>/</span>
+        <span>{product.name}</span>
+      </div>
+
       <div className="pd-grid">
-        {/* Left column: product image */}
-        <div className="pd-images">
-          <img
-            src={productImage}
-            alt={product.name}
-            className="pd-main-image"
-          />
-        </div>
+        <div className="pd-media-column">
+          <div className="pd-main-stage">
+            {gallery.length > 1 && (
+              <button className="pd-gallery-nav prev" onClick={handlePrevImage}>
+                ‹
+              </button>
+            )}
 
-        {/* Right column: details + CTA + accordion */}
-        <div className="pd-info">
-          <h1 className="pd-title">{product.name}</h1>
+            <img
+              src={activeImage}
+              alt={product.name}
+              className="pd-main-image"
+              onError={(e) => {
+                e.currentTarget.src =
+                  gallery[1] ||
+                  "https://via.placeholder.com/900x1080?text=Image+Unavailable";
+              }}
+            />
 
-          <div className="pd-price">
-            <span className="pd-current">₹{product.price}</span>
-            <span className="pd-original">₹{product.originalPrice}</span>
+            {gallery.length > 1 && (
+              <button className="pd-gallery-nav next" onClick={handleNextImage}>
+                ›
+              </button>
+            )}
           </div>
 
-          <p className="pd-description">
-            {product.description ||
-              "Premium physical decor product crafted for modern spaces."}
-          </p>
+          <div className="pd-thumbnails">
+            {gallery.map((image, index) => (
+              <button
+                key={`${image}-${index}`}
+                className={`pd-thumbnail ${index === selectedImageIndex ? "active" : ""}`}
+                onClick={() => setSelectedImageIndex(index)}
+              >
+                <img src={image} alt={`${product.name} preview ${index + 1}`} />
+              </button>
+            ))}
+          </div>
+        </div>
 
-          <button
-            className={`pd-primary-btn ${addedFeedback ? "added" : ""}`}
-            onClick={handleAddToCart}
-          >
-            {addedFeedback ? "Added to Cart ✓" : "Add to Cart"}
+        <div className="pd-info">
+          <p className="pd-collection">{presentation.categoryLabel}</p>
+          <h1 className="pd-title">{product.name}</h1>
+          <p className="pd-subcopy">{presentation.shortDescription}</p>
+
+          <div className="pd-rating-row">
+            <span className="pd-stars">★★★★★</span>
+            <span>{presentation.trustNote}</span>
+          </div>
+
+          <div className="pd-price-row">
+            <div className="pd-price-block">
+              {originalPrice > product.price && (
+                <span className="pd-original">₹{originalPrice}</span>
+              )}
+              <span className="pd-current">₹{product.price}</span>
+              {savings > 0 && (
+                <span className="pd-save-chip">SAVE ₹{savings.toLocaleString("en-IN")}</span>
+              )}
+            </div>
+          </div>
+
+          <p className="pd-tax-note">Inclusive of all taxes. Ships across India.</p>
+
+          <div className="pd-option-group">
+            <div className="pd-option-row">
+              <span className="pd-option-label">Finish</span>
+              <span className="pd-option-value">{selectedFinish}</span>
+            </div>
+
+            <div className="pd-finish-list">
+              {presentation.finishes.map((finish) => (
+                <button
+                  key={finish.name}
+                  className={`pd-finish-btn ${
+                    selectedFinish === finish.name ? "active" : ""
+                  }`}
+                  onClick={() => setSelectedFinish(finish.name)}
+                >
+                  <span className={`pd-finish-swatch ${toFinishClass(finish.name)}`} />
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="pd-option-group">
+            <div className="pd-option-row">
+              <span className="pd-option-label">Style</span>
+            </div>
+
+            <div className="pd-style-list">
+              {presentation.styleOptions.map((option) => (
+                <button
+                  key={option}
+                  className={`pd-style-btn ${selectedStyle === option ? "active" : ""}`}
+                  onClick={() => setSelectedStyle(option)}
+                >
+                  {option}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="pd-actions">
+            <div className="pd-quantity">
+              <button onClick={() => setQuantity((prev) => Math.max(1, prev - 1))}>−</button>
+              <span>{quantity}</span>
+              <button
+                onClick={() => setQuantity((prev) => Math.min(MAX_CART_ITEM_QUANTITY, prev + 1))}
+                disabled={quantity >= MAX_CART_ITEM_QUANTITY}
+                title={quantity >= MAX_CART_ITEM_QUANTITY ? "Maximum quantity reached" : "Increase quantity"}
+              >
+                +
+              </button>
+            </div>
+
+            <button
+              className={`pd-primary-btn ${addedFeedback ? "added" : ""}`}
+              onClick={handleAddToCart}
+            >
+              {addedFeedback ? "Added to Cart ✓" : "Add to cart"}
+            </button>
+          </div>
+
+          <button className="pd-secondary-btn" onClick={handleBuyNow}>
+            Buy it now
           </button>
 
+          <div className="pd-service-list">
+            <div className="pd-service-item">
+              <strong>Offer</strong>
+              <span>
+                {presentation.offer.code}: {presentation.offer.text}
+              </span>
+            </div>
+            <div className="pd-service-item">
+              <strong>Delivery</strong>
+              <span>Secure delivery support across India for decor orders.</span>
+            </div>
+          </div>
+
           <div className="pd-accordion">
-            {/* Description accordion item */}
-            <div
-              className={`pd-accordion-item ${
-                openSection === "description" ? "open" : ""
-              }`}
-            >
+            <div className={`pd-accordion-item ${openSection === "description" ? "open" : ""}`}>
               <button onClick={() => toggle("description")}>
                 Description
-                <span>{openSection === "description" ? "-" : "+"}</span>
+                <span>{openSection === "description" ? "−" : "+"}</span>
               </button>
 
               <div className="pd-accordion-content">
-                <p>{product.description || "No description available."}</p>
+                <div className="pd-description-copy">
+                  <p>{presentation.description}</p>
+
+                  <ul>
+                    {presentation.detailPoints.map((point) => (
+                      <li key={point}>{point}</li>
+                    ))}
+                  </ul>
+                </div>
               </div>
             </div>
 
-            {/* Shipping accordion item */}
-            <div
-              className={`pd-accordion-item ${
-                openSection === "shipping" ? "open" : ""
-              }`}
-            >
+            <div className={`pd-accordion-item ${openSection === "shipping" ? "open" : ""}`}>
               <button onClick={() => toggle("shipping")}>
-                Shipping
-                <span>{openSection === "shipping" ? "-" : "+"}</span>
+                Shipping Information
+                <span>{openSection === "shipping" ? "−" : "+"}</span>
               </button>
 
               <div className="pd-accordion-content">
-                <p>
-                  Ships within 3-5 business days.
-                </p>
+                <div className="pd-description-copy">
+                  {renderInfoBlocks(shippingInfo)}
+                </div>
               </div>
             </div>
 
-            {/* Returns accordion item */}
-            <div
-              className={`pd-accordion-item ${
-                openSection === "returns" ? "open" : ""
-              }`}
-            >
+            <div className={`pd-accordion-item ${openSection === "returns" ? "open" : ""}`}>
               <button onClick={() => toggle("returns")}>
-                Returns
-                <span>{openSection === "returns" ? "-" : "+"}</span>
+                Return Policy
+                <span>{openSection === "returns" ? "−" : "+"}</span>
               </button>
 
               <div className="pd-accordion-content">
-                <p>
-                  7-day return policy on unused items.
-                </p>
+                <div className="pd-description-copy">
+                  {renderInfoBlocks(returnPolicy)}
+                </div>
               </div>
             </div>
           </div>

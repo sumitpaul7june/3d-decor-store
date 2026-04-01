@@ -95,10 +95,30 @@ function Login() {
    
   };
 
+  const handleGoogleLogin = async (credential) => {
+    try {
+      dispatch(loginStart());
+      setError("");
+
+      const { data } = await axios.post("/auth/google", { credential });
+      dispatch(loginSuccess(data));
+      navigate(redirectTo, { replace: true });
+    } catch (err) {
+      const rawMessage = err.response?.data?.message;
+      const message = mapAuthErrorMessage(rawMessage);
+      dispatch(loginFailure(message));
+      setError(message);
+    }
+  };
+
   return (
     <section className="auth-page">
       <div className="auth-card">
+        <p className="auth-kicker">QALARAHI</p>
         <h1>Welcome back</h1>
+        <p className="auth-helper-text">
+          Sign in to your account.
+        </p>
 
         {successMessage && <p className="success-message">{successMessage}</p>}
 
@@ -152,7 +172,12 @@ function Login() {
             {/* Divider + social auth option */}
             <div className="auth-divider">or</div>
 
-            <GoogleAuthButton text="Login with Google" />
+            <GoogleAuthButton
+              text="Login with Google"
+              onSuccess={handleGoogleLogin}
+              onError={setError}
+              disabled={loading}
+            />
           </div>
         </form>
 

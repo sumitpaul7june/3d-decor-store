@@ -23,7 +23,10 @@ import Contact from "./pages/Contact";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TrackOrder from "./pages/TrackOrder";
 import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminHomeContent from "./pages/admin/AdminHomeContent";
 import AdminProducts from "./pages/admin/AdminProducts";
+import AdminStorePolicies from "./pages/admin/AdminStorePolicies";
+import AdminUsers from "./pages/admin/AdminUsers";
 
 // Route guards
 import ProtectedRoute from "./routes/ProtectedRoute";
@@ -57,7 +60,7 @@ const router = createBrowserRouter([
 
       // Product browsing pages are always public.
       { path: "products", element: <Products /> },
-      { path: "product/:id", element: <ProductDetail /> },
+      { path: "product/:productSlug", element: <ProductDetail /> },
       { path: "about", element: <AboutUs /> },
       { path: "contact", element: <Contact /> },
       { path: "privacy-policy", element: <PrivacyPolicy /> },
@@ -89,8 +92,11 @@ const router = createBrowserRouter([
         element: <AdminLayout />,
         children: [
           { index: true, element: <AdminDashboard /> },
+          { path: "home-content", element: <AdminHomeContent /> },
+          { path: "store-policies", element: <AdminStorePolicies /> },
           { path: "products", element: <AdminProducts /> },
           { path: "orders", element: <AdminOrders /> },
+          { path: "users", element: <AdminUsers /> },
         ],
       },
     ],

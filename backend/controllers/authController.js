@@ -2,6 +2,7 @@ import User from "../models/User.js";
 import bcrypt from "bcryptjs";
 import generateToken from "../utils/generateToken.js";
 import crypto from "crypto";
+import jwt from "jsonwebtoken";
 import nodemailer from "nodemailer";
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -14,6 +15,56 @@ const cookieOptions = {
   sameSite: "strict",
   maxAge: 7 * 24 * 60 * 60 * 1000
 };
+
+const GOOGLE_CERTS_URL = "https://www.googleapis.com/oauth2/v1/certs";
+
+const verifyGoogleCredential = async (credential) => {
+  const googleClientId = (process.env.GOOGLE_CLIENT_ID || "").trim();
+
+  if (!googleClientId) {
+    throw new Error("GOOGLE_CLIENT_ID is not configured");
+  }
+
+  const decodedToken = jwt.decode(credential, { complete: true });
+  const keyId = decodedToken?.header?.kid;
+
+  if (!keyId) {
+    throw new Error("Invalid Google credential");
+  }
+
+  const certsResponse = await fetch(GOOGLE_CERTS_URL);
+
+  if (!certsResponse.ok) {
+    throw new Error("Failed to fetch Google signing certificates");
+  }
+
+  const certs = await certsResponse.json();
+  const signingKey = certs[keyId];
+
+  if (!signingKey) {
+    throw new Error("Google signing key not found");
+  }
+
+  const payload = jwt.verify(credential, signingKey, {
+    algorithms: ["RS256"],
+    audience: googleClientId,
+    issuer: ["accounts.google.com", "https://accounts.google.com"]
+  });
+
+  const isEmailVerified =
+    payload?.email_verified === true || payload?.email_verified === "true";
+
+  if (!payload?.email || !isEmailVerified) {
+    throw new Error("Google account email is not verified");
+  }
+
+  return payload;
+};
+
+const buildLoginTracking = (count = 0) => ({
+  loginCount: count + 1,
+  lastLoginAt: new Date()
+});
 
 export const registerUser = async (req, res) => {
   try {
@@ -56,7 +107,8 @@ export const registerUser = async (req, res) => {
     const user = await User.create({
       name,
       email,
-      password: hashedPassword
+      password: hashedPassword,
+      ...buildLoginTracking()
     });
 
     const token = generateToken(user._id);
@@ -113,6 +165,9 @@ export const loginUser = async (req, res) => {
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
+    Object.assign(user, buildLoginTracking(user.loginCount));
+    await user.save();
+
     const token = generateToken(user._id);
 
     res.cookie("token", token, cookieOptions);
@@ -124,7 +179,17 @@ export const loginUser = async (req, res) => {
       role: user.role
     });
   } catch (error) {
-    return res.status(500).json({ message: "Server Error" });
+    console.error("GOOGLE LOGIN ERROR:", error);
+
+    const message = error?.message || "Google authentication failed";
+    const isExpectedGoogleError =
+      message.includes("Google") ||
+      message.includes("credential") ||
+      message.includes("email") ||
+      message.includes("configured") ||
+      message.includes("signing key");
+
+    return res.status(isExpectedGoogleError ? 400 : 500).json({ message });
   }
 };
 
@@ -139,7 +204,18 @@ export const logoutUser = (req, res) => {
 
 export const googleLogin = async (req, res) => {
   try {
-    let { name, email, googleId, photo } = req.body;
+    const credential = req.body.credential || "";
+
+    if (!credential) {
+      return res.status(400).json({ message: "Google credential is required" });
+    }
+
+    const googleUser = await verifyGoogleCredential(credential);
+
+    let name = (googleUser.name || "").trim();
+    let email = (googleUser.email || "").trim().toLowerCase();
+    let googleId = googleUser.sub;
+    let photo = googleUser.picture || "";
     email = (email || "").trim().toLowerCase();
 
     if (!email) {
@@ -157,8 +233,21 @@ export const googleLogin = async (req, res) => {
         name,
         email,
         googleId,
-        photo
+        photo,
+        ...buildLoginTracking()
       });
+    } else {
+      if (user.googleId && user.googleId !== googleId) {
+        return res.status(400).json({
+          message: "This email is already linked to a different Google account"
+        });
+      }
+
+      user.googleId = googleId;
+      user.photo = photo || user.photo;
+      user.name = user.name || name;
+      Object.assign(user, buildLoginTracking(user.loginCount));
+      await user.save();
     }
 
     const token = generateToken(user._id);

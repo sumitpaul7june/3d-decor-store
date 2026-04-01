@@ -32,9 +32,9 @@ function AdminSidebar() {
     <aside className="sidebar">
       {/* Brand block */}
       <div className="sidebar-logo">
-        <span className="sidebar-logo-mark">D</span>
+        <span className="sidebar-logo-mark">Q</span>
         <div>
-          <p className="sidebar-logo-title">3D Decor</p>
+          <p className="sidebar-logo-title">QALARAHI</p>
           <p className="sidebar-logo-subtitle">Admin Panel</p>
         </div>
       </div>
@@ -71,11 +71,12 @@ function AdminSidebar() {
         </NavLink>
 
         <NavLink
-          to="/admin/customers"
-          className="sidebar-item disabled"
-          onClick={(e) => e.preventDefault()}
+          to="/admin/users"
+          className={({ isActive }) =>
+            isActive ? "sidebar-item active" : "sidebar-item"
+          }
         >
-          Customers (Coming Soon)
+          Users
         </NavLink>
 
         <NavLink
@@ -84,6 +85,26 @@ function AdminSidebar() {
           onClick={(e) => e.preventDefault()}
         >
           Inventory (Coming Soon)
+        </NavLink>
+
+        <p className="sidebar-group-title">Storefront</p>
+
+        <NavLink
+          to="/admin/home-content"
+          className={({ isActive }) =>
+            isActive ? "sidebar-item active" : "sidebar-item"
+          }
+        >
+          Home Content
+        </NavLink>
+
+        <NavLink
+          to="/admin/store-policies"
+          className={({ isActive }) =>
+            isActive ? "sidebar-item active" : "sidebar-item"
+          }
+        >
+          Store Policies
         </NavLink>
       </nav>
 

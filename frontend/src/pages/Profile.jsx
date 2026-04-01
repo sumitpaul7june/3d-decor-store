@@ -61,6 +61,14 @@ function Profile() {
 
   return (
     <section className="profile-page">
+      <div className="profile-page-head">
+        <p className="profile-kicker">Account</p>
+        <h1>My Profile</h1>
+        <p className="profile-subtitle">
+          Manage your details, review account information, and jump into your orders.
+        </p>
+      </div>
+
       <div className="profile-shell">
         {/* Left: user identity card */}
         <aside className="profile-hero-card">
@@ -110,6 +118,9 @@ function Profile() {
             <div className="profile-actions">
               <Link to="/orders/my" className="profile-action-btn">
                 View My Orders
+              </Link>
+              <Link to="/track-order" className="profile-action-btn secondary">
+                Track Order
               </Link>
             </div>
           </article>

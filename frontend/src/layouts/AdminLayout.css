@@ -2,7 +2,18 @@
     display: grid;
     grid-template-columns: 252px minmax(0, 1fr);
     min-height: 100vh;
-    background: #f6f6f7;
+    background: #f7f5f0;
+    font-family: var(--font-ui);
+}
+
+.admin-container h1,
+.admin-container h2,
+.admin-container h3,
+.admin-container h4,
+.admin-container h5,
+.admin-container h6 {
+    font-family: var(--font-ui);
+    letter-spacing: -0.03em;
 }
 
 .admin-main {
@@ -12,7 +23,7 @@
 }
 
 .admin-content {
-    padding: 24px 28px 32px;
+    padding: 28px 30px 36px;
 }
 
 @media (max-width: 1080px) {

@@ -51,6 +51,7 @@ function ForgotPassword() {
   return (
     <section className="auth-page">
       <div className="auth-card">
+        <p className="auth-kicker">QALARAHI</p>
         <h1>Forgot password</h1>
 
         <p className="auth-helper-text">

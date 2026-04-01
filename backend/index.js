@@ -11,6 +11,8 @@ import cartRoutes from "./routes/cartRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import uploadRoutes from "./routes/uploadRoutes.js";
+import homeContentRoutes from "./routes/homeContentRoutes.js";
+import storePolicyRoutes from "./routes/storePolicyRoutes.js";
 
 import { protect } from "./middleware/authMiddleware.js";
 import { adminOnly } from "./middleware/adminMiddleware.js";
@@ -42,6 +44,8 @@ app.use("/api/cart", cartRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/upload", uploadRoutes);
+app.use("/api/home-content", homeContentRoutes);
+app.use("/api/store-policies", storePolicyRoutes);
 
 /* -------- TEST ROUTES -------- */
 

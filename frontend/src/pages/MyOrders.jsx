@@ -131,27 +131,40 @@ function MyOrders() {
             <article key={order._id} className="order-row">
               <div className="order-row-main">
                 <div className="order-col order-col-meta">
+                  <span className="order-col-label">Order</span>
                   <p className="my-order-id">#{order._id.slice(-8)}</p>
                   <p className="my-order-date">{formatDateIN(order.createdAt)}</p>
                 </div>
 
-                <p className="order-col order-col-delivery">{getDeliveryLabel(order)}</p>
-                <p className="order-col">{order.items?.length || 0}</p>
-                <p className="order-col order-col-total">{formatCurrencyINR(order.totalAmount)}</p>
+                <p className="order-col order-col-delivery">
+                  <span className="order-col-label">Delivery</span>
+                  {getDeliveryLabel(order)}
+                </p>
+                <p className="order-col">
+                  <span className="order-col-label">Items</span>
+                  {order.items?.length || 0}
+                </p>
+                <p className="order-col order-col-total">
+                  <span className="order-col-label">Total</span>
+                  {formatCurrencyINR(order.totalAmount)}
+                </p>
 
                 <div className="order-col">
+                  <span className="order-col-label">Payment</span>
                   <span className={`payment-chip payment-${order.paymentStatus?.toLowerCase()}`}>
                     {order.paymentStatus}
                   </span>
                 </div>
 
                 <div className="order-col">
+                  <span className="order-col-label">Status</span>
                   <span className={`my-order-status status-${order.orderStatus?.toLowerCase()}`}>
                     {order.orderStatus}
                   </span>
                 </div>
 
                 <div className="order-col order-actions">
+                  <span className="order-col-label">Actions</span>
                   <button
                     className="order-details-btn"
                     onClick={() => toggleDetails(order._id)}

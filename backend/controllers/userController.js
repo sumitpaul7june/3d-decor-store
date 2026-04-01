@@ -81,6 +81,18 @@ export const getProfile = async (req, res) => {
   }
 };
 
+export const getAllUsersAdmin = async (_req, res) => {
+  try {
+    const users = await User.find()
+      .select("name email role photo googleId loginCount lastLoginAt createdAt")
+      .sort({ createdAt: -1 });
+
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ message: "Server Error" });
+  }
+};
+
 export const updateProfile = async (req, res) => {
   try {
     const { name, photo } = req.body;

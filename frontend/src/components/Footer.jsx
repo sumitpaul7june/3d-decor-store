@@ -8,21 +8,24 @@ function Footer() {
       {/* Main footer content columns */}
       <div className="footer-top">
         <div className="footer-container">
-          {/* Brand/category links */}
-          <div className="footer-col">
-            <h4 className="footer-heading">3D Decor Store</h4>
-            <ul>
-              <li>Decor Accents</li>
-              <li>Photo Frames</li>
-              <li>Vases</li>
-              <li>Wall Decor</li>
-            </ul>
+          <div className="footer-col footer-brand-col">
+            <h4 className="footer-heading">QALARAHI</h4>
+            <p className="footer-brand-text">
+              Decor chosen for modern spaces that want warmth, presence, and a more
+              considered visual rhythm.
+            </p>
+            <Link className="footer-brand-link" to="/products">
+              Explore the collection
+            </Link>
           </div>
 
           {/* Quick navigation links */}
           <div className="footer-col">
-            <h4 className="footer-heading">Quick Links</h4>
+            <h4 className="footer-heading">Discover</h4>
             <ul>
+              <li>
+                <Link className="footer-link" to="/products">All Products</Link>
+              </li>
               <li>
                 <Link className="footer-link" to="/about">About Us</Link>
               </li>
@@ -40,7 +43,7 @@ function Footer() {
 
           {/* Policy/support links */}
           <div className="footer-col">
-            <h4 className="footer-heading">Information</h4>
+            <h4 className="footer-heading">Customer Care</h4>
             <ul>
               <li>Shipping & Delivery</li>
               <li>Returns</li>
@@ -51,10 +54,10 @@ function Footer() {
 
           {/* Contact details */}
           <div className="footer-col">
-            <h4 className="footer-heading">Need Help?</h4>
+            <h4 className="footer-heading">Concierge</h4>
             <ul>
-              <li>📞 +91 9560100560</li>
-              <li>✉ hello@3ddecorstore.in</li>
+              <li>+91 9560100560</li>
+              <li>hello@qalarahi.com</li>
               <li>Mon–Sat (10AM – 6PM)</li>
             </ul>
           </div>
@@ -63,7 +66,7 @@ function Footer() {
 
       {/* Bottom copyright strip */}
       <div className="footer-bottom">
-        <p>© 2026 3D Decor Store. All rights reserved.</p>
+        <p>© 2026 QALARAHI. Curated decor for thoughtful homes.</p>
       </div>
     </footer>
   );

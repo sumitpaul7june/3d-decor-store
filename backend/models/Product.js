@@ -43,6 +43,10 @@ const productSchema = new mongoose.Schema(
         },
         message: "Product must have between 1 and 4 images"
       }
+    },
+
+    coverImage: {
+      type: String
     }
   },
   { timestamps: true }

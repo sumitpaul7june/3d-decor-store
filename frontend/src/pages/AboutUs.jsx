@@ -8,7 +8,7 @@ function AboutUs() {
         <p className="store-info-kicker">About</p>
         <h1 className="store-info-title">About Us</h1>
         <p className="store-info-subtitle">
-          3D Decor Store is built to offer modern physical decor products
+          QALARAHI is built to offer modern physical decor products
           for thoughtful homes.
         </p>
 

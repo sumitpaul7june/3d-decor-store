@@ -1,4 +1,4 @@
-// Modal form for adding or editing a physical product in the admin UI.
+// Modal form for adding or editing a physical product with separate cover and gallery media.
 import { useEffect, useState } from "react";
 import axios from "../../api/axios";
 import "./ProductModal.css";
@@ -12,23 +12,21 @@ const readFileAsDataUrl = (file) =>
   });
 
 function ProductModal({ isOpen, onClose, onSave, initialData }) {
-  // Controlled form state for create/edit product.
   const [form, setForm] = useState({
     name: "",
     description: "",
     category: "lighting",
     price: "",
     originalPrice: "",
-    imageUrls: []
+    coverImage: "",
+    galleryImages: []
   });
-  // Form-level error message shown near inputs.
   const [formError, setFormError] = useState("");
-  const [imageUploading, setImageUploading] = useState(false);
+  const [coverUploading, setCoverUploading] = useState(false);
+  const [galleryUploading, setGalleryUploading] = useState(false);
 
   useEffect(() => {
-    // Pre-fill form when editing an existing product.
-    // Also reset fields each time modal opens.
-    const initialImages = Array.isArray(initialData?.images)
+    const initialGallery = Array.isArray(initialData?.images)
       ? initialData.images
       : initialData?.image
         ? [initialData.image]
@@ -40,16 +38,17 @@ function ProductModal({ isOpen, onClose, onSave, initialData }) {
       category: initialData?.category || "lighting",
       price: initialData?.price || "",
       originalPrice: initialData?.originalPrice || "",
-      imageUrls: initialImages.slice(0, 4)
+      coverImage: initialData?.coverImage || "",
+      galleryImages: initialGallery.slice(0, 4)
     });
     setFormError("");
-    setImageUploading(false);
+    setCoverUploading(false);
+    setGalleryUploading(false);
   }, [initialData, isOpen]);
 
   if (!isOpen) return null;
 
   const handleChange = (e) => {
-    // Generic handler for text/number inputs.
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
   };
@@ -60,97 +59,139 @@ function ProductModal({ isOpen, onClose, onSave, initialData }) {
       fileDataUrl,
       fileName: file.name
     });
-    return data;
+    return data?.url || "";
   };
 
-  const handleImageFileChange = (e) => {
-    // Read uploaded image and send to backend upload endpoint.
-    const uploadImage = async () => {
-      const files = Array.from(e.target.files || []);
-      if (files.length === 0) return;
+  const handleCoverFileChange = (e) => {
+    const uploadCover = async () => {
+      const file = Array.from(e.target.files || [])[0];
 
-      const currentCount = form.imageUrls.length;
-      const remainingSlots = 4 - currentCount;
+      if (!file) {
+        return;
+      }
 
-      if (remainingSlots <= 0) {
-        setFormError("Maximum 4 images allowed");
+      if (!file.type.startsWith("image/")) {
+        setFormError("Please upload a valid cover image");
+        e.target.value = "";
         return;
       }
 
       try {
-        setImageUploading(true);
+        setCoverUploading(true);
+        setFormError("");
+        const imageUrl = await uploadFileToBackend(file);
+
+        setForm((prev) => ({
+          ...prev,
+          coverImage: imageUrl
+        }));
+      } catch (error) {
+        setFormError(error.response?.data?.message || "Listing image upload failed");
+      } finally {
+        setCoverUploading(false);
+        e.target.value = "";
+      }
+    };
+
+    uploadCover();
+  };
+
+  const handleGalleryFileChange = (e) => {
+    const uploadGallery = async () => {
+      const files = Array.from(e.target.files || []);
+      if (files.length === 0) return;
+
+      const currentCount = form.galleryImages.length;
+      const remainingSlots = 4 - currentCount;
+
+      if (remainingSlots <= 0) {
+        setFormError("Maximum 4 gallery images allowed");
+        return;
+      }
+
+      try {
+        setGalleryUploading(true);
         setFormError("");
 
         const validImageFiles = files.filter((file) => file.type.startsWith("image/"));
 
         if (!validImageFiles.length) {
-          setFormError("Please upload valid image files");
+          setFormError("Please upload valid gallery image files");
           return;
         }
 
         const filesToUpload = validImageFiles.slice(0, remainingSlots);
-
-        const uploadedResults = await Promise.all(
-          filesToUpload.map((file) => uploadFileToBackend(file))
-        );
-
-        const uploadedUrls = uploadedResults
-          .map((result) => result?.url)
-          .filter(Boolean);
+        const uploadedUrls = (
+          await Promise.all(filesToUpload.map((file) => uploadFileToBackend(file)))
+        ).filter(Boolean);
 
         setForm((prev) => ({
           ...prev,
-          imageUrls: [...prev.imageUrls, ...uploadedUrls].slice(0, 4)
+          galleryImages: [...prev.galleryImages, ...uploadedUrls].slice(0, 4)
         }));
 
         if (validImageFiles.length > filesToUpload.length) {
-          setFormError("Only first 4 images are kept per product");
+          setFormError("Only the first 4 gallery images were added");
         }
       } catch (error) {
-        setFormError(error.response?.data?.message || "Image upload failed");
+        setFormError(error.response?.data?.message || "Gallery upload failed");
       } finally {
-        setImageUploading(false);
+        setGalleryUploading(false);
         e.target.value = "";
       }
     };
 
-    uploadImage();
+    uploadGallery();
   };
 
-  const handleRemoveImage = (indexToRemove) => {
-    // Allow admin to delete/replace already uploaded images while editing.
+  const handleRemoveGalleryImage = (indexToRemove) => {
     setForm((prev) => ({
       ...prev,
-      imageUrls: prev.imageUrls.filter((_, index) => index !== indexToRemove)
+      galleryImages: prev.galleryImages.filter((_, index) => index !== indexToRemove)
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleRemoveCover = () => {
+    setForm((prev) => ({
+      ...prev,
+      coverImage: ""
+    }));
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!Array.isArray(form.imageUrls) || form.imageUrls.length === 0) {
-      setFormError("At least one product image is required");
+    if (!form.coverImage) {
+      setFormError("A listing image is required");
       return;
     }
 
-    if (form.imageUrls.length > 4) {
-      setFormError("Maximum 4 images allowed");
+    if (!Array.isArray(form.galleryImages) || form.galleryImages.length === 0) {
+      setFormError("At least one gallery image is required");
+      return;
+    }
+
+    if (form.galleryImages.length > 4) {
+      setFormError("Maximum 4 gallery images allowed");
       return;
     }
 
     const payload = {
-      // Build payload in backend product schema.
       name: form.name.trim(),
       description: form.description.trim(),
       type: "physical",
       category: form.category.trim(),
       price: Number(form.price),
       originalPrice: Number(form.originalPrice),
-      images: form.imageUrls
+      coverImage: form.coverImage,
+      images: form.galleryImages
     };
 
-    onSave(payload);
-    onClose();
+    const didSave = await onSave(payload);
+
+    if (didSave !== false) {
+      onClose();
+    }
   };
 
   const currentPrice = Number(form.price || 0);
@@ -161,11 +202,8 @@ function ProductModal({ isOpen, onClose, onSave, initialData }) {
       : 0;
 
   return (
-    // Clicking dark overlay closes modal.
     <div className="modal-overlay" onClick={onClose}>
-      {/* Stop overlay close when clicking inside modal panel. */}
       <div className="modal" onClick={(e) => e.stopPropagation()}>
-        {/* Header section */}
         <div className="modal-head">
           <div>
             <p className="modal-kicker">Catalog</p>
@@ -181,7 +219,6 @@ function ProductModal({ isOpen, onClose, onSave, initialData }) {
           </button>
         </div>
 
-        {/* Product form */}
         <form onSubmit={handleSubmit} className="modal-form">
           <div className="modal-grid modal-grid-2">
             <label htmlFor="name">
@@ -219,32 +256,6 @@ function ProductModal({ isOpen, onClose, onSave, initialData }) {
           </label>
 
           <div className="modal-grid modal-grid-2">
-            <label htmlFor="productType">
-              Type
-              <input id="productType" value="Physical" disabled />
-            </label>
-
-            <label htmlFor="imageFile">
-              Product Images (max 4)
-              <input
-                id="imageFile"
-                name="imageFile"
-                type="file"
-                accept="image/*"
-                multiple
-                onChange={handleImageFileChange}
-              />
-              <span className="modal-helper-text">
-                {imageUploading
-                  ? "Uploading image(s)..."
-                  : `${form.imageUrls.length}/4 uploaded`}
-              </span>
-            </label>
-          </div>
-
-          {formError && <p className="modal-form-error">{formError}</p>}
-
-          <div className="modal-grid modal-grid-2">
             <label htmlFor="price">
               Price
               <input
@@ -271,22 +282,92 @@ function ProductModal({ isOpen, onClose, onSave, initialData }) {
           </div>
 
           {!!discountPercent && (
-            // Real-time discount hint for admin while editing prices.
             <p className="modal-discount-chip">
               Discount: {discountPercent}% off
             </p>
           )}
 
-          {form.imageUrls.length > 0 && (
-            // Image preview grid to manage multiple product images.
-            <div className="modal-preview">
-              <p>Image Preview ({form.imageUrls.length}/4)</p>
+          <div className="modal-media-section">
+            <div className="modal-section-head">
+              <div>
+                <p className="modal-section-kicker">Product Listing Media</p>
+                <h3>Listing Image</h3>
+              </div>
+              <label htmlFor="coverFile" className="modal-upload-btn">
+                {coverUploading ? "Uploading..." : "Upload Listing Image"}
+              </label>
+            </div>
+
+            <p className="modal-section-note">
+              Used for product cards, listing pages, and admin previews. This is not the homepage-wide banner.
+            </p>
+
+            <input
+              id="coverFile"
+              name="coverFile"
+              type="file"
+              accept="image/*"
+              onChange={handleCoverFileChange}
+              className="modal-hidden-input"
+            />
+
+            <div className="modal-cover-preview">
+              {form.coverImage ? (
+                <>
+                  <img src={form.coverImage} alt="Listing image preview" />
+                  <button
+                    type="button"
+                    className="modal-remove-image-btn"
+                    onClick={handleRemoveCover}
+                  >
+                    Remove Listing Image
+                  </button>
+                </>
+              ) : (
+                <div className="modal-empty-state">
+                  <strong>No listing image selected</strong>
+                  <span>Upload one clean image for cards and collection grids.</span>
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="modal-media-section">
+            <div className="modal-section-head">
+              <div>
+                <p className="modal-section-kicker">Product Detail Media</p>
+                <h3>Product Gallery</h3>
+              </div>
+              <label htmlFor="galleryFile" className="modal-upload-btn">
+                {galleryUploading ? "Uploading..." : "Upload Gallery"}
+              </label>
+            </div>
+
+            <p className="modal-section-note">
+              Used only on the product detail page. Add up to 4 supporting product images.
+            </p>
+
+            <input
+              id="galleryFile"
+              name="galleryFile"
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={handleGalleryFileChange}
+              className="modal-hidden-input"
+            />
+
+            <div className="modal-gallery-meta">
+              <span>{form.galleryImages.length}/4 uploaded</span>
+            </div>
+
+            {form.galleryImages.length > 0 ? (
               <div className="modal-preview-grid">
-                {form.imageUrls.map((imageUrl, index) => (
+                {form.galleryImages.map((imageUrl, index) => (
                   <div key={`${imageUrl}-${index}`} className="modal-preview-item">
                     <img
                       src={imageUrl}
-                      alt={`Product preview ${index + 1}`}
+                      alt={`Gallery preview ${index + 1}`}
                       onError={(e) => {
                         e.currentTarget.style.display = "none";
                       }}
@@ -294,21 +375,28 @@ function ProductModal({ isOpen, onClose, onSave, initialData }) {
                     <button
                       type="button"
                       className="modal-remove-image-btn"
-                      onClick={() => handleRemoveImage(index)}
+                      onClick={() => handleRemoveGalleryImage(index)}
                     >
                       Remove
                     </button>
                   </div>
                 ))}
               </div>
-            </div>
-          )}
+            ) : (
+              <div className="modal-empty-state">
+                <strong>No gallery images added</strong>
+                <span>Upload close-up or alternate views for the product detail page.</span>
+              </div>
+            )}
+          </div>
+
+          {formError && <p className="modal-form-error">{formError}</p>}
 
           <div className="modal-actions">
             <button type="button" onClick={onClose}>
               Cancel
             </button>
-            <button type="submit" disabled={imageUploading}>
+            <button type="submit" disabled={coverUploading || galleryUploading}>
               {initialData ? "Update Product" : "Create Product"}
             </button>
           </div>

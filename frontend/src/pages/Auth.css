@@ -3,66 +3,78 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--color-bg-main);
-    padding: 2rem;
+    background:
+        radial-gradient(circle at top, rgba(0, 0, 0, 0.03), transparent 36%),
+        #ffffff;
+    padding: 3.5rem 1rem 4.5rem;
 }
 
 .auth-actions {
     display: flex;
     flex-direction: column;
     gap: 0.6rem;
-    /* 🔥 controls ALL spacing */
-    margin-top: 0.4rem;
+    margin-top: 0.5rem;
 }
 
 .auth-card {
     width: 100%;
-    max-width: 420px;
-    padding: 3rem 2.5rem;
+    max-width: 460px;
+    padding: 2.8rem 2.4rem;
     background: #fff;
-    border: 1px solid var(--color-border-light);
-    border-radius: var(--radius-md);
+    border: 1px solid #ece9e2;
+    border-radius: 12px;
+    box-shadow: 0 24px 55px rgba(17, 17, 17, 0.05);
+}
+
+.auth-kicker {
+    font-size: 0.72rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #8a8a8a;
+    margin-bottom: 0.8rem;
+    text-align: center;
 }
 
 .auth-card h1 {
     font-family: var(--font-display);
-    font-size: 1.6rem;
+    font-size: 2rem;
     font-weight: 500;
-    margin-bottom: 2rem;
+    margin-bottom: 0.75rem;
     text-align: center;
 }
 
 .auth-helper-text {
-    margin: -1rem 0 1.2rem;
+    margin: 0 0 1.4rem;
     text-align: center;
-    font-size: 0.88rem;
-    line-height: 1.5;
-    color: var(--color-text-muted);
+    font-size: 0.92rem;
+    line-height: 1.75;
+    color: #6d6d6d;
 }
 
 .auth-form {
     display: flex;
     flex-direction: column;
-    gap: 1.1rem;
-
+    gap: 1rem;
 }
-
 
 .auth-form label {
     display: flex;
     flex-direction: column;
-    gap: 0.35rem;
-    font-size: 0.85rem;
-    color: var(--color-text-muted);
+    gap: 0.45rem;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #7c7c7c;
 }
 
-
 .auth-form input {
-    padding: 0.7rem 0.75rem;
-    border: 1px solid var(--color-border-light);
-    border-radius: var(--radius-sm);
+    padding: 0.9rem 0.95rem;
+    border: 1px solid #dfdbd3;
+    border-radius: 10px;
     font-family: var(--font-ui);
-    font-size: 0.95rem;
+    font-size: 0.96rem;
+    color: #171717;
+    background: #ffffff;
 }
 
 .password-field {
@@ -73,17 +85,17 @@
 
 .password-field input {
     width: 100%;
-    padding-right: 4.1rem;
+    padding-right: 4.4rem;
 }
 
 .password-toggle-btn {
     position: absolute;
-    right: 0.45rem;
+    right: 0.65rem;
     border: none;
     background: transparent;
-    color: #4b5563;
-    font-size: 0.78rem;
-    font-weight: 600;
+    color: #5e5e5e;
+    font-size: 0.74rem;
+    font-weight: 500;
     cursor: pointer;
 }
 
@@ -95,25 +107,26 @@
 
 .auth-inline-link {
     font-size: 0.82rem;
-    color: var(--color-text-muted);
+    color: #676767;
     text-decoration: underline;
 }
 
 
 .auth-form input:focus {
     outline: none;
-    border-color: var(--color-accent);
+    border-color: #bfb7ac;
+    box-shadow: 0 0 0 3px rgba(17, 17, 17, 0.04);
 }
 
 .auth-form button[type="submit"] {
     margin-top: 0.5rem;
-    /* small separation from inputs */
-    padding: 0.85rem;
-    background: var(--color-accent);
+    padding: 0.92rem;
+    background: #111111;
     color: #fff;
     border: none;
-    border-radius: var(--radius-sm);
+    border-radius: 999px;
     font-size: 0.95rem;
+    font-weight: 500;
     cursor: pointer;
     transition: background 0.2s ease, transform 0.15s ease;
 }
@@ -125,10 +138,10 @@
 }
 
 .auth-switch {
-    margin-top: 1.5rem;
-    font-size: 0.85rem;
+    margin-top: 1.7rem;
+    font-size: 0.86rem;
     text-align: center;
-    color: var(--color-text-muted);
+    color: #676767;
 }
 
 .auth-switch a {
@@ -137,15 +150,15 @@
 }
 
 .error {
-    font-size: 0.75rem;
+    font-size: 0.78rem;
     color: #d32f2f;
-    line-height: 1.2;
+    line-height: 1.35;
 }
 
 .success-message {
     display: block;
-    font-size: 0.82rem;
-    line-height: 1.4;
+    font-size: 0.84rem;
+    line-height: 1.55;
     color: #1f6f43;
     background: #ecfdf3;
     border: 1px solid #bbf7d0;
@@ -172,4 +185,18 @@
     flex: 1;
     height: 1px;
     background: var(--color-border-light);
+}
+
+@media (max-width: 640px) {
+    .auth-page {
+        padding: 2rem 0.8rem 3rem;
+    }
+
+    .auth-card {
+        padding: 2rem 1.2rem;
+    }
+
+    .auth-card h1 {
+        font-size: 1.75rem;
+    }
 }

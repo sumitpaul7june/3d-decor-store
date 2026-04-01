@@ -6,6 +6,25 @@ const buildTypeFilter = (type) => {
   };
 };
 
+const normalizeProductImages = (images = []) =>
+  images
+    .map((image) => String(image || "").trim())
+    .filter(Boolean)
+    .slice(0, 4);
+
+const sanitizeProductPayload = (payload = {}) => {
+  const images = normalizeProductImages(payload.images);
+  const requestedCover = String(payload.coverImage || "").trim();
+  const coverImage = requestedCover || images[0] || "";
+
+  return {
+    ...payload,
+    type: "physical",
+    images,
+    coverImage
+  };
+};
+
 /*ALL PRODUCT */
 export const getAllProducts=async(req,res)=>{
     try {
@@ -54,17 +73,19 @@ export const getProductById = async (req, res) => {
 
 export const createProduct = async (req, res) => {
   try {
-    const payload = { ...req.body };
+    const payload = sanitizeProductPayload(req.body);
 
-    if (!Array.isArray(payload.images) || payload.images.length === 0) {
-      return res.status(400).json({ message: "At least 1 product image is required" });
+    if (payload.images.length === 0) {
+      return res.status(400).json({ message: "At least 1 gallery image is required" });
     }
 
     if (payload.images.length > 4) {
       return res.status(400).json({ message: "Maximum 4 images allowed per product" });
     }
 
-    payload.type = "physical";
+    if (!payload.coverImage) {
+      return res.status(400).json({ message: "A listing image is required" });
+    }
 
     const product = await Product.create(payload);
     res.status(201).json(product);
@@ -77,11 +98,11 @@ export const createProduct = async (req, res) => {
 /*UPDATE PRODUCT (ADMIN) */
 export const updateProduct = async (req, res) => {
   try {
-    const payload = { ...req.body };
+    const payload = sanitizeProductPayload(req.body);
 
     if (payload.images) {
-      if (!Array.isArray(payload.images) || payload.images.length === 0) {
-        return res.status(400).json({ message: "At least 1 product image is required" });
+      if (payload.images.length === 0) {
+        return res.status(400).json({ message: "At least 1 gallery image is required" });
       }
 
       if (payload.images.length > 4) {
@@ -89,7 +110,9 @@ export const updateProduct = async (req, res) => {
       }
     }
 
-    payload.type = "physical";
+    if (!payload.coverImage) {
+      return res.status(400).json({ message: "A listing image is required" });
+    }
 
     const product = await Product.findOneAndUpdate(
       {

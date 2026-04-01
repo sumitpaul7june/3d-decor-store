@@ -62,8 +62,10 @@ function AdminProducts() {
         await axios.post("/products", productPayload);
       }
       await fetchProducts();
+      return true;
     } catch (err) {
       setError(err.response?.data?.message || "Failed to save product");
+      return false;
     }
   };
 
@@ -85,7 +87,7 @@ function AdminProducts() {
           <p className="admin-page-kicker">Catalog</p>
           <h1 className="admin-products-title">Products</h1>
           <p className="admin-page-subtitle">
-            Manage product details, pricing, and images from one place.
+            Manage product details, pricing, listing media, and gallery media from one place.
           </p>
         </div>
         <button onClick={handleAdd} className="add-product-btn">
@@ -126,13 +128,16 @@ function AdminProducts() {
               <span className="product-cell">
                 <img
                   className="product-thumb"
-                  src={product.images?.[0] || "https://via.placeholder.com/64?text=No+Img"}
+                  src={product.coverImage || product.images?.[0] || "https://via.placeholder.com/64?text=No+Img"}
                   alt={product.name}
                   onError={(e) => {
                     e.currentTarget.src = "https://via.placeholder.com/64?text=No+Img";
                   }}
                 />
-                <span>{product.name}</span>
+                <span>
+                  {product.name}
+                  {product.coverImage && <small className="product-cover-note">Listing image ready</small>}
+                </span>
               </span>
               <span>{product.category || "-"}</span>
               <span>{formatCurrencyINR(product.price)}</span>

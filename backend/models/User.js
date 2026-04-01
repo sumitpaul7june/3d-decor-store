@@ -21,6 +21,16 @@ const userSchema = new mongoose.Schema(
       type: String,
     },
 
+    loginCount: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+
+    lastLoginAt: {
+      type: Date,
+    },
+
     role: {
       type: String,
       enum: ["admin", "customer"],

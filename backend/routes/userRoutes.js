@@ -1,6 +1,7 @@
 import express from "express";
 import {
   getProfile,
+  getAllUsersAdmin,
   updateProfile,
   getAddresses,
   addAddress,
@@ -8,10 +9,14 @@ import {
 } from "../controllers/userController.js";
 
 import { protect } from "../middleware/authMiddleware.js";
+import { adminOnly } from "../middleware/adminMiddleware.js";
 
 const router = express.Router();
 
 /* -------- PROFILE -------- */
+
+// Get all users for admin dashboard/user management
+router.get("/admin/all", protect, adminOnly, getAllUsersAdmin);
 
 // Get logged-in user profile
 router.get("/profile", protect, getProfile);

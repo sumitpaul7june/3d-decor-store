@@ -1,95 +1,158 @@
 // Reusable product card used on home and product listing pages.
-import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import "./ProductCard.css";
+import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+import "./ProductCard.css";
+import { getProductPresentation } from "../utils/productPresentation";
+import { buildProductPath } from "../utils/productRoutes";
 import axios from "../api/axios";
 import { addToCart, setCartFromServer } from "../store/cartSlice";
-import {
-  buildCartItemFromProduct,
-  normalizeServerCart
-} from "../utils/cartHelpers";
+import { buildCartItemFromProduct, normalizeServerCart } from "../utils/cartHelpers";
+import { formatCurrencyINR } from "../utils/formatters";
 
-function ProductCard({ product }) {
-  // Navigation + Redux helpers.
+const toFinishClass = (finishName = "") =>
+  `swatch-${finishName.toLowerCase().replace(/\s+/g, "-")}`;
+
+function ProductCard({ product, variant = "default" }) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
-  // Short UI feedback state for "Add to Cart" animation/text.
-  const [addedFeedback, setAddedFeedback] = useState(false);
-
-  // Support both Mongo `_id` and legacy `id` shapes.
-  const productId = product._id || product.id;
-  // Prefer backend image fields, fallback to empty string.
-  const productImage = product.image || product.images?.[0] || "";
-
-  const showAddedFeedback = () => {
-    setAddedFeedback(true);
-    window.setTimeout(() => setAddedFeedback(false), 900);
-  };
+  const [isAdding, setIsAdding] = useState(false);
+  const [isBuying, setIsBuying] = useState(false);
+  const presentation = getProductPresentation(product);
+  const originalPrice = product.originalPrice || product.price;
+  const savings = Math.max(originalPrice - product.price, 0);
+  const discountPercent =
+    originalPrice > product.price
+      ? Math.round(((originalPrice - product.price) / originalPrice) * 100)
+      : 0;
+  const isCatalogCard = variant === "catalog";
+  const isHomeCard = variant === "home";
 
   const handleCardClick = () => {
-    // Open product details page.
-    navigate(`/product/${productId}`);
+    navigate(buildProductPath(product));
   };
 
-  const handleAddToCart = async (e) => {
-    // Stop parent click so Add to Cart doesn't open details page.
-    e.stopPropagation();
-
-    // Guest users use local Redux cart.
+  const syncCart = async () => {
     if (!isAuthenticated) {
-      dispatch(addToCart(buildCartItemFromProduct(product)));
-      showAddedFeedback();
+      dispatch(addToCart(buildCartItemFromProduct(product, 1)));
       return;
     }
 
-    // Logged-in users sync cart with backend.
-    try {
-      await axios.post("/cart/add", {
-        productId,
-        quantity: 1
-      });
+    await axios.post("/cart/add", {
+      productId: product._id,
+      quantity: 1
+    });
 
-      const { data } = await axios.get("/cart");
-      dispatch(setCartFromServer(normalizeServerCart(data)));
-      showAddedFeedback();
-    } catch (err) {
-      console.error("Add to cart failed:", err.response?.data?.message || err.message);
+    const { data } = await axios.get("/cart");
+    dispatch(setCartFromServer(normalizeServerCart(data)));
+  };
+
+  const handleAddToCart = async (event) => {
+    event.stopPropagation();
+
+    try {
+      setIsAdding(true);
+      await syncCart();
+    } catch (error) {
+      console.error("Add to cart failed:", error.response?.data?.message || error.message);
+    } finally {
+      setIsAdding(false);
+    }
+  };
+
+  const handleBuyNow = async (event) => {
+    event.stopPropagation();
+
+    try {
+      setIsBuying(true);
+      await syncCart();
+      navigate("/checkout/address");
+    } catch (error) {
+      console.error("Buy now failed:", error.response?.data?.message || error.message);
+    } finally {
+      setIsBuying(false);
     }
   };
 
   return (
-    // Entire card is clickable to open product details.
-    <div className="product" onClick={handleCardClick}>
+    <article
+      className={`product ${isCatalogCard ? "product--catalog" : ""} ${isHomeCard ? "product--home" : ""}`}
+      onClick={handleCardClick}
+    >
       <div className="product-image">
+        {savings > 0 && (
+          <span className={`product-sale-pill ${isCatalogCard ? "product-sale-pill--catalog" : ""}`}>
+            {isCatalogCard && discountPercent > 0 ? `Save ${discountPercent}%` : "Sale"}
+          </span>
+        )}
         <img
-          src={productImage || "https://via.placeholder.com/600x600?text=No+Image"}
+          src={presentation.coverImage}
           alt={product.name}
           onError={(e) => {
-            // If image URL fails, swap to fallback placeholder.
             e.currentTarget.src =
-              "https://via.placeholder.com/600x600?text=Image+Unavailable";
+              presentation.gallery[0] ||
+              "https://via.placeholder.com/600x760?text=Image+Unavailable";
           }}
         />
       </div>
 
       <div className="product-info">
+        {isCatalogCard && (
+          <p className="product-category-label">{presentation.categoryLabel}</p>
+        )}
+
         <h3 className="product-title">{product.name}</h3>
 
         <div className="price">
-          <span className="current-price">₹{product.price}</span>
-          <span className="original-price">₹{product.originalPrice}</span>
+          {originalPrice > product.price && (
+            <span className="original-price">{formatCurrencyINR(originalPrice)}</span>
+          )}
+          <span className="current-price">{formatCurrencyINR(product.price)}</span>
         </div>
 
-        <button
-          className={`btn-primary ${addedFeedback ? "added" : ""}`}
-          onClick={handleAddToCart}
-        >
-          {addedFeedback ? "Added to Cart ✓" : "Add to Cart"}
-        </button>
+        {savings > 0 && !isCatalogCard && (
+          <p className="product-savings">SAVE ₹{savings.toLocaleString("en-IN")}</p>
+        )}
+
+        {isHomeCard && (
+          <div className="product-card-actions">
+            <button
+              type="button"
+              className="product-card-btn product-card-btn--ghost"
+              onClick={handleAddToCart}
+              disabled={isAdding || isBuying}
+            >
+              {isAdding ? "Adding..." : "Add to cart"}
+            </button>
+            <button
+              type="button"
+              className="product-card-btn product-card-btn--primary"
+              onClick={handleBuyNow}
+              disabled={isAdding || isBuying}
+            >
+              {isBuying ? "Processing..." : "Buy now"}
+            </button>
+          </div>
+        )}
+
+        {!isCatalogCard && (
+          <div className="product-footer">
+            <div className="product-swatches" aria-label="Available finishes">
+              {presentation.finishes.map((finish) => (
+                <span
+                  key={finish.name}
+                  className={`product-swatch ${toFinishClass(finish.name)}`}
+                  title={finish.name}
+                />
+              ))}
+            </div>
+
+            <span className="product-arrow" aria-hidden="true">→</span>
+          </div>
+        )}
       </div>
-    </div>
+    </article>
   );
 }
 

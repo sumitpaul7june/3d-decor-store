@@ -1,0 +1,178 @@
+.admin-users {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.admin-users-title {
+  font-size: 28px;
+  font-weight: 600;
+  color: #111827;
+  line-height: 1.05;
+}
+
+.admin-users-error {
+  color: #b42318;
+  font-size: 14px;
+}
+
+.admin-users-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+.admin-user-stat {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 14px;
+  display: grid;
+  gap: 6px;
+}
+
+.admin-user-stat span {
+  font-size: 11px;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.admin-user-stat strong {
+  font-size: 24px;
+  color: #111827;
+}
+
+.admin-users-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 10px;
+}
+
+.users-search-input {
+  min-width: 280px;
+  flex: 1;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 9px 12px;
+  font-size: 13px;
+  background: #fff;
+}
+
+.users-table {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.users-table-head,
+.users-table-row {
+  display: grid;
+  grid-template-columns: 2.4fr 0.8fr 1fr 0.8fr 1fr 1fr;
+  padding: 13px 14px;
+  align-items: center;
+  gap: 10px;
+}
+
+.users-table-head {
+  background: #f7f7f8;
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.users-table-row {
+  border-top: 1px solid #eceff3;
+  font-size: 13px;
+  color: #111827;
+}
+
+.users-primary-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.users-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: #111827;
+  color: #fff;
+  display: grid;
+  place-items: center;
+  font-weight: 600;
+}
+
+.users-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.users-primary-copy {
+  display: grid;
+  gap: 3px;
+}
+
+.users-primary-copy strong {
+  font-size: 13px;
+}
+
+.users-primary-copy small {
+  color: #6b7280;
+  font-size: 12px;
+}
+
+.users-role-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  padding: 4px 8px;
+  font-size: 12px;
+  text-transform: capitalize;
+}
+
+.users-role-chip.role-admin {
+  background: #edf2ff;
+  color: #2a4db0;
+}
+
+.users-role-chip.role-customer {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+@media (max-width: 1080px) {
+  .admin-users-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .users-search-input {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .users-table-head,
+  .users-table-row {
+    grid-template-columns: 1.8fr 0.8fr 1fr 0.8fr;
+  }
+
+  .users-table-head span:nth-child(5),
+  .users-table-row span:nth-child(5),
+  .users-table-head span:nth-child(6),
+  .users-table-row span:nth-child(6) {
+    display: none;
+  }
+}
