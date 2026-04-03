@@ -11,6 +11,14 @@ const paymentSchema = new mongoose.Schema({
     },
     orderId: String,
     paymentId: String,
+    receipt: String,
+    method: String,
+    contact: String,
+    email: String,
+    failureReason: String,
+    failureCode: String,
+    lastAttemptedAt: Date,
+    verifiedAt: Date,
 
     amount: Number,
 

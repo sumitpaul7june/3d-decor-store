@@ -16,6 +16,8 @@ import Profile from "./pages/Profile";
 import Address from "./pages/Address";
 import CheckoutSuccess from "./pages/CheckoutSuccess";
 import MyOrders from "./pages/MyOrders";
+import OrderDetail from "./pages/OrderDetail";
+import OrderInvoice from "./pages/OrderInvoice";
 import Products from "./pages/Products";
 import ProductDetail from "./pages/ProductDetail"
 import AboutUs from "./pages/AboutUs";
@@ -33,6 +35,8 @@ import ProtectedRoute from "./routes/ProtectedRoute";
 import PublicRoute from "./routes/PublicRoute";
 import AdminLayout from "./layouts/AdminLayout";
 import AdminOrders from "./pages/admin/AdminOrders";
+import AdminOrderDetail from "./pages/admin/AdminOrderDetail";
+import AdminOrderInvoice from "./pages/admin/AdminOrderInvoice";
 import AdminRoute from "./routes/AdminRoute";
 
 // Central route tree for public + protected + admin sections.
@@ -72,6 +76,8 @@ const router = createBrowserRouter([
         children: [
           { path: "profile", element: <Profile /> },
           { path: "orders/my", element: <MyOrders /> },
+          { path: "orders/my/:orderId", element: <OrderDetail /> },
+          { path: "orders/my/:orderId/invoice", element: <OrderInvoice /> },
           { path: "checkout/address", element: <Address /> },
           { path: "checkout/success/:orderId", element: <CheckoutSuccess /> },
         ],
@@ -96,6 +102,8 @@ const router = createBrowserRouter([
           { path: "store-policies", element: <AdminStorePolicies /> },
           { path: "products", element: <AdminProducts /> },
           { path: "orders", element: <AdminOrders /> },
+          { path: "orders/:orderId", element: <AdminOrderDetail /> },
+          { path: "orders/:orderId/invoice", element: <AdminOrderInvoice /> },
           { path: "users", element: <AdminUsers /> },
         ],
       },

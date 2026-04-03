@@ -63,7 +63,33 @@ const orderSchema = new mongoose.Schema(
       type: String,
       enum: ["Pending", "Shipped", "Delivered", "Cancelled"],
       default: "Pending"
-    }
+    },
+
+    adminNote: {
+      type: String,
+      default: ""
+    },
+
+    statusTimeline: [
+      {
+        status: {
+          type: String,
+          default: ""
+        },
+        label: {
+          type: String,
+          default: ""
+        },
+        note: {
+          type: String,
+          default: ""
+        },
+        createdAt: {
+          type: Date,
+          default: Date.now
+        }
+      }
+    ]
   },
   { timestamps: true }
 );

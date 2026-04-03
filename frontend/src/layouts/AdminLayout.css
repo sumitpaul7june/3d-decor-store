@@ -1,9 +1,11 @@
 .admin-container {
-    display: grid;
-    grid-template-columns: 252px minmax(0, 1fr);
-    min-height: 100vh;
-    background: #f7f5f0;
-    font-family: var(--font-ui);
+  display: grid;
+  grid-template-columns: 268px minmax(0, 1fr);
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top left, rgba(230, 221, 205, 0.55), transparent 24%),
+    linear-gradient(180deg, #f8f5ef 0%, #f4f0e8 100%);
+  font-family: var(--font-ui);
 }
 
 .admin-container h1,
@@ -12,32 +14,32 @@
 .admin-container h4,
 .admin-container h5,
 .admin-container h6 {
-    font-family: var(--font-ui);
-    letter-spacing: -0.03em;
+  font-family: var(--font-ui);
+  letter-spacing: -0.03em;
 }
 
 .admin-main {
-    display: flex;
-    flex-direction: column;
-    min-width: 0;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
 }
 
 .admin-content {
-    padding: 28px 30px 36px;
+  padding: 28px 32px 38px;
 }
 
 @media (max-width: 1080px) {
-    .admin-container {
-        grid-template-columns: 220px minmax(0, 1fr);
-    }
+  .admin-container {
+    grid-template-columns: 228px minmax(0, 1fr);
+  }
 
-    .admin-content {
-        padding: 18px 16px 24px;
-    }
+  .admin-content {
+    padding: 20px 16px 28px;
+  }
 }
 
 @media (max-width: 860px) {
-    .admin-container {
-        grid-template-columns: 1fr;
-    }
+  .admin-container {
+    grid-template-columns: 1fr;
+  }
 }

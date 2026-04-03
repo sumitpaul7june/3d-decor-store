@@ -1,34 +1,44 @@
-// Mock track-order page with simple input and demo result.
+// Track-order page: validate order id and take signed-in users to their real order timeline.
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import axios from "../api/axios";
 import "./StoreInfo.css";
 
 function TrackOrder() {
-  // Input and result state for mock tracking.
+  // Input and result state for order lookup.
   const [orderCode, setOrderCode] = useState("");
   const [error, setError] = useState("");
-  const [result, setResult] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
 
-  const handleTrack = (e) => {
+  const handleTrack = async (e) => {
     e.preventDefault();
 
-    const normalized = orderCode.trim();
+    const normalized = orderCode.trim().replace(/^#/, "");
 
     if (!normalized) {
       setError("Please enter an order id");
-      setResult(null);
+      return;
+    }
+
+    if (!isAuthenticated) {
+      setError("Please sign in to track your order.");
       return;
     }
 
     setError("");
+    setLoading(true);
 
-    // Mock tracking result for demo UI.
-    setResult({
-      orderId: normalized.startsWith("#") ? normalized : `#${normalized}`,
-      status: "Shipped",
-      updatedAt: new Date().toLocaleString("en-IN"),
-      destination: "Mumbai, India",
-      message: "Package is in transit to nearest delivery hub."
-    });
+    try {
+      await axios.get(`/orders/my-orders/${normalized}`);
+      navigate(`/orders/my/${normalized}`);
+    } catch (err) {
+      setError(err.response?.data?.message || "Order not found.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -51,24 +61,7 @@ function TrackOrder() {
         </form>
 
         {error && <p className="track-error">{error}</p>}
-
-        {result && (
-          <div className="track-result">
-            <p className="track-row">
-              Order: <strong>{result.orderId}</strong>
-            </p>
-            <p className="track-row">
-              Status: <span className="track-status-chip">{result.status}</span>
-            </p>
-            <p className="track-row">
-              Last update: <strong>{result.updatedAt}</strong>
-            </p>
-            <p className="track-row">
-              Destination: <strong>{result.destination}</strong>
-            </p>
-            <p className="track-row">{result.message}</p>
-          </div>
-        )}
+        {loading && <p className="track-row">Checking your order...</p>}
       </article>
     </section>
   );

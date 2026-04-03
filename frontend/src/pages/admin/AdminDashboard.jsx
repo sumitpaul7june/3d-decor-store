@@ -114,7 +114,7 @@ function AdminDashboard() {
           </button>
         </div>
         {error && <p className="dashboard-error">{error}</p>}
-  
+
         {/* KPI cards */}
         <div className="dashboard-cards">
           {metricCards.map((card) => (

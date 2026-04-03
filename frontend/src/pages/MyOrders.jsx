@@ -1,18 +1,24 @@
-// Customer orders page: summary metrics + order list with expandable details.
+// Customer orders page: premium order cards with quick actions and snapshots.
 import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import axios from "../api/axios";
+import { clearCart } from "../store/cartSlice";
 import { formatCurrencyINR, formatDateIN } from "../utils/formatters";
+import { openRazorpayCheckout } from "../utils/razorpayCheckout";
 import "./MyOrders.css";
 
 function MyOrders() {
-  // Orders list and page UI states.
   const [orders, setOrders] = useState([]);
   const [expandedOrderId, setExpandedOrderId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [retryingOrderId, setRetryingOrderId] = useState("");
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const authUser = useSelector((state) => state.auth.user);
 
   const fetchOrders = async () => {
-    // Load current user's orders.
     try {
       setLoading(true);
       setError("");
@@ -30,7 +36,6 @@ function MyOrders() {
   }, []);
 
   const handleCancel = async (orderId) => {
-    // Allow cancel only for pending orders.
     try {
       await axios.put(`/orders/${orderId}/cancel`);
       await fetchOrders();
@@ -39,28 +44,52 @@ function MyOrders() {
     }
   };
 
+  const handleRetryPayment = async (order) => {
+    await openRazorpayCheckout({
+      orderId: order._id,
+      selectedAddress: order.addressSnapshot,
+      authUser,
+      contactEmail: authUser?.email || "",
+      onLoadingChange: (loadingState) => {
+        setRetryingOrderId(loadingState ? order._id : "");
+      },
+      onError: setError,
+      onSuccess: async () => {
+        dispatch(clearCart());
+        navigate(`/checkout/success/${order._id}`);
+      },
+    });
+  };
+
   const totalSpend = orders
     .filter((order) => order.orderStatus !== "Cancelled")
     .reduce((sum, order) => sum + (order.totalAmount || 0), 0);
-  // High-level KPI counts for top insight cards.
   const pendingCount = orders.filter((order) => order.orderStatus === "Pending").length;
   const deliveredCount = orders.filter((order) => order.orderStatus === "Delivered").length;
   const cancelledCount = orders.filter((order) => order.orderStatus === "Cancelled").length;
 
   const getDeliveryLabel = (order) => {
-    // Compact delivery label for table row preview.
     if (!order.addressSnapshot) return "Address unavailable";
+
     return [
       order.addressSnapshot.fullName,
       order.addressSnapshot.city,
-      order.addressSnapshot.country
+      order.addressSnapshot.country,
     ]
       .filter(Boolean)
       .join(", ");
   };
 
+  const getItemsPreview = (order) => {
+    const items = order.items || [];
+
+    if (!items.length) return "No items";
+    if (items.length === 1) return items[0].name || "1 item";
+
+    return `${items[0].name || "Item"} +${items.length - 1} more`;
+  };
+
   const toggleDetails = (orderId) => {
-    // Toggle expanded details panel for one order at a time.
     setExpandedOrderId((prev) => (prev === orderId ? null : orderId));
   };
 
@@ -76,25 +105,26 @@ function MyOrders() {
 
   return (
     <section className="my-orders-page">
-      {/* Page heading */}
       <div className="my-orders-head">
-        <p className="my-orders-kicker">Orders</p>
-        <h2>My Orders</h2>
-        <p className="my-orders-subtitle">
-          Track status, payment and delivery details for each order.
-        </p>
+        <div>
+          <p className="my-orders-kicker">Orders</p>
+          <h2>My Orders</h2>
+          <p className="my-orders-subtitle">
+            Follow each order through payment, fulfilment, and delivery in one calm place.
+          </p>
+        </div>
       </div>
+
       {error && <p className="my-orders-error">{error}</p>}
 
-      {/* Top KPI cards */}
       <div className="my-orders-metrics">
+        <article className="my-orders-metric feature">
+          <p>Total Spend</p>
+          <strong>{formatCurrencyINR(totalSpend)}</strong>
+        </article>
         <article className="my-orders-metric">
           <p>Total Orders</p>
           <strong>{orders.length}</strong>
-        </article>
-        <article className="my-orders-metric">
-          <p>Total Spend</p>
-          <strong>{formatCurrencyINR(totalSpend)}</strong>
         </article>
         <article className="my-orders-metric">
           <p>Pending</p>
@@ -109,71 +139,82 @@ function MyOrders() {
           <strong>{cancelledCount}</strong>
         </article>
       </div>
-      <div className="my-orders-section-divider" />
 
       {orders.length === 0 ? (
         <p className="my-orders-empty">You do not have any orders yet.</p>
       ) : (
-        // Desktop-style order list/table layout.
-        <div className="orders-table-shell">
-          <div className="orders-table-head">
-            <span>Order</span>
-            <span>Delivery</span>
-            <span>Items</span>
-            <span>Total</span>
-            <span>Payment</span>
-            <span>Status</span>
-            <span>Actions</span>
-          </div>
-
+        <div className="my-orders-list">
           {orders.map((order) => (
-            // One order row with optional expanded details.
-            <article key={order._id} className="order-row">
-              <div className="order-row-main">
-                <div className="order-col order-col-meta">
-                  <span className="order-col-label">Order</span>
-                  <p className="my-order-id">#{order._id.slice(-8)}</p>
-                  <p className="my-order-date">{formatDateIN(order.createdAt)}</p>
+            <article key={order._id} className="my-order-card">
+              <div className="my-order-card-top">
+                <div className="my-order-card-copy">
+                  <p className="my-order-card-kicker">Order #{order._id.slice(-8)}</p>
+                  <h3 className="my-order-card-title">{getItemsPreview(order)}</h3>
+                  <p className="my-order-card-subtitle">
+                    Placed on {formatDateIN(order.createdAt)}
+                  </p>
                 </div>
 
-                <p className="order-col order-col-delivery">
-                  <span className="order-col-label">Delivery</span>
-                  {getDeliveryLabel(order)}
-                </p>
-                <p className="order-col">
-                  <span className="order-col-label">Items</span>
-                  {order.items?.length || 0}
-                </p>
-                <p className="order-col order-col-total">
-                  <span className="order-col-label">Total</span>
-                  {formatCurrencyINR(order.totalAmount)}
-                </p>
+                <div className="my-order-card-head-side">
+                  <div className="my-order-card-chips">
+                    <span className={`payment-chip payment-${order.paymentStatus?.toLowerCase()}`}>
+                      {order.paymentStatus}
+                    </span>
+                    <span className={`my-order-status status-${order.orderStatus?.toLowerCase()}`}>
+                      {order.orderStatus}
+                    </span>
+                  </div>
 
-                <div className="order-col">
-                  <span className="order-col-label">Payment</span>
-                  <span className={`payment-chip payment-${order.paymentStatus?.toLowerCase()}`}>
-                    {order.paymentStatus}
-                  </span>
+                  <div className="my-order-card-total">
+                    <span>Total</span>
+                    <strong>{formatCurrencyINR(order.totalAmount)}</strong>
+                  </div>
                 </div>
+              </div>
 
-                <div className="order-col">
-                  <span className="order-col-label">Status</span>
-                  <span className={`my-order-status status-${order.orderStatus?.toLowerCase()}`}>
-                    {order.orderStatus}
-                  </span>
+              <div className="my-order-card-meta">
+                <div className="my-order-meta-pill">
+                  <span className="my-order-meta-label">Delivery</span>
+                  <strong>{getDeliveryLabel(order)}</strong>
                 </div>
+                <div className="my-order-meta-pill">
+                  <span className="my-order-meta-label">Items</span>
+                  <strong>
+                    {order.items?.length || 0} item{order.items?.length === 1 ? "" : "s"}
+                  </strong>
+                </div>
+                <div className="my-order-meta-pill">
+                  <span className="my-order-meta-label">Reference</span>
+                  <strong className="my-order-id">#{order._id.slice(-8)}</strong>
+                </div>
+              </div>
 
-                <div className="order-col order-actions">
-                  <span className="order-col-label">Actions</span>
+              <div className="my-order-card-actions">
+                <div className="my-order-card-actions-primary">
+                  <Link className="order-view-link" to={`/orders/my/${order._id}`}>
+                    View Order
+                  </Link>
+
                   <button
                     className="order-details-btn"
                     onClick={() => toggleDetails(order._id)}
                   >
-                    {expandedOrderId === order._id ? "Hide" : "Details"}
+                    {expandedOrderId === order._id ? "Hide Snapshot" : "Quick View"}
                   </button>
+                </div>
+
+                <div className="my-order-card-actions-secondary">
+                  {order.paymentStatus !== "Paid" && order.orderStatus !== "Cancelled" && (
+                    <button
+                      className="order-details-btn"
+                      onClick={() => handleRetryPayment(order)}
+                      disabled={retryingOrderId === order._id}
+                    >
+                      {retryingOrderId === order._id ? "Opening..." : "Retry Payment"}
+                    </button>
+                  )}
 
                   {order.orderStatus === "Pending" && (
-                    // Cancel is only allowed while pending.
                     <button
                       className="my-order-cancel-btn"
                       onClick={() => handleCancel(order._id)}
@@ -187,15 +228,14 @@ function MyOrders() {
               {expandedOrderId === order._id && (
                 <div className="order-row-details">
                   {!!order.items?.length && (
-                    <div className="details-block">
+                    <div className="details-block details-block-items">
                       <p className="details-title">Items</p>
                       <div className="details-items">
                         {order.items.map((item, index) => (
                           <div key={`${order._id}-${index}`} className="my-order-item-row">
                             <div className="my-order-item-meta">
-                              <span>
-                                {item.name || "Product"} • Qty {item.quantity}
-                              </span>
+                              <span>{item.name || "Product"}</span>
+                              <small>Qty {item.quantity}</small>
                             </div>
                             <strong>
                               {formatCurrencyINR((item.price || 0) * (item.quantity || 0))}
@@ -213,6 +253,13 @@ function MyOrders() {
                         {order.addressSnapshot.fullName}, {order.addressSnapshot.addressLine},{" "}
                         {order.addressSnapshot.city}, {order.addressSnapshot.country}
                       </p>
+                    </div>
+                  )}
+
+                  {order.payment?.failureReason && (
+                    <div className="details-block">
+                      <p className="details-title">Payment Update</p>
+                      <p className="my-order-address">{order.payment.failureReason}</p>
                     </div>
                   )}
                 </div>

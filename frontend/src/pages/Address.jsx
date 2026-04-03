@@ -10,6 +10,7 @@ import axios from "../api/axios";
 import { clearCart, setCartFromServer } from "../store/cartSlice";
 import { normalizeServerCart } from "../utils/cartHelpers";
 import { formatCurrencyINR } from "../utils/formatters";
+import { openRazorpayCheckout } from "../utils/razorpayCheckout";
 import "./Address.css";
 
 // Shared client-side address validator so user gets instant feedback
@@ -80,31 +81,6 @@ const validateAddressForm = (form) => {
   };
 };
 
-const loadRazorpayScript = () =>
-  new Promise((resolve) => {
-    if (window.Razorpay) {
-      resolve(true);
-      return;
-    }
-
-    const existingScript = document.querySelector(
-      'script[src="https://checkout.razorpay.com/v1/checkout.js"]'
-    );
-
-    if (existingScript) {
-      existingScript.addEventListener("load", () => resolve(true), { once: true });
-      existingScript.addEventListener("error", () => resolve(false), { once: true });
-      return;
-    }
-
-    const script = document.createElement("script");
-    script.src = "https://checkout.razorpay.com/v1/checkout.js";
-    script.async = true;
-    script.onload = () => resolve(true);
-    script.onerror = () => resolve(false);
-    document.body.appendChild(script);
-  });
-
 function Address() {
   // Which saved address card is currently selected for placing order.
   const [selectedAddressId, setSelectedAddressId] = useState(null);
@@ -153,76 +129,29 @@ function Address() {
   const [discountCode, setDiscountCode] = useState("");
 
   const startCheckoutPayment = async (addressId) => {
-    let shouldStopLoading = true;
-
     try {
-      setPlacingOrder(true);
       setApiError("");
-
-      const razorpayLoaded = await loadRazorpayScript();
-      if (!razorpayLoaded) {
-        setApiError("Unable to load Razorpay checkout. Please try again.");
-        return false;
-      }
 
       const { data: orderData } = await axios.post("/orders", {
         addressId
-      });
-      const { data: paymentData } = await axios.post("/payment/create-order", {
-        orderId: orderData.orderId
       });
 
       const selectedAddress = savedAddress.find(
         (address) => address._id === addressId
       );
 
-      const razorpay = new window.Razorpay({
-        key: paymentData.key,
-        amount: paymentData.order.amount,
-        currency: paymentData.order.currency,
-        name: "QALARAHI",
-        description: `Order #${orderData.orderId}`,
-        order_id: paymentData.razorpayOrderId,
-        handler: async (response) => {
-          try {
-            await axios.post("/payment/verify", {
-              appOrderId: orderData.orderId,
-              ...response
-            });
-
-            dispatch(clearCart());
-            navigate(`/checkout/success/${orderData.orderId || ""}`);
-          } catch (verifyErr) {
-            setApiError(
-              verifyErr.response?.data?.message || "Payment verification failed"
-            );
-          } finally {
-            setPlacingOrder(false);
-          }
+      return await openRazorpayCheckout({
+        orderId: orderData.orderId,
+        selectedAddress,
+        authUser,
+        contactEmail,
+        onLoadingChange: setPlacingOrder,
+        onError: setApiError,
+        onSuccess: async () => {
+          dispatch(clearCart());
+          navigate(`/checkout/success/${orderData.orderId || ""}`);
         },
-        prefill: {
-          name: selectedAddress?.fullName || authUser?.name || "",
-          email: contactEmail || authUser?.email || "",
-          contact: selectedAddress?.phone || ""
-        },
-        notes: {
-          address: selectedAddress
-            ? `${selectedAddress.addressLine}, ${selectedAddress.city}, ${selectedAddress.state} ${selectedAddress.pincode}, ${selectedAddress.country}`
-            : ""
-        },
-        theme: {
-          color: "#111111"
-        },
-        modal: {
-          ondismiss: () => {
-            setPlacingOrder(false);
-          }
-        }
       });
-
-      shouldStopLoading = false;
-      razorpay.open();
-      return true;
     } catch (err) {
       const backendMessage =
         err.response?.data?.message ||
@@ -232,10 +161,6 @@ function Address() {
 
       setApiError(backendMessage);
       return false;
-    } finally {
-      if (shouldStopLoading) {
-        setPlacingOrder(false);
-      }
     }
   };
 

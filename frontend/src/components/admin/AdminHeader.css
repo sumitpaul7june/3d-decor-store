@@ -1,92 +1,85 @@
 .admin-header {
-    height: 68px;
-    background: rgba(255, 255, 255, 0.92);
-    border-bottom: 1px solid #e8e1d6;
-    padding: 0 24px;
-
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    position: sticky;
-    top: 0;
-    z-index: 20;
-    backdrop-filter: blur(10px);
+  height: 76px;
+  background: rgba(255, 255, 255, 0.86);
+  border-bottom: 1px solid #e7dfd2;
+  padding: 0 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  backdrop-filter: blur(14px);
 }
 
 .admin-header-title {
-    font-size: 18px;
-    font-weight: 600;
-    margin-top: 3px;
-    letter-spacing: -0.03em;
-    color: #141414;
+  font-size: 28px;
+  font-weight: 700;
+  margin-top: 4px;
+  letter-spacing: -0.035em;
+  color: #141414;
 }
 
 .admin-header-kicker {
-    font-size: 11px;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: #8d8678;
-    font-weight: 600;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #8d8678;
+  font-weight: 600;
 }
 
 .admin-header-home {
-    font-size: 13px;
-    color: #141414;
-    text-decoration: none;
-    font-weight: 600;
-}
-
-.admin-header-home:hover {
-    text-decoration: underline;
+  font-size: 13px;
+  color: #141414;
+  text-decoration: none;
+  font-weight: 600;
 }
 
 .admin-header-right {
-    display: flex;
-    align-items: center;
-    gap: 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .admin-header-user {
-    font-size: 13px;
-    font-weight: 500;
-    color: #4c4c4c;
-    background: #f7f3ec;
-    padding: 6px 10px;
-    border-radius: 999px;
-    border: 1px solid #e7dfd2;
+  font-size: 13px;
+  font-weight: 600;
+  color: #6f6453;
+  background: #f6f0e6;
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid #e7dfd2;
 }
 
 .admin-header-logout {
-    background: #ffffff;
-    border: 1px solid #ddd6c9;
-    padding: 7px 12px;
-    border-radius: 999px;
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-}
-
-.admin-header-logout:hover {
-    background: #faf8f3;
+  background: #111827;
+  color: #fff;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 10px 20px rgba(17, 24, 39, 0.12);
 }
 
 .admin-header-title a {
-    color: inherit;
-    text-decoration: none;
-    font-weight: 600;
-}
-
-.admin-header-title a:hover {
-    opacity: 0.8;
+  color: inherit;
+  text-decoration: none;
+  font-weight: 700;
 }
 
 @media (max-width: 860px) {
-    .admin-header {
-        padding: 0 12px;
-        height: 62px;
-    }
+  .admin-header {
+    padding: 0 14px;
+    height: 68px;
+  }
 
-    .admin-header-home {
-        display: none;
-    }
+  .admin-header-home {
+    display: none;
+  }
+
+  .admin-header-title {
+    font-size: 22px;
+  }
 }
