@@ -56,7 +56,8 @@ export const createOrder = async (req, res) => {
 
     res.status(201).json({
       message: "Order created. Proceed to payment.",
-      orderId: newOrder._id
+      orderId: newOrder._id,
+      totalAmount: newOrder.totalAmount
     });
 
   } catch (error) {

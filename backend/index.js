@@ -1,5 +1,6 @@
-import express from "express";
 import dotenv from "dotenv";
+dotenv.config();
+import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 
@@ -13,11 +14,11 @@ import userRoutes from "./routes/userRoutes.js";
 import uploadRoutes from "./routes/uploadRoutes.js";
 import homeContentRoutes from "./routes/homeContentRoutes.js";
 import storePolicyRoutes from "./routes/storePolicyRoutes.js";
+import paymentRoutes from "./routes/paymentRoutes.js"; 
 
 import { protect } from "./middleware/authMiddleware.js";
 import { adminOnly } from "./middleware/adminMiddleware.js";
 
-dotenv.config();
 
 /* -------- CONNECT DATABASE -------- */
 connectDB();
@@ -38,6 +39,7 @@ app.use(cookieParser());
 
 /* -------- ROUTES -------- */
 
+app.use("/api/payment", paymentRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/cart", cartRoutes);

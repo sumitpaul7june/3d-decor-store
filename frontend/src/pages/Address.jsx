@@ -80,6 +80,31 @@ const validateAddressForm = (form) => {
   };
 };
 
+const loadRazorpayScript = () =>
+  new Promise((resolve) => {
+    if (window.Razorpay) {
+      resolve(true);
+      return;
+    }
+
+    const existingScript = document.querySelector(
+      'script[src="https://checkout.razorpay.com/v1/checkout.js"]'
+    );
+
+    if (existingScript) {
+      existingScript.addEventListener("load", () => resolve(true), { once: true });
+      existingScript.addEventListener("error", () => resolve(false), { once: true });
+      return;
+    }
+
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.async = true;
+    script.onload = () => resolve(true);
+    script.onerror = () => resolve(false);
+    document.body.appendChild(script);
+  });
+
 function Address() {
   // Which saved address card is currently selected for placing order.
   const [selectedAddressId, setSelectedAddressId] = useState(null);
@@ -104,6 +129,7 @@ function Address() {
   // Redux + router helpers.
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const authUser = useSelector((state) => state.auth.user);
 
   // Controlled form state for new address inputs.
   const [form, setForm] = useState({
@@ -125,6 +151,93 @@ function Address() {
   const [marketingOptIn, setMarketingOptIn] = useState(true);
   // Discount code input state (UI only for now).
   const [discountCode, setDiscountCode] = useState("");
+
+  const startCheckoutPayment = async (addressId) => {
+    let shouldStopLoading = true;
+
+    try {
+      setPlacingOrder(true);
+      setApiError("");
+
+      const razorpayLoaded = await loadRazorpayScript();
+      if (!razorpayLoaded) {
+        setApiError("Unable to load Razorpay checkout. Please try again.");
+        return false;
+      }
+
+      const { data: orderData } = await axios.post("/orders", {
+        addressId
+      });
+      const { data: paymentData } = await axios.post("/payment/create-order", {
+        orderId: orderData.orderId
+      });
+
+      const selectedAddress = savedAddress.find(
+        (address) => address._id === addressId
+      );
+
+      const razorpay = new window.Razorpay({
+        key: paymentData.key,
+        amount: paymentData.order.amount,
+        currency: paymentData.order.currency,
+        name: "QALARAHI",
+        description: `Order #${orderData.orderId}`,
+        order_id: paymentData.razorpayOrderId,
+        handler: async (response) => {
+          try {
+            await axios.post("/payment/verify", {
+              appOrderId: orderData.orderId,
+              ...response
+            });
+
+            dispatch(clearCart());
+            navigate(`/checkout/success/${orderData.orderId || ""}`);
+          } catch (verifyErr) {
+            setApiError(
+              verifyErr.response?.data?.message || "Payment verification failed"
+            );
+          } finally {
+            setPlacingOrder(false);
+          }
+        },
+        prefill: {
+          name: selectedAddress?.fullName || authUser?.name || "",
+          email: contactEmail || authUser?.email || "",
+          contact: selectedAddress?.phone || ""
+        },
+        notes: {
+          address: selectedAddress
+            ? `${selectedAddress.addressLine}, ${selectedAddress.city}, ${selectedAddress.state} ${selectedAddress.pincode}, ${selectedAddress.country}`
+            : ""
+        },
+        theme: {
+          color: "#111111"
+        },
+        modal: {
+          ondismiss: () => {
+            setPlacingOrder(false);
+          }
+        }
+      });
+
+      shouldStopLoading = false;
+      razorpay.open();
+      return true;
+    } catch (err) {
+      const backendMessage =
+        err.response?.data?.message ||
+        err.response?.data?.error?.description ||
+        err.response?.data?.error ||
+        "Failed to start payment";
+
+      setApiError(backendMessage);
+      return false;
+    } finally {
+      if (shouldStopLoading) {
+        setPlacingOrder(false);
+      }
+    }
+  };
 
   // Generic input handler for all form fields.
   // It updates state using input's `name` as key.
@@ -208,6 +321,10 @@ function Address() {
         postalCode: "",
         country: "India",
       });
+
+      if (latestAddress?._id) {
+        await startCheckoutPayment(latestAddress._id);
+      }
     } catch (err) {
       // Map backend field names to frontend form field names.
       const backendErrors = err.response?.data?.errors || {};
@@ -342,26 +459,7 @@ function Address() {
       return;
     }
 
-    try {
-      // Start action loading and clear old error.
-      setPlacingOrder(true);
-      setApiError("");
-
-      // Create order using selected address id.
-      const { data } = await axios.post("/orders", { addressId: selectedAddressId });
-
-      // Clear cart in Redux after successful order create.
-      dispatch(clearCart());
-
-      // Navigate to success page with order id.
-      navigate(`/checkout/success/${data.orderId || ""}`);
-    } catch (err) {
-      // Show backend error if order creation fails.
-      setApiError(err.response?.data?.message || "Failed to place order");
-    } finally {
-      // Stop button loading.
-      setPlacingOrder(false);
-    }
+    await startCheckoutPayment(selectedAddressId);
   };
 
   // Keep address form visible if user has no saved addresses yet.
@@ -596,33 +694,25 @@ function Address() {
                     Cancel
                   </button>
                   <button type="submit" disabled={savingAddress}>
-                    {savingAddress ? "Saving..." : "Save Address"}
+                    {savingAddress ? "Saving..." : "Save address & proceed to payment"}
                   </button>
                 </div>
               </form>
             )}
           </section>
 
-          {/* Payment block is currently a visual stub until gateway integration */}
+          {/* Payment section explains the actual Razorpay handoff */}
           <section className="checkout-section payment-section">
             <h3>Payment</h3>
             <p className="payment-caption">All transactions are secure and encrypted.</p>
             <div className="payment-card-box">
               <div className="payment-card-head">
                 <span className="payment-dot" />
-                <span>Credit card</span>
-                <span className="card-badges">
-                  <i>VISA</i>
-                  <i>MC</i>
-                  <i>AMEX</i>
-                </span>
+                <span>Secure Razorpay Checkout</span>
               </div>
-              <input className="checkout-input" placeholder="Card number" disabled />
-              <div className="form-row two-col">
-                <input className="checkout-input" placeholder="Expiration date (MM / YY)" disabled />
-                <input className="checkout-input" placeholder="Security code" disabled />
-              </div>
-              <input className="checkout-input" placeholder="Name on card" disabled />
+              <p className="payment-caption">
+                After you confirm your address, payment will open in Razorpay where you can pay using card, UPI, net banking, or wallet.
+              </p>
             </div>
           </section>
 
@@ -631,7 +721,7 @@ function Address() {
             onClick={handlePlaceOrder}
             disabled={!selectedAddressId || placingOrder}
           >
-            {placingOrder ? "Placing order..." : "Place secure order"}
+            {placingOrder ? "Opening payment..." : "Proceed to payment"}
           </button>
         </div>
 
