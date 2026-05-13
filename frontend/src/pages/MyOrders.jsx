@@ -14,10 +14,11 @@ function MyOrders() {
   const navigate = useNavigate();
   const authUser = useSelector((state) => state.auth.user);
 
-  const { data: orders = [], loading, error, reload } = useFetch(async () => {
+  const { data: rawOrders = [], loading, error, reload } = useFetch(async () => {
     const { data } = await axios.get("/orders/my-orders");
     return data || [];
   });
+  const orders = rawOrders || [];
 
   const handleRetryPayment = async (order) => {
     await openRazorpayCheckout({

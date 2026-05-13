@@ -9,10 +9,11 @@ import "./AdminUsers.css";
 function AdminUsers() {
   const [query, setQuery] = useState("");
 
-  const { data: users = [], loading, error } = useFetch(async () => {
+  const { data: rawUsers = [], loading, error } = useFetch(async () => {
     const { data } = await axios.get("/users/admin/all");
     return Array.isArray(data) ? data : [];
   });
+  const users = rawUsers || [];
 
   const filteredUsers = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();

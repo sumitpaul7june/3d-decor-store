@@ -11,7 +11,7 @@ import { useState, useEffect, useCallback } from "react";
  * @returns {{ data: any, loading: boolean, error: string, reload: () => void }}
  */
 export function useFetch(fetcher) {
-  const [data, setData] = useState(null);
+  const [data, setData] = useState();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 

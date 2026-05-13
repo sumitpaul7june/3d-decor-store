@@ -13,10 +13,11 @@ function AdminOrders() {
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
 
-  const { data: orders = [], loading, error, reload } = useFetch(async () => {
+  const { data: rawOrders = [], loading, error, reload } = useFetch(async () => {
     const { data } = await axios.get("/orders");
     return data || [];
   });
+  const orders = rawOrders || [];
 
   const handleStatusChange = async (id, newStatus) => {
     try {

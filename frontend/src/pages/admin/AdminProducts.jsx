@@ -14,10 +14,11 @@ function AdminProducts() {
   const [query, setQuery] = useState("");
   const [mutationError, setMutationError] = useState("");
 
-  const { data: products = [], loading, error: fetchError, reload } = useFetch(async () => {
+  const { data: rawProducts = [], loading, error: fetchError, reload } = useFetch(async () => {
     const { data } = await axios.get("/products/admin/all");
     return data || [];
   });
+  const products = rawProducts || [];
 
   // Surface either the fetch error or a mutation error.
   const error = mutationError || fetchError;

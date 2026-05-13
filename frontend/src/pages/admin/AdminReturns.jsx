@@ -6,10 +6,11 @@ import AdminPageHeader from "../../components/admin/AdminPageHeader";
 import "./AdminReturns.css";
 
 function AdminReturns() {
-  const { data: returns = [], loading, error, reload } = useFetch(async () => {
+  const { data: rawReturns = [], loading, error, reload } = useFetch(async () => {
     const { data } = await axios.get("/returns/admin/all");
     return data || [];
   });
+  const returns = rawReturns || [];
 
   // Inline-edit state for the currently opened return.
   const [activeReturn, setActiveReturn] = useState(null);
