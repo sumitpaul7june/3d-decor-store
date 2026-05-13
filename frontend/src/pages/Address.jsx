@@ -390,10 +390,9 @@ function Address() {
   // Keep address form visible if user has no saved addresses yet.
   const shouldShowAddressForm = showForm || savedAddress.length === 0;
 
-  // Initial loading UI while checkout data is being fetched.
   if (loadingCheckout) {
     return (
-      <section className="checkout-page">
+      <section className="checkout-page loading-checkout">
         <p>Loading checkout...</p>
       </section>
     );

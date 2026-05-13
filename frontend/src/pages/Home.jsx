@@ -24,11 +24,6 @@ const fallbackHeroSlides = [
   }
 ];
 
-const fallbackCategories = [
-  { title: "Wall Decor", image: showcaseImages[0], link: "/products" },
-  { title: "Sculptural Accents", image: showcaseImages[1], link: "/products" },
-];
-
 const fallbackTestimonials = [
   { author: "Aarohi Mehta", role: "Mumbai", quote: "The finish looked premium in person and the piece instantly made our living room feel more complete." }
 ];
@@ -72,7 +67,6 @@ function Home() {
   // Compute Active CMS Data
   const hasCMS = homeContent !== null;
   const activeHeroSlides = hasCMS && homeContent.heroSlides?.length > 0 ? homeContent.heroSlides : fallbackHeroSlides;
-  const activeCategories = hasCMS && homeContent.featuredCategories?.length > 0 ? homeContent.featuredCategories : fallbackCategories;
   const activeTestimonials = hasCMS && homeContent.testimonials?.length > 0 ? homeContent.testimonials : fallbackTestimonials;
   
   // Use CMS curated products, fallback to generic recent products
@@ -82,11 +76,11 @@ function Home() {
 
   const sectionOrder = hasCMS && homeContent.sectionOrder?.length > 0 
     ? homeContent.sectionOrder 
-    : ["promo", "hero", "categories", "products", "testimonials"];
+    : ["promo", "hero", "products", "testimonials"];
   
   const visibilityFlags = hasCMS && homeContent.visibilityFlags 
     ? homeContent.visibilityFlags 
-    : { promo: false, hero: true, categories: true, products: true, testimonials: true };
+    : { promo: false, hero: true, products: true, testimonials: true };
 
   const promoStrip = homeContent?.promoStrip || { active: false };
 
@@ -175,33 +169,7 @@ function Home() {
     );
   };
 
-  const renderCategories = () => {
-    if (!visibilityFlags.categories) return null;
-    return (
-      <section className="category-section">
-        <div className="section-heading center">
-          <p className="section-kicker">Shop By Category</p>
-          <h2 className="section-title">Collections with a quieter, refined feel</h2>
-        </div>
-        <div className="category-grid">
-          {activeCategories.map((card, index) => (
-            <Link
-              key={`cat-${index}`}
-              className="category-card"
-              to={card.link || "/products"}
-              style={{ backgroundImage: `linear-gradient(180deg, rgba(15, 15, 15, 0.02) 0%, rgba(15, 15, 15, 0.52) 100%), url(${card.image})` }}
-            >
-              <div className="category-card-content">
-                <span>{card.subtitle || "Collection"}</span>
-                <h3>{card.title}</h3>
-                <p>Explore</p>
-              </div>
-            </Link>
-          ))}
-        </div>
-      </section>
-    );
-  };
+
 
   const renderProducts = () => {
     if (!visibilityFlags.products) return null;
@@ -257,7 +225,6 @@ function Home() {
   const blockRenderers = {
     promo: renderPromo,
     hero: renderHero,
-    categories: renderCategories,
     products: renderProducts,
     testimonials: renderTestimonials,
   };

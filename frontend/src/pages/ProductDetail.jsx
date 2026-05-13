@@ -15,9 +15,6 @@ import {
 } from "../utils/productRoutes";
 import "./ProductDetail.css";
 
-const toFinishClass = (finishName = "") =>
-  `swatch-${finishName.toLowerCase().replace(/\s+/g, "-")}`;
-
 const parseInfoBlocks = (content = "") => {
   const lines = String(content)
     .split("\n")
@@ -75,8 +72,6 @@ function ProductDetail() {
   const [addedFeedback, setAddedFeedback] = useState(false);
   const [product, setProduct] = useState(null);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
-  const [selectedFinish, setSelectedFinish] = useState("");
-  const [selectedStyle, setSelectedStyle] = useState("");
   const [quantity, setQuantity] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -132,8 +127,6 @@ function ProductDetail() {
 
     const presentation = getProductPresentation(product);
     setSelectedImageIndex(0);
-    setSelectedFinish(presentation.finishes[0]?.name || "");
-    setSelectedStyle(presentation.styleOptions[0] || "");
     setQuantity(1);
   }, [product, location.pathname, navigate]);
 
@@ -287,45 +280,6 @@ function ProductDetail() {
           </div>
 
           <p className="pd-tax-note">Inclusive of all taxes. Ships across India.</p>
-
-          <div className="pd-option-group">
-            <div className="pd-option-row">
-              <span className="pd-option-label">Finish</span>
-              <span className="pd-option-value">{selectedFinish}</span>
-            </div>
-
-            <div className="pd-finish-list">
-              {presentation.finishes.map((finish) => (
-                <button
-                  key={finish.name}
-                  className={`pd-finish-btn ${
-                    selectedFinish === finish.name ? "active" : ""
-                  }`}
-                  onClick={() => setSelectedFinish(finish.name)}
-                >
-                  <span className={`pd-finish-swatch ${toFinishClass(finish.name)}`} />
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="pd-option-group">
-            <div className="pd-option-row">
-              <span className="pd-option-label">Style</span>
-            </div>
-
-            <div className="pd-style-list">
-              {presentation.styleOptions.map((option) => (
-                <button
-                  key={option}
-                  className={`pd-style-btn ${selectedStyle === option ? "active" : ""}`}
-                  onClick={() => setSelectedStyle(option)}
-                >
-                  {option}
-                </button>
-              ))}
-            </div>
-          </div>
 
           <div className="pd-actions">
             <div className="pd-quantity">
