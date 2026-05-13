@@ -2,7 +2,7 @@ import Product from "../models/Product.js";
 
 const buildTypeFilter = (type) => {
   return {
-    type: "physical"
+    $or: [{ type: "physical" }, { type: { $exists: false } }]
   };
 };
 
@@ -37,7 +37,7 @@ export const getAllProducts = async (req, res) => {
         const { type, q, category, sort, material, minPrice, maxPrice, inStock } = req.query;
         const filter = buildTypeFilter(type);
         
-        filter.status = "published";
+        filter.status = { $ne: "draft" };
 
         if (q) {
            filter.$or = [
@@ -93,7 +93,7 @@ export const getProductById = async (req, res) => {
   try {
     const product = await Product.findOne({
       _id: req.params.id,
-      type: "physical"
+      $or: [{ type: "physical" }, { type: { $exists: false } }]
     });
 
     if (!product) {
@@ -155,7 +155,7 @@ export const updateProduct = async (req, res) => {
     const product = await Product.findOneAndUpdate(
       {
         _id: req.params.id,
-        type: "physical"
+        $or: [{ type: "physical" }, { type: { $exists: false } }]
       },
       payload,
       { new: true }

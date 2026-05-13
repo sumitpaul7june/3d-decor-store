@@ -97,7 +97,7 @@ export const getDashboardStats = async (req, res) => {
     }));
 
     // 4. Feeds
-    const [recentOrders, recentReturns, recentCustomers] = await Promise.all([
+    const [recentOrders, recentReturns, recentCustomers, lowStockAlerts] = await Promise.all([
       Order.find().sort({ createdAt: -1 }).limit(4).populate("user", "name email"),
       ReturnRequest.find({ status: "Requested" }).sort({ createdAt: -1 }).limit(4).populate("user", "name email").populate("order", "_id"),
       User.find({ role: "user" }).sort({ createdAt: -1 }).limit(4),

@@ -5,24 +5,7 @@ import axios from "../api/axios";
 import { showcaseImages } from "../data/showcaseImages";
 import "./Home.css";
 
-const fallbackHeroSlides = [
-  {
-    id: "hero-1",
-    title: "Handpicked decor for elevated modern homes",
-    subtitle: "Discover statement pieces, warm textures, and sculptural accents designed to transform blank walls and styled corners.",
-    ctaLabel: "Shop All",
-    ctaLink: "/products",
-    image: showcaseImages[0],
-  },
-  {
-    id: "hero-2",
-    title: "Bring gallery-like styling into everyday spaces",
-    subtitle: "Build a home that feels layered, collected, and premium with decor chosen for visual impact and softness.",
-    ctaLabel: "Explore Collection",
-    ctaLink: "/products",
-    image: showcaseImages[1],
-  }
-];
+const fallbackHeroSlides = [];
 
 const fallbackTestimonials = [
   { author: "Aarohi Mehta", role: "Mumbai", quote: "The finish looked premium in person and the piece instantly made our living room feel more complete." }
@@ -110,7 +93,7 @@ function Home() {
   };
 
   const renderHero = () => {
-    if (!visibilityFlags.hero) return null;
+    if (!visibilityFlags.hero || activeHeroSlides.length === 0) return null;
     return (
       <section className="hero-carousel">
         <div className="hero-track" style={{ transform: `translateX(-${current * 100}%)` }}>
