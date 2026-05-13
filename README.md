@@ -65,68 +65,12 @@ A full-stack e-commerce platform for premium home decor and interior design prod
 
 ---
 
-## 🚀 Getting Started
+## 🌐 Live
 
-### Prerequisites
-- **Node.js** v18+
-- **MongoDB** (local or Atlas)
-- **Razorpay** account (for payments)
-- **Google Cloud Console** project (for OAuth)
-
-### 1. Clone the repository
-```bash
-git clone https://github.com/sumitpaul7june/3d-decor-store.git
-cd 3d-decor-store
-```
-
-### 2. Setup Backend
-```bash
-cd backend
-npm install
-```
-
-Create a `.env` file in `backend/`:
-```env
-PORT=5000
-MONGO_URI=your_mongodb_connection_string
-JWT_SECRET=your_jwt_secret
-GOOGLE_CLIENT_ID=your_google_client_id
-GOOGLE_CLIENT_SECRET=your_google_client_secret
-RAZORPAY_KEY_ID=your_razorpay_key_id
-RAZORPAY_KEY_SECRET=your_razorpay_key_secret
-EMAIL_USER=your_email
-EMAIL_PASS=your_email_app_password
-```
-
-Start the backend:
-```bash
-npm run dev
-```
-
-### 3. Setup Frontend
-```bash
-cd frontend
-npm install
-```
-
-Create a `.env` file in `frontend/`:
-```env
-VITE_GOOGLE_CLIENT_ID=your_google_client_id
-```
-
-Start the frontend:
-```bash
-npm run dev
-```
-
-The app will be available at `http://localhost:5173`.
+Visit the store → [**qalarahi.com**](https://qalarahi.com)
 
 ---
 
 ## 📜 License
 
 This project is proprietary. All rights reserved.
-
----
-
-<p align="center">Built with ❤️ by <a href="https://github.com/sumitpaul7june">Sumit Paul</a></p>
