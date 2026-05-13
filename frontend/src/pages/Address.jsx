@@ -619,7 +619,7 @@ function Address() {
                     Cancel
                   </button>
                   <button type="submit" disabled={savingAddress}>
-                    {savingAddress ? "Saving..." : "Save address & proceed to payment"}
+                    {savingAddress ? "Saving..." : "Save address"}
                   </button>
                 </div>
               </form>

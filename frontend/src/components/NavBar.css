@@ -336,3 +336,45 @@
         font: inherit;
     }
 }
+
+.nav-search-item {
+  display: flex;
+  align-items: center;
+}
+
+.nav-search-form {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #111;
+  padding-bottom: 2px;
+}
+
+.nav-search-form input {
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 13px;
+  width: 120px;
+  transition: width 0.3s ease;
+  color: #111;
+}
+
+.nav-search-form input:focus {
+  width: 180px;
+}
+
+.nav-search-form button {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: #111;
+  display: flex;
+  align-items: center;
+}
+
+.nav-search-form svg {
+  width: 16px;
+  height: 16px;
+}
+

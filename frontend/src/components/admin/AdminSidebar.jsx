@@ -80,6 +80,15 @@ function AdminSidebar() {
         </NavLink>
 
         <NavLink
+          to="/admin/returns"
+          className={({ isActive }) =>
+            isActive ? "sidebar-item active" : "sidebar-item"
+          }
+        >
+          Returns / RMAs
+        </NavLink>
+
+        <NavLink
           to="/admin/inventory"
           className="sidebar-item disabled"
           onClick={(e) => e.preventDefault()}

@@ -88,3 +88,29 @@ export const uploadProductImage = async (req, res) => {
     return res.status(500).json({ message: error.message || "Upload failed" });
   }
 };
+
+// Upload general media (supports video and images up to 50MB, admin-only).
+export const uploadMedia = async (req, res) => {
+  try {
+    if (!hasCloudinaryEnv()) {
+      return res.status(500).json({ message: "Cloudinary env variables are missing" });
+    }
+
+    const { fileDataUrl, fileName } = req.body;
+
+    if (!fileDataUrl || !/^data:(image|video)\/[^;]+;base64,/.test(fileDataUrl)) {
+      return res.status(400).json({ message: "Valid media data (image or video) is required" });
+    }
+
+    const uploaded = await uploadToCloudinary(
+      fileDataUrl,
+      fileName,
+      "storefront/media",
+      "auto"
+    );
+
+    return res.status(201).json(uploaded);
+  } catch (error) {
+    return res.status(500).json({ message: error.message || "Upload failed" });
+  }
+};

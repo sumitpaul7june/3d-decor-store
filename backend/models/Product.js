@@ -23,6 +23,11 @@ const productSchema = new mongoose.Schema(
       required: true
     },
 
+    stock: {
+      type: Number,
+      default: 0
+    },
+
     type: {
       type: String,
       enum: ["physical"],
@@ -47,6 +52,16 @@ const productSchema = new mongoose.Schema(
 
     coverImage: {
       type: String
+    },
+
+    averageRating: {
+      type: Number,
+      default: 0
+    },
+
+    numReviews: {
+      type: Number,
+      default: 0
     }
   },
   { timestamps: true }

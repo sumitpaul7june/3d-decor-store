@@ -84,6 +84,9 @@ function ProductDetail() {
     shippingInfo: "",
     returnPolicy: ""
   });
+  
+  const [reviews, setReviews] = useState([]);
+
   const dispatch = useDispatch();
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
 
@@ -94,12 +97,14 @@ function ProductDetail() {
         setError("");
 
         const productId = getProductIdFromRouteParam(productSlug);
-        const [productResponse, policiesResponse] = await Promise.all([
+        const [productResponse, policiesResponse, reviewsResponse] = await Promise.all([
           axios.get(`/products/${productId}`),
-          axios.get("/store-policies").catch(() => ({ data: null }))
+          axios.get("/store-policies").catch(() => ({ data: null })),
+          axios.get(`/reviews/${productId}`).catch(() => ({ data: [] }))
         ]);
 
         setProduct(productResponse.data);
+        setReviews(reviewsResponse.data || []);
         setStorePolicies({
           shippingInfo: policiesResponse.data?.shippingInfo || "",
           returnPolicy: policiesResponse.data?.returnPolicy || ""
@@ -199,6 +204,8 @@ function ProductDetail() {
     }
   };
 
+
+
   const handlePrevImage = () => {
     setSelectedImageIndex((prev) => (prev - 1 + gallery.length) % gallery.length);
   };
@@ -263,8 +270,8 @@ function ProductDetail() {
           <p className="pd-subcopy">{presentation.shortDescription}</p>
 
           <div className="pd-rating-row">
-            <span className="pd-stars">★★★★★</span>
-            <span>{presentation.trustNote}</span>
+            <span className="pd-stars">★ {product.averageRating || 5}</span>
+            <span>({product.numReviews || 0} reviews) • {presentation.trustNote}</span>
           </div>
 
           <div className="pd-price-row">
@@ -403,7 +410,28 @@ function ProductDetail() {
                 </div>
               </div>
             </div>
+
+
           </div>
+        </div>
+      </div>
+
+      <div className="pd-full-width-reviews">
+        <h3>Customer Reviews</h3>
+        <div className="pd-reviews-list">
+          {reviews.length === 0 ? (
+            <p className="pd-no-reviews">No reviews yet. Be the first to review this piece!</p>
+          ) : (
+            reviews.map((r) => (
+              <div key={r._id} className="pd-review-card">
+                <div className="pd-rc-head">
+                  <strong>{r.user?.name || "Customer"}</strong>
+                  <span className="pd-rc-stars">{"★".repeat(r.rating)}{"☆".repeat(5-r.rating)}</span>
+                </div>
+                <p>{r.comment}</p>
+              </div>
+            ))
+          )}
         </div>
       </div>
     </section>

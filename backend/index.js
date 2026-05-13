@@ -15,6 +15,9 @@ import uploadRoutes from "./routes/uploadRoutes.js";
 import homeContentRoutes from "./routes/homeContentRoutes.js";
 import storePolicyRoutes from "./routes/storePolicyRoutes.js";
 import paymentRoutes from "./routes/paymentRoutes.js"; 
+import returnRoutes from "./routes/returnRoutes.js";
+import analyticsRoutes from "./routes/analyticsRoutes.js";
+import reviewRoutes from "./routes/reviewRoutes.js";
 
 import { protect } from "./middleware/authMiddleware.js";
 import { adminOnly } from "./middleware/adminMiddleware.js";
@@ -48,6 +51,9 @@ app.use("/api/users", userRoutes);
 app.use("/api/upload", uploadRoutes);
 app.use("/api/home-content", homeContentRoutes);
 app.use("/api/store-policies", storePolicyRoutes);
+app.use("/api/returns", returnRoutes);
+app.use("/api/analytics", analyticsRoutes);
+app.use("/api/reviews", reviewRoutes);
 
 /* -------- TEST ROUTES -------- */
 

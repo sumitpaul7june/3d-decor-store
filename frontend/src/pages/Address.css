@@ -6,13 +6,13 @@
 .checkout-shell {
   max-width: 1220px;
   margin: 0 auto;
-  border: 1px solid #ebe6dd;
-  border-radius: 28px;
+  border: 1px solid #ece8e0;
+  border-radius: 26px;
   background: #ffffff;
   display: grid;
   grid-template-columns: 1fr;
   overflow: hidden;
-  box-shadow: 0 24px 70px rgba(17, 17, 17, 0.05);
+  box-shadow: 0 24px 60px rgba(17, 24, 39, 0.05);
 }
 
 .checkout-main-pane {
@@ -58,10 +58,11 @@
 
 .checkout-section {
   margin-bottom: 1.25rem;
-  border: 1px solid #eee8de;
-  border-radius: 20px;
-  padding: 1.15rem;
-  background: #ffffff;
+  border: 1px solid #ece8e0;
+  border-radius: 22px;
+  padding: 1.25rem;
+  background: linear-gradient(180deg, #ffffff 0%, #fcfbf8 100%);
+  box-shadow: 0 12px 24px rgba(17, 24, 39, 0.02);
 }
 
 .section-head {
@@ -94,19 +95,20 @@
 .address-form input,
 .address-form select {
   width: 100%;
-  border: 1px solid #d9d5cd;
+  border: 1px solid #ddd4c6;
   border-radius: 12px;
-  padding: 0.82rem 0.92rem;
+  padding: 0.88rem 1rem;
   background: #ffffff;
   font-size: 0.94rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .checkout-input:focus,
 .address-form input:focus,
 .address-form select:focus {
   outline: none;
-  border-color: #171717;
-  box-shadow: 0 0 0 1px #171717;
+  border-color: #b88f4b;
+  box-shadow: 0 0 0 3px rgba(184, 143, 75, 0.1);
 }
 
 .checkbox-row {
@@ -324,17 +326,27 @@
   width: 100%;
   border: none;
   border-radius: 999px;
-  background: #111111;
+  background: #111827;
   color: #ffffff;
   font-size: 0.95rem;
   font-weight: 600;
-  padding: 0.98rem 1.2rem;
+  padding: 1.1rem 1.4rem;
   cursor: pointer;
+  box-shadow: 0 12px 24px rgba(17, 24, 39, 0.12);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.review-order-btn:hover {
+  background: #1f2937;
+  transform: translateY(-1px);
+  box-shadow: 0 16px 28px rgba(17, 24, 39, 0.16);
 }
 
 .review-order-btn:disabled {
   opacity: 0.65;
   cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
 }
 
 .summary-head {

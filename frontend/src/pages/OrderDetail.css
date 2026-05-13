@@ -147,7 +147,8 @@
   background: #fff;
   border: 1px solid #ece8e0;
   border-radius: 22px;
-  padding: 22px;
+  padding: 24px;
+  box-shadow: 0 20px 44px rgba(17, 24, 39, 0.04);
 }
 
 .order-detail-card.subtle {
@@ -191,6 +192,7 @@
   border-radius: 999px;
   background: #111827;
   margin-top: 4px;
+  box-shadow: 0 0 0 6px rgba(17, 24, 39, 0.06);
 }
 
 .order-timeline-line {
@@ -380,6 +382,165 @@
   color: #b42318;
 }
 
+.order-return-status-box {
+  background: #f7f8fc;
+  border: 1px solid #e1e7f5;
+  border-radius: 16px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.order-return-status-box h4 {
+  font-size: 15px;
+  color: #111827;
+  margin-bottom: 8px;
+}
+
+.return-stepper {
+  display: flex;
+  margin-top: 12px;
+  position: relative;
+}
+
+.return-step {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.return-step:last-child {
+  flex: 0;
+  min-width: 60px;
+}
+
+.return-step-marker {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #d6d3cd;
+  box-shadow: 0 0 0 4px #f7f8fc;
+  z-index: 2;
+  transition: background 0.3s ease;
+}
+
+.return-step-line {
+  position: absolute;
+  top: 5px;
+  left: 50%;
+  width: 100%;
+  height: 2px;
+  background: #d6d3cd;
+  z-index: 1;
+  transition: background 0.3s ease;
+}
+
+.return-step p {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #9ca3af;
+  margin-top: 10px;
+  text-align: center;
+  line-height: 1.4;
+}
+
+.return-step.completed .return-step-marker,
+.return-step.completed .return-step-line {
+  background: #111827;
+}
+
+.return-step.completed p {
+  color: #111827;
+  font-weight: 600;
+}
+
+.return-rejected-box {
+  background: #fdf5f5;
+  border: 1px solid #f7d4d4;
+  color: #b42318;
+  padding: 12px 14px;
+  border-radius: 12px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.return-refund-amt {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #e1e7f5;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.return-refund-amt span {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #6b7280;
+}
+
+.return-refund-amt strong {
+  font-size: 16px;
+  color: #18794e;
+}
+
+.order-return-form {
+  background: #fff;
+  border: 1px solid #ece8e0;
+  border-radius: 16px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.order-return-form h4 {
+  font-size: 16px;
+  color: #111827;
+  margin-bottom: 4px;
+}
+
+.order-return-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.order-return-form label span {
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b7280;
+}
+
+.order-return-form select,
+.order-return-form textarea {
+  border: 1px solid #ddd4c6;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 13px;
+  background: #fff;
+  font-family: inherit;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.order-return-form select:focus,
+.order-return-form textarea:focus {
+  outline: none;
+  border-color: #b88f4b;
+  box-shadow: 0 0 0 3px rgba(184, 143, 75, 0.1);
+}
+
+.return-form-acts {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
 @media (max-width: 1100px) {
   .order-detail-hero,
   .order-detail-layout {
@@ -424,4 +585,80 @@
     width: 100%;
     height: 220px;
   }
+}
+
+/* Order Detail Review Section */
+.order-detail-review-section {
+  padding: 12px 0;
+  border-top: 1px dashed #eaeaea;
+}
+
+.order-review-toggle-btn {
+  background: transparent;
+  color: #111;
+  border: 1px solid #111;
+  padding: 6px 12px;
+  font-size: 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.order-review-toggle-btn:hover {
+  background: #111;
+  color: #fff;
+}
+
+.order-review-form {
+  background: #f7f8fc;
+  padding: 16px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.order-review-form h4 {
+  font-size: 14px;
+  margin: 0;
+}
+
+.order-review-form select,
+.order-review-form textarea {
+  border: 1px solid #dcdcdc;
+  padding: 8px;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 13px;
+  width: 100%;
+}
+
+.order-review-acts {
+  display: flex;
+  gap: 8px;
+}
+
+.order-review-acts button {
+  padding: 8px 16px;
+  font-size: 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  border: none;
+}
+
+.order-review-acts button[type="submit"] {
+  background: #111;
+  color: #fff;
+}
+
+.order-review-acts button[type="button"] {
+  background: transparent;
+  color: #666;
+  text-decoration: underline;
+}
+
+.order-review-msg {
+  color: #a80000;
+  font-size: 12px;
 }

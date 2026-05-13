@@ -1,42 +1,29 @@
 // Admin orders page: view, filter, and update order statuses.
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "../../api/axios";
+import { useFetch } from "../../hooks/useFetch";
 import { formatCurrencyINR, formatDateIN } from "../../utils/formatters";
 import { getProductPresentation } from "../../utils/productPresentation";
+import AdminPageHeader from "../../components/admin/AdminPageHeader";
 import "./AdminOrders.css";
 
 function AdminOrders() {
-  // Orders table data + filter states.
-  const [orders, setOrders] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  // Filter UI state lives here; data comes from the hook.
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
 
-  const fetchOrders = async () => {
-    try {
-      setLoading(true);
-      setError("");
-      const { data } = await axios.get("/orders");
-      setOrders(data || []);
-    } catch (err) {
-      setError(err.response?.data?.message || "Failed to load orders");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchOrders();
-  }, []);
+  const { data: orders = [], loading, error, reload } = useFetch(async () => {
+    const { data } = await axios.get("/orders");
+    return data || [];
+  });
 
   const handleStatusChange = async (id, newStatus) => {
     try {
       await axios.put(`/orders/${id}/status`, { status: newStatus });
-      await fetchOrders();
+      await reload();
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to update order");
+      console.error(err.response?.data?.message || "Failed to update order");
     }
   };
 
@@ -57,25 +44,16 @@ function AdminOrders() {
     return matchesQuery && matchesStatus;
   });
 
-  const pendingCount = orders.filter(
-    (order) => order.orderStatus === "Pending"
-  ).length;
-
-  const paidCount = orders.filter(
-    (order) => order.paymentStatus === "Paid"
-  ).length;
+  const pendingCount = orders.filter((order) => order.orderStatus === "Pending").length;
+  const paidCount = orders.filter((order) => order.paymentStatus === "Paid").length;
 
   return (
     <section className="admin-orders">
-      <div className="admin-page-head">
-        <div>
-          <p className="admin-page-kicker">Fulfilment</p>
-          <h1 className="admin-orders-title">Orders</h1>
-          <p className="admin-page-subtitle">
-            Review every order, update status, and open the full detail view.
-          </p>
-        </div>
-      </div>
+      <AdminPageHeader
+        kicker="Fulfilment"
+        title="Orders"
+        subtitle="Review every order, update status, and open the full detail view."
+      />
 
       {error && <p className="admin-orders-error">{error}</p>}
 
@@ -161,10 +139,7 @@ function AdminOrders() {
                     <div className="order-preview-stack">
                       {previewItems.map((item, index) => {
                         const product = item.product || {};
-                        const previewProduct = {
-                          ...product,
-                          name: item.name || product.name,
-                        };
+                        const previewProduct = { ...product, name: item.name || product.name };
                         const previewImage = getProductPresentation(previewProduct).coverImage;
 
                         return (

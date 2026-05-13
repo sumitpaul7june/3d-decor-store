@@ -39,12 +39,13 @@ const authSlice = createSlice({
             state.isAuthenticated = true;
             state.user = action.payload;
 
-            // Persist auth state for refresh support.
+            // Persist ONLY necessary fields in local storage to minimize security footprint.
+            const { _id, name, email, role, googleId } = action.payload || {};
             localStorage.setItem(
                 "auth",
                 JSON.stringify({
                     isAuthenticated: true,
-                    user: action.payload,
+                    user: { _id, name, email, role, googleId },
                 })
             );
         },

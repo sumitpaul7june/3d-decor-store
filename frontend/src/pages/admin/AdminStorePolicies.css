@@ -34,13 +34,13 @@
 }
 
 .admin-store-policies__panel {
-  background: #ffffff;
-  border: 1px solid #e8e1d6;
-  border-radius: 18px;
-  padding: 18px;
+  background: linear-gradient(180deg, #ffffff 0%, #fcfbf8 100%);
+  border: 1px solid #ece8e0;
+  border-radius: 22px;
+  padding: 24px;
   display: grid;
   gap: 18px;
-  box-shadow: 0 14px 34px rgba(17, 17, 17, 0.035);
+  box-shadow: 0 20px 44px rgba(17, 24, 39, 0.04);
 }
 
 .admin-store-policies__field-block {
@@ -78,21 +78,22 @@
 
 .admin-store-policies textarea {
   width: 100%;
-  border: 1px solid #ddd6c9;
-  border-radius: 16px;
-  padding: 12px 14px;
+  border: 1px solid #ddd4c6;
+  border-radius: 12px;
+  padding: 14px 16px;
   font: inherit;
-  color: #141414;
-  background: #ffffff;
+  color: #111827;
+  background: #fff;
   resize: vertical;
   min-height: 180px;
   line-height: 1.7;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .admin-store-policies textarea:focus {
   outline: none;
-  border-color: #141414;
-  box-shadow: 0 0 0 1px #141414;
+  border-color: #b88f4b;
+  box-shadow: 0 0 0 3px rgba(184, 143, 75, 0.1);
 }
 
 .admin-store-policies__messages {
@@ -128,19 +129,31 @@
 .admin-store-policies__primary-btn,
 .admin-store-policies__secondary-btn {
   border-radius: 999px;
-  padding: 10px 15px;
+  padding: 12px 20px;
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
-  border: 1px solid #ddd6c9;
+  border: 1px solid #ddd4c6;
   background: #ffffff;
-  color: #141414;
+  color: #111827;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+
+.admin-store-policies__secondary-btn:hover {
+  background: #f8f6f2;
 }
 
 .admin-store-policies__primary-btn {
-  background: #111111;
+  background: #111827;
   color: #ffffff;
-  border-color: #111111;
+  border-color: #111827;
+  box-shadow: 0 12px 24px rgba(17, 24, 39, 0.12);
+}
+
+.admin-store-policies__primary-btn:hover {
+  background: #1f2937;
+  transform: translateY(-1px);
+  box-shadow: 0 16px 28px rgba(17, 24, 39, 0.16);
 }
 
 .admin-store-policies__primary-btn:disabled,

@@ -30,9 +30,11 @@
 
 .pd-main-stage {
     position: relative;
-    border-radius: 4px;
+    border-radius: 22px;
     overflow: hidden;
     background: #f7f5f1;
+    border: 1px solid #ece8e0;
+    box-shadow: 0 20px 44px rgba(17, 24, 39, 0.03);
 }
 
 .pd-main-image {
@@ -55,6 +57,13 @@
     font-size: 1.7rem;
     line-height: 1;
     cursor: pointer;
+    box-shadow: 0 12px 24px rgba(17, 24, 39, 0.08);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.pd-gallery-nav:hover {
+    transform: translateY(-50%) scale(1.05);
+    box-shadow: 0 16px 32px rgba(17, 24, 39, 0.12);
 }
 
 .pd-gallery-nav.prev {
@@ -73,13 +82,13 @@
 }
 
 .pd-thumbnail {
-    border: 1px solid #ece9e2;
+    border: 1px solid #ece8e0;
     background: #ffffff;
-    border-radius: 2px;
-    padding: 0.18rem;
+    border-radius: 14px;
+    padding: 0.2rem;
     overflow: hidden;
     cursor: pointer;
-    transition: border-color 0.2s ease;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .pd-thumbnail img {
@@ -87,7 +96,7 @@
     aspect-ratio: 1 / 1;
     object-fit: cover;
     display: block;
-    border-radius: 1px;
+    border-radius: 10px;
 }
 
 .pd-thumbnail.active,
@@ -283,11 +292,11 @@
 .pd-secondary-btn {
     width: 100%;
     border-radius: 999px;
-    padding: 0.98rem 1.2rem;
+    padding: 1.1rem 1.4rem;
     cursor: pointer;
     font-size: 0.94rem;
-    font-weight: 500;
-    transition: transform 0.16s ease, opacity 0.2s ease, background 0.2s ease;
+    font-weight: 600;
+    transition: transform 0.2s ease, opacity 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
 }
 
 .pd-primary-btn {
@@ -297,15 +306,21 @@
 }
 
 .pd-secondary-btn {
-    background: #111111;
+    background: #111827;
     color: #ffffff;
-    border: 1px solid #111111;
+    border: 1px solid #111827;
     margin-bottom: 1.25rem;
+    box-shadow: 0 12px 24px rgba(17, 24, 39, 0.12);
 }
 
-.pd-primary-btn:hover,
+.pd-primary-btn:hover {
+    background: #f8f6f2;
+}
+
 .pd-secondary-btn:hover {
+    background: #1f2937;
     transform: translateY(-1px);
+    box-shadow: 0 16px 28px rgba(17, 24, 39, 0.16);
 }
 
 .pd-primary-btn.added {
@@ -432,4 +447,72 @@
         flex-wrap: wrap;
         line-height: 1.5;
     }
+}
+
+.pd-full-width-reviews {
+  margin-top: 80px;
+  padding-top: 60px;
+  border-top: 1px solid #ece9e2;
+  max-width: 1000px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.pd-full-width-reviews h3 {
+  font-size: 26px;
+  font-family: inherit;
+  font-weight: 400;
+  margin-bottom: 40px;
+  text-align: center;
+  color: #111;
+  letter-spacing: -0.02em;
+}
+
+.pd-reviews-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 32px;
+}
+
+.pd-review-card {
+  border: 1px solid #111;
+  padding: 24px;
+  background: #fff;
+  border-radius: 0; 
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.pd-rc-head {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.pd-rc-head strong {
+  font-size: 15px;
+  font-weight: 500;
+  color: #111;
+}
+
+.pd-rc-stars {
+  color: #111;
+  font-size: 14px;
+  letter-spacing: 2px;
+}
+
+.pd-review-card p {
+  font-size: 14px;
+  color: #444;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.pd-no-reviews {
+  text-align: center;
+  color: #666;
+  font-size: 15px;
+  grid-column: 1 / -1;
+  padding: 40px 0;
 }

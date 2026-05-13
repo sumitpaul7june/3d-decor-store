@@ -1,40 +1,23 @@
 // Admin users page: view registered users and simple login activity metrics.
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import axios from "../../api/axios";
+import { useFetch } from "../../hooks/useFetch";
 import { formatDateIN } from "../../utils/formatters";
+import AdminPageHeader from "../../components/admin/AdminPageHeader";
 import "./AdminUsers.css";
 
 function AdminUsers() {
-  const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
   const [query, setQuery] = useState("");
 
-  const fetchUsers = async () => {
-    try {
-      setLoading(true);
-      setError("");
-      const { data } = await axios.get("/users/admin/all");
-      setUsers(Array.isArray(data) ? data : []);
-    } catch (err) {
-      setError(err.response?.data?.message || "Failed to load users");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchUsers();
-  }, []);
+  const { data: users = [], loading, error } = useFetch(async () => {
+    const { data } = await axios.get("/users/admin/all");
+    return Array.isArray(data) ? data : [];
+  });
 
   const filteredUsers = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
-
     return users.filter((user) => {
-      if (!normalizedQuery) {
-        return true;
-      }
-
+      if (!normalizedQuery) return true;
       return (
         user.name?.toLowerCase().includes(normalizedQuery) ||
         user.email?.toLowerCase().includes(normalizedQuery) ||
@@ -47,26 +30,16 @@ function AdminUsers() {
     const googleUsers = users.filter((user) => Boolean(user.googleId)).length;
     const activeLogins = users.filter((user) => Number(user.loginCount || 0) > 0).length;
     const admins = users.filter((user) => user.role === "admin").length;
-
-    return {
-      total: users.length,
-      googleUsers,
-      activeLogins,
-      admins
-    };
+    return { total: users.length, googleUsers, activeLogins, admins };
   }, [users]);
 
   return (
     <section className="admin-users">
-      <div className="admin-page-head">
-        <div>
-          <p className="admin-page-kicker">Customers</p>
-          <h1 className="admin-users-title">Users</h1>
-          <p className="admin-page-subtitle">
-            See registered accounts, login activity, and authentication source.
-          </p>
-        </div>
-      </div>
+      <AdminPageHeader
+        kicker="Customers"
+        title="Users"
+        subtitle="See registered accounts, login activity, and authentication source."
+      />
 
       {error && <p className="admin-users-error">{error}</p>}
 

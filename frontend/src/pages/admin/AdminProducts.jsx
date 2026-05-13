@@ -1,76 +1,64 @@
 // Admin catalog page: list, search, and CRUD actions for physical products.
-import { useEffect, useState } from "react";
-import ProductModal from "../../components/admin/ProductModal";
+import { useState } from "react";
 import axios from "../../api/axios";
+import { useFetch } from "../../hooks/useFetch";
 import { formatCurrencyINR } from "../../utils/formatters";
+import ProductModal from "../../components/admin/ProductModal";
+import AdminPageHeader from "../../components/admin/AdminPageHeader";
 import "./AdminProducts.css";
 
 function AdminProducts() {
-  // Catalog data + modal controls + search state.
-  const [products, setProducts] = useState([]);
+  // Modal controls + search state.
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
   const [query, setQuery] = useState("");
+  const [mutationError, setMutationError] = useState("");
 
-  const fetchProducts = async () => {
-    // Fetch full product catalog for admin table.
-    try {
-      setLoading(true);
-      setError("");
-      const { data } = await axios.get("/products/admin/all");
-      setProducts(data || []);
-    } catch (err) {
-      setError(err.response?.data?.message || "Failed to load products");
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { data: products = [], loading, error: fetchError, reload } = useFetch(async () => {
+    const { data } = await axios.get("/products/admin/all");
+    return data || [];
+  });
 
-  useEffect(() => {
-    fetchProducts();
-  }, []);
+  // Surface either the fetch error or a mutation error.
+  const error = mutationError || fetchError;
 
   const handleAdd = () => {
-    // Open modal in create mode.
     setEditingProduct(null);
     setIsModalOpen(true);
   };
 
   const handleEdit = (product) => {
-    // Open modal in edit mode with selected product.
     setEditingProduct(product);
     setIsModalOpen(true);
   };
 
   const handleDelete = async (id) => {
     try {
+      setMutationError("");
       await axios.delete(`/products/${id}`);
-      await fetchProducts();
+      await reload();
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to delete product");
+      setMutationError(err.response?.data?.message || "Failed to delete product");
     }
   };
 
   const handleSave = async (productPayload) => {
-    // Create when adding, update when editing.
     try {
+      setMutationError("");
       if (editingProduct) {
         await axios.put(`/products/${editingProduct._id}`, productPayload);
       } else {
         await axios.post("/products", productPayload);
       }
-      await fetchProducts();
+      await reload();
       return true;
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to save product");
+      setMutationError(err.response?.data?.message || "Failed to save product");
       return false;
     }
   };
 
   const filteredProducts = products.filter((product) => {
-    // Match text query.
     const q = query.trim().toLowerCase();
     return (
       !q ||
@@ -81,19 +69,17 @@ function AdminProducts() {
 
   return (
     <section className="admin-products">
-      {/* Header + primary action */}
-      <div className="admin-page-head">
-        <div>
-          <p className="admin-page-kicker">Catalog</p>
-          <h1 className="admin-products-title">Products</h1>
-          <p className="admin-page-subtitle">
-            Manage product details, pricing, listing media, and gallery media from one place.
-          </p>
-        </div>
-        <button onClick={handleAdd} className="add-product-btn">
-          Add Product
-        </button>
-      </div>
+      <AdminPageHeader
+        kicker="Catalog"
+        title="Products"
+        subtitle="Manage product details, pricing, listing media, and gallery media from one place."
+        action={
+          <button onClick={handleAdd} className="add-product-btn">
+            Add Product
+          </button>
+        }
+      />
+
       {error && <p className="admin-products-error">{error}</p>}
 
       {/* Search toolbar */}
@@ -113,7 +99,6 @@ function AdminProducts() {
       {loading ? (
         <p>Loading products...</p>
       ) : (
-        // Products table/grid.
         <div className="products-table">
           <div className="products-table-head">
             <span>Product</span>
@@ -123,7 +108,6 @@ function AdminProducts() {
           </div>
 
           {filteredProducts.map((product) => (
-            // One product row.
             <div key={product._id} className="products-table-row">
               <span className="product-cell">
                 <img
@@ -142,16 +126,10 @@ function AdminProducts() {
               <span>{product.category || "-"}</span>
               <span>{formatCurrencyINR(product.price)}</span>
               <span className="actions">
-                <button
-                  className="edit-btn"
-                  onClick={() => handleEdit(product)}
-                >
+                <button className="edit-btn" onClick={() => handleEdit(product)}>
                   Edit
                 </button>
-                <button
-                  onClick={() => handleDelete(product._id)}
-                  className="delete-btn"
-                >
+                <button onClick={() => handleDelete(product._id)} className="delete-btn">
                   Delete
                 </button>
               </span>
@@ -159,9 +137,7 @@ function AdminProducts() {
           ))}
 
           {!filteredProducts.length && (
-            <p className="admin-table-empty">
-              No products matched your search.
-            </p>
+            <p className="admin-table-empty">No products matched your search.</p>
           )}
         </div>
       )}

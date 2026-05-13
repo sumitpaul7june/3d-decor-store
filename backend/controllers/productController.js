@@ -26,12 +26,28 @@ const sanitizeProductPayload = (payload = {}) => {
 };
 
 /*ALL PRODUCT */
-export const getAllProducts=async(req,res)=>{
+export const getAllProducts = async (req, res) => {
     try {
-        const {type}=req.query;
+        const { type, q, category, sort } = req.query;
         const filter = buildTypeFilter(type);
 
-        const products = await Product.find(filter);
+        if (q) {
+           filter.$or = [
+             { name: { $regex: q, $options: "i" } },
+             { description: { $regex: q, $options: "i" } }
+           ];
+        }
+
+        if (category && category !== "All") {
+           filter.category = category;
+        }
+
+        let sortOption = { createdAt: -1 };
+        if (sort === "price_asc") sortOption = { price: 1 };
+        if (sort === "price_desc") sortOption = { price: -1 };
+        if (sort === "newest") sortOption = { createdAt: -1 };
+
+        const products = await Product.find(filter).sort(sortOption);
         res.json(products);
     } catch (error) {
         res.status(500).json({message:"server error"});

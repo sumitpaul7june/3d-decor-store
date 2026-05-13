@@ -29,6 +29,7 @@ import AdminHomeContent from "./pages/admin/AdminHomeContent";
 import AdminProducts from "./pages/admin/AdminProducts";
 import AdminStorePolicies from "./pages/admin/AdminStorePolicies";
 import AdminUsers from "./pages/admin/AdminUsers";
+import AdminReturns from "./pages/admin/AdminReturns";
 
 // Route guards
 import ProtectedRoute from "./routes/ProtectedRoute";
@@ -102,6 +103,7 @@ const router = createBrowserRouter([
           { path: "store-policies", element: <AdminStorePolicies /> },
           { path: "products", element: <AdminProducts /> },
           { path: "orders", element: <AdminOrders /> },
+          { path: "returns", element: <AdminReturns /> },
           { path: "orders/:orderId", element: <AdminOrderDetail /> },
           { path: "orders/:orderId/invoice", element: <AdminOrderInvoice /> },
           { path: "users", element: <AdminUsers /> },

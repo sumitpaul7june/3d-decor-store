@@ -1,7 +1,7 @@
-// Customer orders page: premium order cards with quick actions and snapshots.
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+import { useFetch } from "../hooks/useFetch";
 import axios from "../api/axios";
 import { clearCart } from "../store/cartSlice";
 import { formatCurrencyINR, formatDateIN } from "../utils/formatters";
@@ -9,40 +9,15 @@ import { openRazorpayCheckout } from "../utils/razorpayCheckout";
 import "./MyOrders.css";
 
 function MyOrders() {
-  const [orders, setOrders] = useState([]);
-  const [expandedOrderId, setExpandedOrderId] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
   const [retryingOrderId, setRetryingOrderId] = useState("");
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const authUser = useSelector((state) => state.auth.user);
 
-  const fetchOrders = async () => {
-    try {
-      setLoading(true);
-      setError("");
-      const { data } = await axios.get("/orders/my-orders");
-      setOrders(data || []);
-    } catch (err) {
-      setError(err.response?.data?.message || "Failed to load orders");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchOrders();
-  }, []);
-
-  const handleCancel = async (orderId) => {
-    try {
-      await axios.put(`/orders/${orderId}/cancel`);
-      await fetchOrders();
-    } catch (err) {
-      setError(err.response?.data?.message || "Failed to cancel order");
-    }
-  };
+  const { data: orders = [], loading, error, reload } = useFetch(async () => {
+    const { data } = await axios.get("/orders/my-orders");
+    return data || [];
+  });
 
   const handleRetryPayment = async (order) => {
     await openRazorpayCheckout({
@@ -53,7 +28,10 @@ function MyOrders() {
       onLoadingChange: (loadingState) => {
         setRetryingOrderId(loadingState ? order._id : "");
       },
-      onError: setError,
+      onError: (err) => {
+        console.error("Payment retry failed:", err);
+        // Could expand this to set a local retryError state if we want to show it in the UI instead of the main page error
+      },
       onSuccess: async () => {
         dispatch(clearCart());
         navigate(`/checkout/success/${order._id}`);
@@ -61,213 +39,105 @@ function MyOrders() {
     });
   };
 
-  const totalSpend = orders
-    .filter((order) => order.orderStatus !== "Cancelled")
-    .reduce((sum, order) => sum + (order.totalAmount || 0), 0);
-  const pendingCount = orders.filter((order) => order.orderStatus === "Pending").length;
-  const deliveredCount = orders.filter((order) => order.orderStatus === "Delivered").length;
-  const cancelledCount = orders.filter((order) => order.orderStatus === "Cancelled").length;
-
-  const getDeliveryLabel = (order) => {
-    if (!order.addressSnapshot) return "Address unavailable";
-
-    return [
-      order.addressSnapshot.fullName,
-      order.addressSnapshot.city,
-      order.addressSnapshot.country,
-    ]
-      .filter(Boolean)
-      .join(", ");
-  };
-
   const getItemsPreview = (order) => {
     const items = order.items || [];
-
-    if (!items.length) return "No items";
+    if (!items.length) return "Empty Order";
     if (items.length === 1) return items[0].name || "1 item";
-
-    return `${items[0].name || "Item"} +${items.length - 1} more`;
-  };
-
-  const toggleDetails = (orderId) => {
-    setExpandedOrderId((prev) => (prev === orderId ? null : orderId));
+    return `${items[0].name || "Item"} and ${items.length - 1} other item(s)`;
   };
 
   if (loading) {
     return (
-      <section className="my-orders-page">
-        <p className="my-orders-kicker">Orders</p>
-        <h2>My Orders</h2>
-        <p>Loading orders...</p>
+      <section className="my-orders-page loading">
+        <div className="orders-container">
+          <p className="orders-kicker">Account</p>
+          <h2>Order History</h2>
+          <div className="orders-divider"></div>
+          <p>Retrieving your orders...</p>
+        </div>
       </section>
     );
   }
 
   return (
     <section className="my-orders-page">
-      <div className="my-orders-head">
-        <div>
-          <p className="my-orders-kicker">Orders</p>
-          <h2>My Orders</h2>
-          <p className="my-orders-subtitle">
-            Follow each order through payment, fulfilment, and delivery in one calm place.
+      <div className="orders-container">
+        <header className="orders-header">
+          <p className="orders-kicker">Account</p>
+          <h2>Order History</h2>
+          <p className="orders-subtitle">
+            View the status of your recent purchases and arrange returns.
           </p>
-        </div>
-      </div>
+        </header>
 
-      {error && <p className="my-orders-error">{error}</p>}
+        <div className="orders-divider"></div>
 
-      <div className="my-orders-metrics">
-        <article className="my-orders-metric feature">
-          <p>Total Spend</p>
-          <strong>{formatCurrencyINR(totalSpend)}</strong>
-        </article>
-        <article className="my-orders-metric">
-          <p>Total Orders</p>
-          <strong>{orders.length}</strong>
-        </article>
-        <article className="my-orders-metric">
-          <p>Pending</p>
-          <strong>{pendingCount}</strong>
-        </article>
-        <article className="my-orders-metric">
-          <p>Delivered</p>
-          <strong>{deliveredCount}</strong>
-        </article>
-        <article className="my-orders-metric">
-          <p>Cancelled</p>
-          <strong>{cancelledCount}</strong>
-        </article>
-      </div>
+        {error && <p className="orders-error">{error}</p>}
 
-      {orders.length === 0 ? (
-        <p className="my-orders-empty">You do not have any orders yet.</p>
-      ) : (
-        <div className="my-orders-list">
-          {orders.map((order) => (
-            <article key={order._id} className="my-order-card">
-              <div className="my-order-card-top">
-                <div className="my-order-card-copy">
-                  <p className="my-order-card-kicker">Order #{order._id.slice(-8)}</p>
-                  <h3 className="my-order-card-title">{getItemsPreview(order)}</h3>
-                  <p className="my-order-card-subtitle">
-                    Placed on {formatDateIN(order.createdAt)}
-                  </p>
-                </div>
-
-                <div className="my-order-card-head-side">
-                  <div className="my-order-card-chips">
-                    <span className={`payment-chip payment-${order.paymentStatus?.toLowerCase()}`}>
-                      {order.paymentStatus}
-                    </span>
-                    <span className={`my-order-status status-${order.orderStatus?.toLowerCase()}`}>
-                      {order.orderStatus}
-                    </span>
+        {orders.length === 0 ? (
+          <p className="orders-empty">You haven't placed any orders yet.</p>
+        ) : (
+          <div className="orders-feed">
+            {orders.map((order) => (
+              <article key={order._id} className="order-row">
+                <div className="order-row-main">
+                  
+                  {/* Left block: details */}
+                  <div className="order-info">
+                    <div className="order-reference">
+                      <span>Order No.</span>
+                      <strong>{order._id.slice(-8).toUpperCase()}</strong>
+                    </div>
+                    <h3 className="order-items-preview">{getItemsPreview(order)}</h3>
+                    <p className="order-date">Placed on {formatDateIN(order.createdAt)}</p>
                   </div>
 
-                  <div className="my-order-card-total">
-                    <span>Total</span>
-                    <strong>{formatCurrencyINR(order.totalAmount)}</strong>
+                  {/* Middle block: Status */}
+                  <div className="order-status-block">
+                    <div className="status-item">
+                      <span>Status</span>
+                      <strong className={`status-text ${order.orderStatus?.toLowerCase()}`}>
+                        {order.orderStatus}
+                      </strong>
+                    </div>
+                    <div className="status-item">
+                      <span>Payment</span>
+                      <strong className={`status-text ${order.paymentStatus?.toLowerCase()}`}>
+                        {order.paymentStatus}
+                      </strong>
+                    </div>
                   </div>
-                </div>
-              </div>
 
-              <div className="my-order-card-meta">
-                <div className="my-order-meta-pill">
-                  <span className="my-order-meta-label">Delivery</span>
-                  <strong>{getDeliveryLabel(order)}</strong>
-                </div>
-                <div className="my-order-meta-pill">
-                  <span className="my-order-meta-label">Items</span>
-                  <strong>
-                    {order.items?.length || 0} item{order.items?.length === 1 ? "" : "s"}
-                  </strong>
-                </div>
-                <div className="my-order-meta-pill">
-                  <span className="my-order-meta-label">Reference</span>
-                  <strong className="my-order-id">#{order._id.slice(-8)}</strong>
-                </div>
-              </div>
-
-              <div className="my-order-card-actions">
-                <div className="my-order-card-actions-primary">
-                  <Link className="order-view-link" to={`/orders/my/${order._id}`}>
-                    View Order
-                  </Link>
-
-                  <button
-                    className="order-details-btn"
-                    onClick={() => toggleDetails(order._id)}
-                  >
-                    {expandedOrderId === order._id ? "Hide Snapshot" : "Quick View"}
-                  </button>
-                </div>
-
-                <div className="my-order-card-actions-secondary">
-                  {order.paymentStatus !== "Paid" && order.orderStatus !== "Cancelled" && (
-                    <button
-                      className="order-details-btn"
-                      onClick={() => handleRetryPayment(order)}
-                      disabled={retryingOrderId === order._id}
-                    >
-                      {retryingOrderId === order._id ? "Opening..." : "Retry Payment"}
-                    </button>
-                  )}
-
-                  {order.orderStatus === "Pending" && (
-                    <button
-                      className="my-order-cancel-btn"
-                      onClick={() => handleCancel(order._id)}
-                    >
-                      Cancel
-                    </button>
-                  )}
-                </div>
-              </div>
-
-              {expandedOrderId === order._id && (
-                <div className="order-row-details">
-                  {!!order.items?.length && (
-                    <div className="details-block details-block-items">
-                      <p className="details-title">Items</p>
-                      <div className="details-items">
-                        {order.items.map((item, index) => (
-                          <div key={`${order._id}-${index}`} className="my-order-item-row">
-                            <div className="my-order-item-meta">
-                              <span>{item.name || "Product"}</span>
-                              <small>Qty {item.quantity}</small>
-                            </div>
-                            <strong>
-                              {formatCurrencyINR((item.price || 0) * (item.quantity || 0))}
-                            </strong>
-                          </div>
-                        ))}
-                      </div>
+                  {/* Right block: Total and Actions */}
+                  <div className="order-total-actions">
+                    <div className="order-total">
+                      <span>Total</span>
+                      <strong>{formatCurrencyINR(order.totalAmount)}</strong>
                     </div>
-                  )}
+                    
+                    <div className="order-actions">
+                      <Link className="btn-view" to={`/orders/my/${order._id}`}>
+                        View Details
+                      </Link>
 
-                  {order.addressSnapshot && (
-                    <div className="details-block">
-                      <p className="details-title">Shipping Address</p>
-                      <p className="my-order-address">
-                        {order.addressSnapshot.fullName}, {order.addressSnapshot.addressLine},{" "}
-                        {order.addressSnapshot.city}, {order.addressSnapshot.country}
-                      </p>
+                      {order.paymentStatus !== "Paid" && order.orderStatus !== "Cancelled" && (
+                        <button
+                          className="btn-retry"
+                          onClick={() => handleRetryPayment(order)}
+                          disabled={retryingOrderId === order._id}
+                        >
+                          {retryingOrderId === order._id ? "Processing..." : "Complete Payment"}
+                        </button>
+                      )}
                     </div>
-                  )}
+                  </div>
 
-                  {order.payment?.failureReason && (
-                    <div className="details-block">
-                      <p className="details-title">Payment Update</p>
-                      <p className="my-order-address">{order.payment.failureReason}</p>
-                    </div>
-                  )}
                 </div>
-              )}
-            </article>
-          ))}
-        </div>
-      )}
+              </article>
+            ))}
+          </div>
+        )}
+      </div>
     </section>
   );
 }

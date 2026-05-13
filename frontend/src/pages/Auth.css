@@ -18,12 +18,12 @@
 
 .auth-card {
     width: 100%;
-    max-width: 460px;
-    padding: 2.8rem 2.4rem;
-    background: #fff;
-    border: 1px solid #ece9e2;
-    border-radius: 12px;
-    box-shadow: 0 24px 55px rgba(17, 17, 17, 0.05);
+    max-width: 480px;
+    padding: 3rem 2.5rem;
+    background: linear-gradient(180deg, #ffffff 0%, #fcfbf8 100%);
+    border: 1px solid #ece8e0;
+    border-radius: 22px;
+    box-shadow: 0 24px 60px rgba(17, 24, 39, 0.05);
 }
 
 .auth-kicker {
@@ -68,13 +68,14 @@
 }
 
 .auth-form input {
-    padding: 0.9rem 0.95rem;
-    border: 1px solid #dfdbd3;
-    border-radius: 10px;
+    padding: 0.95rem 1rem;
+    border: 1px solid #ddd4c6;
+    border-radius: 12px;
     font-family: var(--font-ui);
     font-size: 0.96rem;
-    color: #171717;
+    color: #111827;
     background: #ffffff;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .password-field {
@@ -114,27 +115,28 @@
 
 .auth-form input:focus {
     outline: none;
-    border-color: #bfb7ac;
-    box-shadow: 0 0 0 3px rgba(17, 17, 17, 0.04);
+    border-color: #b88f4b;
+    box-shadow: 0 0 0 3px rgba(184, 143, 75, 0.1);
 }
 
 .auth-form button[type="submit"] {
-    margin-top: 0.5rem;
-    padding: 0.92rem;
-    background: #111111;
+    margin-top: 0.8rem;
+    padding: 1.1rem 1.4rem;
+    background: #111827;
     color: #fff;
-    border: none;
+    border: 1px solid #111827;
     border-radius: 999px;
     font-size: 0.95rem;
-    font-weight: 500;
+    font-weight: 600;
     cursor: pointer;
-    transition: background 0.2s ease, transform 0.15s ease;
+    box-shadow: 0 12px 24px rgba(17, 24, 39, 0.12);
+    transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
 }
 
-
 .auth-form button[type="submit"]:hover {
-    background: #000;
+    background: #1f2937;
     transform: translateY(-1px);
+    box-shadow: 0 16px 28px rgba(17, 24, 39, 0.16);
 }
 
 .auth-switch {
