@@ -122,7 +122,7 @@ function AdminHomeContent() {
           <h1 className="admin-cms-title">Homepage Editor</h1>
           <p className="admin-page-subtitle">Configure hero banners, featured categories, and page visibility.</p>
         </div>
-        <button className="order-primary-btn" onClick={handleSave} disabled={saving}>
+        <button className="cms-primary-btn" onClick={handleSave} disabled={saving}>
           {saving ? "Saving..." : "Save Changes"}
         </button>
       </div>
@@ -195,7 +195,7 @@ function AdminHomeContent() {
               ))}
               {formData.heroSlides.length < 3 && (
                 <button 
-                  className="order-secondary-btn mt-2" 
+                  className="cms-secondary-btn mt-2" 
                   onClick={() => addArrayItem("heroSlides", { image: "", title: "", subtitle: "", ctaLabel: "", ctaLink: "/products" })}
                 >
                   + Add Slide
@@ -231,7 +231,7 @@ function AdminHomeContent() {
                 </div>
               ))}
               <button 
-                className="order-secondary-btn mt-2" 
+                className="cms-secondary-btn mt-2" 
                 onClick={() => addArrayItem("featuredCategories", { title: "", subtitle: "", image: "", link: "/products" })}
               >
                 + Add Category
@@ -291,12 +291,15 @@ function AdminHomeContent() {
                     <label><span>Role / Context</span>
                       <input value={test.role} onChange={(e) => updateArrayItem("testimonials", index, "role", e.target.value)} />
                     </label>
+                    <label><span>Rating (1-5)</span>
+                      <input type="number" min="1" max="5" value={test.rating || 5} onChange={(e) => updateArrayItem("testimonials", index, "rating", Number(e.target.value))} />
+                    </label>
                   </div>
                 </div>
               ))}
               <button 
-                className="order-secondary-btn mt-2" 
-                onClick={() => addArrayItem("testimonials", { quote: "", author: "", role: "" })}
+                className="cms-secondary-btn mt-2" 
+                onClick={() => addArrayItem("testimonials", { quote: "", author: "", role: "", rating: 5 })}
               >
                 + Add Testimonial
               </button>

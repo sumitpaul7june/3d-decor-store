@@ -216,7 +216,9 @@ function Home() {
         <div className="testimonial-grid">
           {activeTestimonials.map((testimonial, index) => (
             <article key={`test-${index}`} className="testimonial-card">
-              <span className="testimonial-stars">★★★★★</span>
+              <span className="testimonial-stars">
+                {"★".repeat(testimonial.rating || 5)}{"☆".repeat(5 - (testimonial.rating || 5))}
+              </span>
               <p className="testimonial-quote">“{testimonial.quote}”</p>
               <div className="testimonial-author">
                 <strong>{testimonial.author}</strong>
