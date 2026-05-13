@@ -25,10 +25,10 @@ const parseInfoBlocks = (content = "") => {
   let currentList = [];
 
   lines.forEach((line) => {
-    const isBullet = /^[-*•]/.test(line);
+    const isBullet = /^[-*•]\s+/.test(line);
 
     if (isBullet) {
-      currentList.push(line.replace(/^[-*•]\s*/, ""));
+      currentList.push(line.replace(/^[-*•]\s+/, ""));
       return;
     }
 
@@ -217,6 +217,20 @@ function ProductDetail() {
   const handleNextImage = () => {
     setSelectedImageIndex((prev) => (prev + 1) % gallery.length);
   };
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
+      if (e.key === "ArrowLeft") {
+        handlePrevImage();
+      } else if (e.key === "ArrowRight") {
+        handleNextImage();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [gallery.length]);
 
   return (
     <section className="product-detail">

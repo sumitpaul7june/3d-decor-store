@@ -201,6 +201,30 @@ function ProductModal({ isOpen, onClose, onSave, initialData }) {
       ? Math.round(((originalPrice - currentPrice) / originalPrice) * 100)
       : 0;
 
+  const handleDescriptionKeyDown = (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "b") {
+      e.preventDefault();
+      const textarea = e.target;
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      const text = form.description;
+      const selectedText = text.substring(start, end);
+
+      const newText = text.substring(0, start) + `**${selectedText}**` + text.substring(end);
+
+      setForm((prev) => ({ ...prev, description: newText }));
+
+      setTimeout(() => {
+        textarea.focus();
+        if (selectedText) {
+          textarea.setSelectionRange(start + 2, end + 2);
+        } else {
+          textarea.setSelectionRange(start + 2, start + 2);
+        }
+      }, 0);
+    }
+  };
+
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal" onClick={(e) => e.stopPropagation()}>
@@ -251,6 +275,7 @@ function ProductModal({ isOpen, onClose, onSave, initialData }) {
               name="description"
               value={form.description}
               onChange={handleChange}
+              onKeyDown={handleDescriptionKeyDown}
               rows={3}
             />
           </label>
