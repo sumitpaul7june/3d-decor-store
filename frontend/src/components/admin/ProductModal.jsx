@@ -1,5 +1,5 @@
 // Modal form for adding or editing a physical product with separate cover and gallery media.
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import axios from "../../api/axios";
 import "./ProductModal.css";
 
@@ -24,6 +24,7 @@ function ProductModal({ isOpen, onClose, onSave, initialData }) {
   const [formError, setFormError] = useState("");
   const [coverUploading, setCoverUploading] = useState(false);
   const [galleryUploading, setGalleryUploading] = useState(false);
+  const descriptionRef = useRef(null);
 
   useEffect(() => {
     const initialGallery = Array.isArray(initialData?.images)
@@ -201,27 +202,56 @@ function ProductModal({ isOpen, onClose, onSave, initialData }) {
       ? Math.round(((originalPrice - currentPrice) / originalPrice) * 100)
       : 0;
 
+  const updateDescriptionWithSelection = (nextText, selectionStart, selectionEnd) => {
+    setForm((prev) => ({ ...prev, description: nextText }));
+
+    requestAnimationFrame(() => {
+      if (!descriptionRef.current) return;
+      descriptionRef.current.focus();
+      descriptionRef.current.setSelectionRange(selectionStart, selectionEnd);
+    });
+  };
+
+  const toggleDescriptionWrap = (marker = "**") => {
+    const textarea = descriptionRef.current;
+    if (!textarea) return;
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const text = form.description;
+    const selectedText = text.substring(start, end);
+    const prefix = text.substring(start - marker.length, start);
+    const suffix = text.substring(end, end + marker.length);
+
+    if (start >= marker.length && prefix === marker && suffix === marker) {
+      const nextText =
+        text.substring(0, start - marker.length) +
+        selectedText +
+        text.substring(end + marker.length);
+
+      updateDescriptionWithSelection(
+        nextText,
+        Math.max(start - marker.length, 0),
+        Math.max(end - marker.length, 0)
+      );
+      return;
+    }
+
+    const nextText =
+      text.substring(0, start) +
+      `${marker}${selectedText}${marker}` +
+      text.substring(end);
+
+    const selectionStart = start + marker.length;
+    const selectionEnd = selectedText ? end + marker.length : start + marker.length;
+
+    updateDescriptionWithSelection(nextText, selectionStart, selectionEnd);
+  };
+
   const handleDescriptionKeyDown = (e) => {
     if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "b") {
       e.preventDefault();
-      const textarea = e.target;
-      const start = textarea.selectionStart;
-      const end = textarea.selectionEnd;
-      const text = form.description;
-      const selectedText = text.substring(start, end);
-
-      const newText = text.substring(0, start) + `**${selectedText}**` + text.substring(end);
-
-      setForm((prev) => ({ ...prev, description: newText }));
-
-      setTimeout(() => {
-        textarea.focus();
-        if (selectedText) {
-          textarea.setSelectionRange(start + 2, end + 2);
-        } else {
-          textarea.setSelectionRange(start + 2, start + 2);
-        }
-      }, 0);
+      toggleDescriptionWrap("**");
     }
   };
 
@@ -270,13 +300,29 @@ function ProductModal({ isOpen, onClose, onSave, initialData }) {
 
           <label htmlFor="description">
             Description
+            <div className="modal-formatting-row">
+              <button
+                type="button"
+                className="modal-format-btn"
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={() => toggleDescriptionWrap("**")}
+                aria-label="Bold selected text"
+                title="Bold (Cmd/Ctrl + B)"
+              >
+                <strong>B</strong>
+              </button>
+              <span className="modal-format-hint">
+                Select text and use <kbd>Cmd</kbd>/<kbd>Ctrl</kbd> + <kbd>B</kbd> for bold.
+              </span>
+            </div>
             <textarea
               id="description"
               name="description"
+              ref={descriptionRef}
               value={form.description}
               onChange={handleChange}
               onKeyDown={handleDescriptionKeyDown}
-              rows={3}
+              rows={5}
             />
           </label>
 

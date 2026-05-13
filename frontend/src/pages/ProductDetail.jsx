@@ -47,9 +47,17 @@ const parseInfoBlocks = (content = "") => {
   return blocks;
 };
 
+const normalizeLooseBoldMarkdown = (text = "") =>
+  String(text)
+    .replace(/(^|[\s([{])\*([^*\n][^*\n]*?)\*\*(?=[:;,.!?)}\]\s]|$)/g, "$1**$2**")
+    .replace(/(^|[\s([{])\*\*([^*\n][^*\n]*?)\*(?=[:;,.!?)}\]\s]|$)/g, "$1**$2**");
+
 const formatText = (text) => {
   if (!text) return "";
-  const parts = text.split(/(\*\*.*?\*\*)/g);
+
+  const normalizedText = normalizeLooseBoldMarkdown(text);
+  const parts = normalizedText.split(/(\*\*.*?\*\*)/g);
+
   return parts.map((part, i) => {
     if (part.startsWith("**") && part.endsWith("**")) {
       return <strong key={i}>{part.slice(2, -2)}</strong>;
