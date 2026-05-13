@@ -342,6 +342,12 @@
   align-items: center;
 }
 
+@media (max-width: 720px) {
+    .nav-search-item {
+        display: none;
+    }
+}
+
 .nav-search-form {
   display: flex;
   align-items: center;

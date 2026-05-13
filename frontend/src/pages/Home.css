@@ -138,6 +138,10 @@
     transform: translateX(-50%);
     display: flex;
     gap: 0.55rem;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 6px 10px;
+    border-radius: 999px;
+    backdrop-filter: blur(4px);
 }
 
 .dot {

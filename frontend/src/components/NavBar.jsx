@@ -197,6 +197,44 @@ function NavBar() {
             )}
           </ul>
         </div>
+
+        <div className={`navbar-mobile-panel ${isMobileMenuOpen ? "open" : ""}`}>
+          <div className="navbar-mobile-links">
+            {!isCheckoutRoute && (
+              <form onSubmit={handleSearchSubmit} className="nav-search-form" style={{ padding: '0.5rem 0.1rem', marginBottom: '0.5rem' }}>
+                <input 
+                  type="text" 
+                  name="q" 
+                  placeholder="Search store..." 
+                  defaultValue={searchParams.get("q") || ""}
+                  style={{ width: '100%' }}
+                />
+                <button type="submit" aria-label="Search">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                  </svg>
+                </button>
+              </form>
+            )}
+            <Link to="/" onClick={() => setIsMobileMenuOpen(false)}>Home</Link>
+            <Link to="/products" onClick={() => setIsMobileMenuOpen(false)}>Shop</Link>
+            <Link to="/about" onClick={() => setIsMobileMenuOpen(false)}>About Us</Link>
+            <Link to="/contact" onClick={() => setIsMobileMenuOpen(false)}>Contact</Link>
+            {!isLoggedIn ? (
+              <Link to="/login" onClick={() => setIsMobileMenuOpen(false)}>Login / Register</Link>
+            ) : (
+              <>
+                <Link to="/profile" onClick={() => setIsMobileMenuOpen(false)}>My Profile</Link>
+                <Link to="/orders/my" onClick={() => setIsMobileMenuOpen(false)}>My Orders</Link>
+                {auth.user?.role === "admin" && (
+                    <Link to="/admin" onClick={() => setIsMobileMenuOpen(false)}>Admin Panel</Link>
+                )}
+                <button onClick={handleLogout}>Logout</button>
+              </>
+            )}
+          </div>
+        </div>
       </nav>
 
       <CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
