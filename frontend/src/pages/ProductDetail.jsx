@@ -317,7 +317,6 @@ function ProductDetail() {
         <div className="pd-info">
           <p className="pd-collection">{presentation.categoryLabel}</p>
           <h1 className="pd-title">{product.name}</h1>
-          <p className="pd-subcopy">{presentation.shortDescription}</p>
 
           <div className="pd-rating-row">
             <span className="pd-stars">★ {product.averageRating || 0}</span>
