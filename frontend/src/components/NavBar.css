@@ -50,29 +50,21 @@
 .navbar-logo a {
     display: flex;
     align-items: center;
-    gap: 0.9rem;
+    gap: 0.6rem;
     text-decoration: none;
     color: inherit;
 }
 
-.navbar-mark {
-    width: 38px;
+.navbar-mark-img {
     height: 38px;
-    border-radius: 10px;
-    display: grid;
-    place-items: center;
-    background: #111111;
-    color: #ffffff;
-    font-weight: 600;
-    letter-spacing: 0.06em;
-    font-size: 0.88rem;
+    width: auto;
+    object-fit: contain;
 }
 
-.navbar-brand-name {
-    font-family: var(--font-display);
-    font-size: 1.95rem;
-    font-weight: 500;
-    letter-spacing: 0.04em;
+.navbar-brand-img {
+    height: 32px;
+    width: auto;
+    object-fit: contain;
 }
 
 .nav-links a {
@@ -254,8 +246,8 @@
         grid-template-columns: auto 1fr auto;
     }
 
-    .navbar-brand-name {
-        font-size: 1.55rem;
+    .navbar-brand-img {
+        height: 24px;
     }
 
     .nav-center {
@@ -287,8 +279,7 @@
         display: inline-flex;
     }
 
-    .navbar-mark {
-        width: 34px;
+    .navbar-mark-img {
         height: 34px;
     }
 
