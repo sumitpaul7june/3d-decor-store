@@ -1,0 +1,159 @@
+:root {
+    /* Brand palette */
+    --color-text-primary: #111111;
+    --color-text-muted: #636363;
+    --color-border-light: #e9e8e2;
+    --color-accent: #1b1b1b;
+    --color-accent-deep: #101010;
+    --color-accent-soft: #f4f4f4;
+    --color-highlight: #b88f4b;
+
+    /* Backgrounds */
+    --color-bg-main: #ffffff;
+    --color-bg-surface: #ffffff;
+    --color-bg-muted: #f6f6f6;
+    --color-bg-dark: #101010;
+
+    /* Typography */
+    --font-ui: 'Inter', system-ui, sans-serif;
+    --font-display: 'Cormorant Garamond', serif;
+
+    /* Layout */
+    --max-page-width: 1240px;
+
+    /* Spacing */
+    --space-xs: 0.4rem;
+    --space-sm: 0.75rem;
+    --space-md: 1rem;
+    --space-lg: 2rem;
+    --space-xl: 4rem;
+
+    /* Radius */
+    --radius-sm: 8px;
+    --radius-md: 18px;
+    --radius-lg: 28px;
+
+    /* Shadows */
+    --shadow-card: 0 24px 60px rgba(17, 17, 17, 0.08);
+    --shadow-soft: 0 12px 30px rgba(17, 17, 17, 0.05);
+}
+
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+
+body {
+    font-family: var(--font-ui);
+    font-weight: 400;
+    color: var(--color-text-primary);
+    -webkit-font-smoothing: antialiased;
+    background: var(--color-bg-main);
+    line-height: 1.6;
+    letter-spacing: 0.005em;
+}
+
+a {
+    color: inherit;
+}
+
+button,
+input,
+select,
+textarea {
+    font: inherit;
+}
+
+
+h1,
+h2,
+.section-title,
+.product-title {
+    font-family: var(--font-display);
+    font-weight: 500;
+    letter-spacing: -0.02em;
+}
+
+
+.section-title {
+    font-weight: 500;
+}
+
+.product-title {
+    font-weight: 500;
+}
+
+#root {
+    min-height: 100vh;
+}
+
+.swatch-gold {
+    background: #d19b1f;
+}
+
+.swatch-clay {
+    background: #cb7e2f;
+}
+
+.swatch-ivory {
+    background: #efe6d7;
+}
+
+.swatch-bronze {
+    background: #9a6735;
+}
+
+.swatch-stone {
+    background: #e6dfd2;
+}
+
+.swatch-sand {
+    background: #cfac6b;
+}
+
+.swatch-walnut {
+    background: #8a5832;
+}
+
+.swatch-pearl {
+    background: #f1ece2;
+}
+
+.swatch-ochre {
+    background: #d8a20a;
+}
+
+.swatch-copper {
+    background: #cb7e2f;
+}
+
+.swatch-linen {
+    background: #f4ede1;
+}
+
+.swatch-white {
+    background: #f5f1e8;
+}
+
+.swatch-terracotta {
+    background: #be7440;
+}
+
+.swatch-bone {
+    background: #efe7d8;
+}
+
+.swatch-amber {
+    background: #c68c26;
+}
+
+.swatch-opal {
+    background: #f1ede5;
+}
+
+.swatch-shell {
+    background: #f4ead7;
+}

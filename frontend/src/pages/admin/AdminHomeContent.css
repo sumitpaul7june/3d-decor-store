@@ -1,0 +1,304 @@
+.admin-cms {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.admin-cms .admin-page-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.admin-cms .admin-page-kicker {
+  font-size: 11px;
+  color: #9a9487;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.admin-cms-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: #141414;
+  line-height: 1.05;
+}
+
+.admin-cms .admin-page-subtitle {
+  font-size: 13px;
+  color: #6e6b64;
+  margin-top: 5px;
+  line-height: 1.7;
+}
+
+.cms-error {
+  background: #fdecec;
+  color: #b42318;
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.cms-success {
+  background: #e5f8ea;
+  color: #18794e;
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.cms-layout {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+.cms-tabs {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  position: sticky;
+  top: 90px;
+}
+
+.cms-tabs button {
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: 1px solid transparent;
+  padding: 12px 14px;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cms-tabs button:hover {
+  background: #f7f8fc;
+  color: #111827;
+}
+
+.cms-tabs button.active {
+  background: #111;
+  color: #fff;
+  box-shadow: none;
+}
+
+.cms-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.cms-block h2 {
+  font-size: 20px;
+  color: #111827;
+  margin-bottom: 4px;
+}
+
+.cms-desc {
+  font-size: 13px;
+  color: #6b7280;
+  margin-bottom: 16px;
+}
+
+.cms-card {
+  background: #fff;
+  border: 1px solid #ece9e2;
+  border-radius: 4px;
+  padding: 22px;
+  margin-bottom: 14px;
+  box-shadow: none;
+}
+
+.cms-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #ece8e0;
+}
+
+.cms-card-head h4 {
+  font-size: 14px;
+  color: #111827;
+}
+
+.cms-card-head button {
+  background: transparent;
+  border: none;
+  color: #b42318;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.cms-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.cms-form-grid .span-2 {
+  grid-column: 1 / -1;
+}
+
+.cms-form-grid label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cms-form-grid label span {
+  font-size: 11px;
+  font-weight: 600;
+  color: #9ca3af;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.cms-form-grid input,
+.cms-form-grid textarea {
+  border: 1px solid #dcdcdc;
+  border-radius: 4px;
+  padding: 10px 14px;
+  font-size: 13px;
+  background: #fff;
+  transition: border-color 0.2s ease;
+}
+
+.cms-form-grid input:focus,
+.cms-form-grid textarea:focus {
+  outline: none;
+  border-color: #111;
+  box-shadow: none;
+}
+
+.mt-2 { margin-top: 8px; }
+.mt-4 { margin-top: 16px; }
+.mb-2 { margin-bottom: 8px; }
+.mb-4 { margin-bottom: 16px; }
+.pb-2 { padding-bottom: 8px; }
+
+.cms-checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.cms-checkbox-detail {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.cms-checkbox-detail img {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  object-fit: cover;
+  background: #f7f4ee;
+  border: 1px solid #ece8e0;
+}
+
+.cms-checkbox-detail span {
+  font-size: 14px;
+  font-weight: 500;
+  color: #111827;
+}
+
+.cms-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cms-visibility-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 12px;
+}
+.text-secondary { color: #6b7280; }
+.small { font-size: 12px; }
+
+@media (max-width: 900px) {
+  .cms-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .cms-tabs {
+    flex-direction: row;
+    overflow-x: auto;
+    position: static;
+    padding-bottom: 10px;
+  }
+
+  .cms-tabs button {
+    white-space: nowrap;
+  }
+
+  .cms-form-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.cms-primary-btn {
+  background: #111;
+  color: #fff;
+  border: none;
+  padding: 12px 20px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 999px;
+  cursor: pointer;
+  box-shadow: 0 12px 24px rgba(17, 17, 17, 0.12);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  white-space: nowrap;
+}
+
+.cms-primary-btn:hover {
+  background: #1f2937;
+  transform: translateY(-1px);
+  box-shadow: 0 16px 28px rgba(17, 17, 17, 0.16);
+}
+
+.cms-primary-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.cms-secondary-btn {
+  background: #fff;
+  color: #111;
+  border: 1px solid #ddd4c6;
+  padding: 10px 20px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cms-secondary-btn:hover {
+  background: #f8f6f2;
+  border-color: #c9c3b8;
+}
+
+@media (max-width: 900px) {
+  .admin-cms .admin-page-head {
+    flex-direction: column;
+  }
+}

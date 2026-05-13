@@ -1,0 +1,30 @@
+.google-auth-wrapper {
+    display: grid;
+    gap: 0.45rem;
+    width: 100%;
+}
+
+.google-auth-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 44px;
+}
+
+.google-auth-btn.is-disabled {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.google-auth-btn>div {
+    width: 100% !important;
+    display: flex;
+    justify-content: center;
+}
+
+.google-auth-error {
+    font-size: 0.78rem;
+    color: #b42318;
+    line-height: 1.35;
+}
