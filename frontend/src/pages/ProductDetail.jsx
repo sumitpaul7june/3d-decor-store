@@ -47,6 +47,17 @@ const parseInfoBlocks = (content = "") => {
   return blocks;
 };
 
+const formatText = (text) => {
+  if (!text) return "";
+  const parts = text.split(/(\*\*.*?\*\*)/g);
+  return parts.map((part, i) => {
+    if (part.startsWith("**") && part.endsWith("**")) {
+      return <strong key={i}>{part.slice(2, -2)}</strong>;
+    }
+    return part;
+  });
+};
+
 const renderInfoBlocks = (content, fallback) => {
   const blocks = parseInfoBlocks(content || fallback);
 
@@ -54,11 +65,11 @@ const renderInfoBlocks = (content, fallback) => {
     block.type === "list" ? (
       <ul key={`list-${index}`}>
         {block.items.map((item, itemIndex) => (
-          <li key={`${item}-${itemIndex}`}>{item}</li>
+          <li key={`${item}-${itemIndex}`}>{formatText(item)}</li>
         ))}
       </ul>
     ) : (
-      <p key={`paragraph-${index}`}>{block.text}</p>
+      <p key={`paragraph-${index}`}>{formatText(block.text)}</p>
     )
   );
 };
@@ -226,16 +237,23 @@ function ProductDetail() {
               </button>
             )}
 
-            <img
-              src={activeImage}
-              alt={product.name}
-              className="pd-main-image"
-              onError={(e) => {
-                e.currentTarget.src =
-                  gallery[1] ||
-                  "https://via.placeholder.com/900x1080?text=Image+Unavailable";
-              }}
-            />
+            <div
+              className="pd-image-track"
+              style={{ transform: `translateX(-${selectedImageIndex * 100}%)` }}
+            >
+              {gallery.map((imgSrc, index) => (
+                <img
+                  key={`${imgSrc}-${index}`}
+                  src={imgSrc}
+                  alt={`${product.name} - View ${index + 1}`}
+                  className="pd-main-image"
+                  onError={(e) => {
+                    e.currentTarget.src =
+                      "https://via.placeholder.com/900x1080?text=Image+Unavailable";
+                  }}
+                />
+              ))}
+            </div>
 
             {gallery.length > 1 && (
               <button className="pd-gallery-nav next" onClick={handleNextImage}>
@@ -328,13 +346,11 @@ function ProductDetail() {
 
               <div className="pd-accordion-content">
                 <div className="pd-description-copy">
-                  <p>{presentation.description}</p>
-
-                  <ul>
-                    {presentation.detailPoints.map((point) => (
-                      <li key={point}>{point}</li>
-                    ))}
-                  </ul>
+                  {renderInfoBlocks(
+                    product?.description && product.description.trim().length > 40
+                      ? product.description
+                      : `${presentation.description}\n\n${presentation.detailPoints.map((p) => `- ${p}`).join("\n")}`
+                  )}
                 </div>
               </div>
             </div>

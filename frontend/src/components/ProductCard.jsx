@@ -10,8 +10,6 @@ import { addToCart, setCartFromServer } from "../store/cartSlice";
 import { buildCartItemFromProduct, normalizeServerCart } from "../utils/cartHelpers";
 import { formatCurrencyINR } from "../utils/formatters";
 
-const toFinishClass = (finishName = "") =>
-  `swatch-${finishName.toLowerCase().replace(/\s+/g, "-")}`;
 
 function ProductCard({ product, variant = "default" }) {
   const navigate = useNavigate();
@@ -136,21 +134,7 @@ function ProductCard({ product, variant = "default" }) {
           </div>
         )}
 
-        {!isCatalogCard && (
-          <div className="product-footer">
-            <div className="product-swatches" aria-label="Available finishes">
-              {presentation.finishes.map((finish) => (
-                <span
-                  key={finish.name}
-                  className={`product-swatch ${toFinishClass(finish.name)}`}
-                  title={finish.name}
-                />
-              ))}
-            </div>
 
-            <span className="product-arrow" aria-hidden="true">→</span>
-          </div>
-        )}
       </div>
     </article>
   );
