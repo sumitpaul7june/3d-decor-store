@@ -328,7 +328,15 @@
 
 @media (max-width: 760px) {
     .product-image {
-        aspect-ratio: 4 / 4.6;
+        aspect-ratio: 1 / 1.05;
+    }
+
+    .product-title {
+        font-size: 0.88rem;
+    }
+
+    .current-price {
+        font-size: 0.94rem;
     }
 
     .product--catalog .product-title {

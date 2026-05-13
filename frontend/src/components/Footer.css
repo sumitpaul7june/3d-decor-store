@@ -89,3 +89,18 @@
         padding: 0 1rem;
     }
 }
+
+@media (max-width: 480px) {
+    .footer-top {
+        padding: 3rem 0 2rem;
+    }
+    .footer-heading {
+        font-size: 1.5rem;
+    }
+    .footer-brand-text {
+        font-size: 0.9rem;
+    }
+    .footer-col li {
+        margin-bottom: 0.75rem;
+    }
+}

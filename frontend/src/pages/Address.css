@@ -570,3 +570,18 @@
     grid-template-columns: 1fr;
   }
 }
+
+@media (max-width: 480px) {
+  .checkout-page {
+    padding: 0 0 2rem;
+  }
+  
+  .checkout-main-pane,
+  .checkout-summary-pane {
+    padding: 1.25rem 1rem;
+  }
+  
+  .checkout-head h2 {
+    font-size: 1.7rem;
+  }
+}

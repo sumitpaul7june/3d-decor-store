@@ -180,15 +180,12 @@
     width: 100%;
   }
 
-  .users-table-head,
-  .users-table-row {
-    grid-template-columns: 1.8fr 0.8fr 1fr 0.8fr;
+  .users-table {
+    overflow-x: auto;
   }
 
-  .users-table-head span:nth-child(5),
-  .users-table-row span:nth-child(5),
-  .users-table-head span:nth-child(6),
-  .users-table-row span:nth-child(6) {
-    display: none;
+  .users-table-head,
+  .users-table-row {
+    min-width: 860px;
   }
 }

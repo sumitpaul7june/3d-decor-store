@@ -236,3 +236,18 @@
     margin-bottom: 12px;
   }
 }
+
+@media (max-width: 480px) {
+  .shop-page {
+    padding: 20px 14px 60px;
+  }
+
+  .shop-title {
+    font-size: 32px;
+  }
+
+  .shop-grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 24px 12px;
+  }
+}

@@ -320,3 +320,19 @@
         font-size: 1.65rem;
     }
 }
+
+@media (max-width: 400px) {
+    .cart-item {
+        grid-template-columns: 60px minmax(0, 1fr);
+        gap: 0.6rem;
+    }
+
+    .cart-item-media {
+        width: 60px;
+        height: 76px;
+    }
+    
+    .cart-item-info .name {
+        font-size: 0.9rem;
+    }
+}

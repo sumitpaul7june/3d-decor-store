@@ -40,4 +40,8 @@
   .admin-container {
     grid-template-columns: 1fr;
   }
+  
+  .admin-content {
+    padding: 16px 12px 24px;
+  }
 }

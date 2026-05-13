@@ -119,11 +119,23 @@
     margin-bottom: 14px;
   }
 
-  .sidebar-nav,
-  .sidebar-footer {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-    gap: 6px;
+  .sidebar-nav {
+    display: flex;
+    flex-direction: row;
+    overflow-x: auto;
+    padding-bottom: 6px;
+    gap: 8px;
+    scrollbar-width: none;
+  }
+
+  .sidebar-nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .sidebar-item {
+    white-space: nowrap;
+    padding: 8px 14px;
+    text-align: center;
   }
 
   .sidebar-group-title {
@@ -131,7 +143,14 @@
   }
 
   .sidebar-footer {
-    margin-top: 10px;
-    padding-top: 10px;
+    display: flex;
+    flex-direction: row;
+    margin-top: 8px;
+    padding-top: 8px;
+  }
+  
+  .logout {
+    width: 100%;
+    text-align: center;
   }
 }

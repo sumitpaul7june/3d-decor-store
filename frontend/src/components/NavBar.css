@@ -378,3 +378,13 @@
   height: 16px;
 }
 
+@media (max-width: 480px) {
+  .nav-search-form input {
+    width: 90px;
+  }
+  
+  .nav-search-form input:focus {
+    width: 130px;
+  }
+}
+
