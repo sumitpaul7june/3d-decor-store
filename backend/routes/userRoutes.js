@@ -5,7 +5,9 @@ import {
   updateProfile,
   getAddresses,
   addAddress,
-  deleteAddress
+  deleteAddress,
+  getWishlist,
+  toggleWishlist
 } from "../controllers/userController.js";
 
 import { protect } from "../middleware/authMiddleware.js";
@@ -35,5 +37,10 @@ router.post("/address", protect, addAddress);
 
 // Delete address
 router.delete("/address/:id", protect, deleteAddress);
+
+/* -------- WISHLIST -------- */
+
+router.get("/wishlist", protect, getWishlist);
+router.post("/wishlist", protect, toggleWishlist);
 
 export default router;

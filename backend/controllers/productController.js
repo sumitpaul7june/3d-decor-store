@@ -21,15 +21,23 @@ const sanitizeProductPayload = (payload = {}) => {
     ...payload,
     type: "physical",
     images,
-    coverImage
+    coverImage,
+    dimensions: payload.dimensions,
+    material: payload.material,
+    careInstructions: payload.careInstructions,
+    isFeatured: Boolean(payload.isFeatured),
+    isBestseller: Boolean(payload.isBestseller),
+    status: payload.status === "draft" ? "draft" : "published"
   };
 };
 
 /*ALL PRODUCT */
 export const getAllProducts = async (req, res) => {
     try {
-        const { type, q, category, sort } = req.query;
+        const { type, q, category, sort, material, minPrice, maxPrice, inStock } = req.query;
         const filter = buildTypeFilter(type);
+        
+        filter.status = "published";
 
         if (q) {
            filter.$or = [
@@ -40,6 +48,20 @@ export const getAllProducts = async (req, res) => {
 
         if (category && category !== "All") {
            filter.category = category;
+        }
+
+        if (material && material !== "All") {
+           filter.material = material;
+        }
+
+        if (inStock === "true") {
+           filter.stock = { $gt: 0 };
+        }
+
+        if (minPrice || maxPrice) {
+           filter.price = {};
+           if (minPrice) filter.price.$gte = Number(minPrice);
+           if (maxPrice) filter.price.$lte = Number(maxPrice);
         }
 
         let sortOption = { createdAt: -1 };

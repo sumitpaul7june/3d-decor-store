@@ -190,3 +190,42 @@ export const deleteAddress = async (req, res) => {
     res.status(500).json({ message: "Server Error" });
   }
 };
+
+/* -------- WISHLIST -------- */
+
+export const getWishlist = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id).populate("wishlist");
+    res.json(user.wishlist || []);
+  } catch (error) {
+    res.status(500).json({ message: "Server Error" });
+  }
+};
+
+export const toggleWishlist = async (req, res) => {
+  try {
+    const { productId } = req.body;
+    const user = await User.findById(req.user._id);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const index = user.wishlist.findIndex(id => id.toString() === productId);
+
+    if (index === -1) {
+      user.wishlist.push(productId);
+    } else {
+      user.wishlist.splice(index, 1);
+    }
+
+    await user.save();
+    
+    // Return populated wishlist
+    const populatedUser = await User.findById(req.user._id).populate("wishlist");
+    res.json(populatedUser.wishlist);
+
+  } catch (error) {
+    res.status(500).json({ message: "Server Error" });
+  }
+};

@@ -65,6 +65,17 @@ const orderSchema = new mongoose.Schema(
       default: "Pending"
     },
 
+    trackingLink: {
+      type: String,
+      default: ""
+    },
+
+    refundStatus: {
+      type: String,
+      enum: ["None", "Pending", "Processed"],
+      default: "None"
+    },
+
     adminNote: {
       type: String,
       default: ""

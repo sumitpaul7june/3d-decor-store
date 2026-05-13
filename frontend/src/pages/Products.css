@@ -65,6 +65,25 @@
   border-bottom: 1px solid #eaeaea;
 }
 
+.mt-6 {
+  margin-top: 32px;
+}
+
+.checkbox-filter {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #666;
+  cursor: pointer;
+}
+
+.checkbox-filter input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
 .category-list {
   list-style: none;
   padding: 0;
@@ -146,6 +165,44 @@
 
 .shop-state-msg.error {
   color: #a80000;
+}
+
+.shop-loading-spinner {
+  border: 3px solid rgba(0, 0, 0, 0.1);
+  border-top-color: #111;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 16px;
+}
+
+@keyframes spin { 
+  to { transform: rotate(360deg); } 
+}
+
+.shop-empty-state {
+  text-align: center;
+  padding: 80px 20px;
+  background: #fdfaf5;
+  border: 1px dashed #dfd8cb;
+  border-radius: 16px;
+}
+
+.shop-empty-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.shop-empty-state h2 {
+  font-size: 24px;
+  color: #111;
+  margin-bottom: 8px;
+}
+
+.shop-empty-state p {
+  color: #666;
+  font-size: 15px;
 }
 
 .reset-btn {

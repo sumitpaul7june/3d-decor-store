@@ -299,6 +299,33 @@ export const updateOrderStatus = async (req, res) => {
   }
 };
 
+export const updateOrderDetails = async (req, res) => {
+  try {
+    const { trackingLink, refundStatus } = req.body;
+    const order = await Order.findById(req.params.id);
+
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    if (trackingLink !== undefined) {
+      order.trackingLink = trackingLink;
+    }
+
+    if (refundStatus !== undefined) {
+      if (!["None", "Pending", "Processed"].includes(refundStatus)) {
+        return res.status(400).json({ message: "Invalid refund status" });
+      }
+      order.refundStatus = refundStatus;
+    }
+
+    await order.save();
+    res.json({ message: "Order details updated" });
+  } catch (error) {
+    res.status(500).json({ message: "Server Error" });
+  }
+};
+
 export const updateAdminOrderNote = async (req, res) => {
   try {
     const note = String(req.body.note || "").trim();

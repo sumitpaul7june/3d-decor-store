@@ -19,7 +19,14 @@ function ProductModal({ isOpen, onClose, onSave, initialData }) {
     price: "",
     originalPrice: "",
     coverImage: "",
-    galleryImages: []
+    galleryImages: [],
+    dimensions: "",
+    material: "",
+    careInstructions: "",
+    isFeatured: false,
+    isBestseller: false,
+    status: "published",
+    stock: 0
   });
   const [formError, setFormError] = useState("");
   const [coverUploading, setCoverUploading] = useState(false);
@@ -40,7 +47,14 @@ function ProductModal({ isOpen, onClose, onSave, initialData }) {
       price: initialData?.price || "",
       originalPrice: initialData?.originalPrice || "",
       coverImage: initialData?.coverImage || "",
-      galleryImages: initialGallery.slice(0, 4)
+      galleryImages: initialGallery.slice(0, 4),
+      dimensions: initialData?.dimensions || "",
+      material: initialData?.material || "",
+      careInstructions: initialData?.careInstructions || "",
+      isFeatured: initialData?.isFeatured || false,
+      isBestseller: initialData?.isBestseller || false,
+      status: initialData?.status || "published",
+      stock: initialData?.stock || 0
     });
     setFormError("");
     setCoverUploading(false);
@@ -185,7 +199,14 @@ function ProductModal({ isOpen, onClose, onSave, initialData }) {
       price: Number(form.price),
       originalPrice: Number(form.originalPrice),
       coverImage: form.coverImage,
-      images: form.galleryImages
+      images: form.galleryImages,
+      dimensions: form.dimensions.trim(),
+      material: form.material.trim(),
+      careInstructions: form.careInstructions.trim(),
+      isFeatured: form.isFeatured,
+      isBestseller: form.isBestseller,
+      status: form.status,
+      stock: Number(form.stock)
     };
 
     const didSave = await onSave(payload);
@@ -255,6 +276,20 @@ function ProductModal({ isOpen, onClose, onSave, initialData }) {
     }
   };
 
+  const renderMarkdownLive = (text) => {
+    if (!text) return null;
+    const html = text
+      .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>") // bold
+      .replace(/^### (.*$)/gim, "<h3>$1</h3>") // heading 3
+      .replace(/^## (.*$)/gim, "<h2>$1</h2>") // heading 2
+      .replace(/^# (.*$)/gim, "<h1>$1</h1>") // heading 1
+      .replace(/^\- (.*$)/gim, "<li>$1</li>") // list item
+      .replace(/<\/li>\n<li>/g, "</li><li>")
+      .replace(/(<li>.*<\/li>)/s, "<ul>$1</ul>")
+      .replace(/\n/g, "<br />");
+    return { __html: html };
+  };
+
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal" onClick={(e) => e.stopPropagation()}>
@@ -297,10 +332,44 @@ function ProductModal({ isOpen, onClose, onSave, initialData }) {
               />
             </label>
           </div>
+          
+          <div className="modal-grid modal-grid-3">
+            <label htmlFor="status">
+              Status
+              <select name="status" id="status" value={form.status} onChange={handleChange}>
+                <option value="published">Published</option>
+                <option value="draft">Draft</option>
+              </select>
+            </label>
+            <label htmlFor="stock">
+              Stock
+              <input type="number" id="stock" name="stock" value={form.stock} onChange={handleChange} min="0" required />
+            </label>
+            <div className="modal-checkbox-group">
+              <label className="checkbox-label">
+                <input type="checkbox" name="isFeatured" checked={form.isFeatured} onChange={(e) => setForm(prev => ({...prev, isFeatured: e.target.checked}))} />
+                Featured
+              </label>
+              <label className="checkbox-label">
+                <input type="checkbox" name="isBestseller" checked={form.isBestseller} onChange={(e) => setForm(prev => ({...prev, isBestseller: e.target.checked}))} />
+                Bestseller
+              </label>
+            </div>
+          </div>
 
           <label htmlFor="description">
             Description
             <div className="modal-formatting-row">
+              <button
+                type="button"
+                className="modal-format-btn"
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={() => toggleDescriptionWrap("### ")}
+                aria-label="Heading"
+                title="Heading 3"
+              >
+                <strong>H3</strong>
+              </button>
               <button
                 type="button"
                 className="modal-format-btn"
@@ -310,6 +379,16 @@ function ProductModal({ isOpen, onClose, onSave, initialData }) {
                 title="Bold (Cmd/Ctrl + B)"
               >
                 <strong>B</strong>
+              </button>
+              <button
+                type="button"
+                className="modal-format-btn"
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={() => toggleDescriptionWrap("- ")}
+                aria-label="Bullet List"
+                title="Bullet List"
+              >
+                <strong>• List</strong>
               </button>
               <span className="modal-format-hint">
                 Select text and use <kbd>Cmd</kbd>/<kbd>Ctrl</kbd> + <kbd>B</kbd> for bold.
@@ -324,7 +403,31 @@ function ProductModal({ isOpen, onClose, onSave, initialData }) {
               onKeyDown={handleDescriptionKeyDown}
               rows={5}
             />
+            {form.description && (
+              <div className="modal-live-preview">
+                <small className="modal-live-preview-label">Live Preview</small>
+                <div 
+                  className="modal-live-preview-content"
+                  dangerouslySetInnerHTML={renderMarkdownLive(form.description)}
+                />
+              </div>
+            )}
           </label>
+
+          <div className="modal-grid modal-grid-3">
+            <label htmlFor="dimensions">
+              Dimensions
+              <input id="dimensions" name="dimensions" value={form.dimensions} onChange={handleChange} placeholder="e.g. 10x12x5 inches" />
+            </label>
+            <label htmlFor="material">
+              Material
+              <input id="material" name="material" value={form.material} onChange={handleChange} placeholder="e.g. Ceramic, Wood" />
+            </label>
+            <label htmlFor="careInstructions">
+              Care Instructions
+              <input id="careInstructions" name="careInstructions" value={form.careInstructions} onChange={handleChange} placeholder="e.g. Wipe with dry cloth" />
+            </label>
+          </div>
 
           <div className="modal-grid modal-grid-2">
             <label htmlFor="price">

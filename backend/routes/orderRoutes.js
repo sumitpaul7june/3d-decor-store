@@ -8,7 +8,8 @@ import {
   getAllOrders,
   getAdminOrderById,
   updateOrderStatus,
-  updateAdminOrderNote
+  updateAdminOrderNote,
+  updateOrderDetails
 } from "../controllers/orderController.js";
 
 import { protect } from "../middleware/authMiddleware.js";
@@ -43,5 +44,6 @@ router.get("/:id", protect, adminOnly, getAdminOrderById);
 // Update order status (Shipped, Delivered etc.)
 router.put("/:id/status", protect, adminOnly, updateOrderStatus);
 router.put("/:id/admin-note", protect, adminOnly, updateAdminOrderNote);
+router.put("/:id/details", protect, adminOnly, updateOrderDetails);
 
 export default router;

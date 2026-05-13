@@ -141,6 +141,9 @@
 .text-success {
   color: #18794e !important;
 }
+.text-warning {
+  color: #b86b11 !important;
+}
 
 .sub-kicker {
   font-size: 11px;
@@ -255,6 +258,10 @@
   background: #fdf5f5;
   transition: opacity 0.2s;
   padding: 10px 12px;
+}
+.action-row.low-stock-row {
+  border-color: #f7ebd4;
+  background: #fdfaf5;
 }
 .action-row:hover { opacity: 0.8; }
 

@@ -10,11 +10,22 @@ function Products() {
   const [searchParams, setSearchParams] = useSearchParams();
   const q = searchParams.get("q") || "";
   const activeCategory = searchParams.get("category") || "All";
+  const activeMaterial = searchParams.get("material") || "All";
+  const inStockOnly = searchParams.get("inStock") === "true";
+  const minPrice = searchParams.get("minPrice") || "";
+  const maxPrice = searchParams.get("maxPrice") || "";
   
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [sortBy, setSortBy] = useState("featured");
+
+  const MATERIALS = useMemo(() => {
+    // Unique materials from loaded products if any, or static list
+    const materials = new Set(["Wood", "Metal", "Ceramic", "Glass", "Fabric", "Plastic", "Concrete"]);
+    products.forEach(p => p.material && materials.add(p.material));
+    return Array.from(materials).sort();
+  }, [products]);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -22,9 +33,14 @@ function Products() {
         setLoading(true);
         setError("");
 
-        const { data } = await axios.get("/products", {
-          params: { q, category: activeCategory }
-        });
+        const params = { q };
+        if (activeCategory !== "All") params.category = activeCategory;
+        if (activeMaterial !== "All") params.material = activeMaterial;
+        if (inStockOnly) params.inStock = "true";
+        if (minPrice) params.minPrice = minPrice;
+        if (maxPrice) params.maxPrice = maxPrice;
+
+        const { data } = await axios.get("/products", { params });
         setProducts(Array.isArray(data) ? data : []);
       } catch (err) {
         setError(err.response?.data?.message || "Failed to load products");
@@ -34,7 +50,7 @@ function Products() {
     };
 
     fetchProducts();
-  }, [q, activeCategory]);
+  }, [q, activeCategory, activeMaterial, inStockOnly, minPrice, maxPrice]);
 
   const sortedProducts = useMemo(() => {
     const productList = [...products];
@@ -45,12 +61,12 @@ function Products() {
     return productList;
   }, [products, sortBy]);
 
-  const setCategoryFilter = (cat) => {
+  const setFilter = (key, value) => {
     const newParams = new URLSearchParams(searchParams);
-    if (cat === "All") {
-      newParams.delete("category");
+    if (value === "All" || value === "" || value === false) {
+      newParams.delete(key);
     } else {
-      newParams.set("category", cat);
+      newParams.set(key, value);
     }
     setSearchParams(newParams);
   };
@@ -82,7 +98,7 @@ function Products() {
               <li>
                 <button 
                   className={activeCategory === "All" ? "active" : ""} 
-                  onClick={() => setCategoryFilter("All")}
+                  onClick={() => setFilter("category", "All")}
                 >
                   All Products
                 </button>
@@ -91,13 +107,49 @@ function Products() {
                 <li key={cat}>
                   <button 
                     className={activeCategory === cat ? "active" : ""} 
-                    onClick={() => setCategoryFilter(cat)}
+                    onClick={() => setFilter("category", cat)}
                   >
                     {cat}
                   </button>
                 </li>
               ))}
             </ul>
+          </div>
+
+          <div className="filter-group mt-6">
+            <h3>Material</h3>
+            <ul className="category-list">
+              <li>
+                <button 
+                  className={activeMaterial === "All" ? "active" : ""} 
+                  onClick={() => setFilter("material", "All")}
+                >
+                  Any Material
+                </button>
+              </li>
+              {MATERIALS.map(mat => (
+                <li key={mat}>
+                  <button 
+                    className={activeMaterial === mat ? "active" : ""} 
+                    onClick={() => setFilter("material", mat)}
+                  >
+                    {mat}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="filter-group mt-6">
+            <h3>Availability</h3>
+            <label className="checkbox-filter">
+              <input 
+                type="checkbox" 
+                checked={inStockOnly} 
+                onChange={(e) => setFilter("inStock", e.target.checked)} 
+              />
+              <span>In Stock Only</span>
+            </label>
           </div>
         </aside>
 
@@ -122,12 +174,17 @@ function Products() {
           </div>
 
           {loading ? (
-            <div className="shop-state-msg">Loading catalog...</div>
+            <div className="shop-state-msg">
+              <div className="shop-loading-spinner"></div>
+              <p>Loading catalog...</p>
+            </div>
           ) : error ? (
             <div className="shop-state-msg error">{error}</div>
           ) : sortedProducts.length === 0 ? (
-            <div className="shop-state-msg">
-              <p>No products found.</p>
+            <div className="shop-empty-state">
+              <div className="shop-empty-icon">🔍</div>
+              <h2>No products found</h2>
+              <p>We couldn't find any products matching your current filters.</p>
               <button className="reset-btn" onClick={() => setSearchParams({})}>Clear all filters</button>
             </div>
           ) : (

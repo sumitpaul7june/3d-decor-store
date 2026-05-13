@@ -168,6 +168,13 @@
   line-height: 1.05;
 }
 
+.order-tracking-btn {
+  font-size: 13px;
+  color: #111;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
 .order-timeline-list {
   display: grid;
   gap: 14px;
@@ -345,6 +352,10 @@
 .order-detail-info.address p strong {
   color: #111827;
 }
+
+.refund-status-none { color: #6b7280; }
+.refund-status-pending { color: #8b5e00; }
+.refund-status-processed { color: #18794e; }
 
 .order-detail-summary {
   display: flex;

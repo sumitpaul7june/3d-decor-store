@@ -34,6 +34,7 @@ const EMPTY_DASHBOARD = {
   recentReturns: [],
   recentCustomers: [],
   topProducts: [],
+  lowStockAlerts: [],
 };
 
 function AdminDashboard() {
@@ -213,6 +214,25 @@ function AdminDashboard() {
                        <div className="action-info">
                          <span><strong>RMA:</strong> {req.order?._id?.slice(-8) || "N/A"}</span>
                          <small>{req.user?.name || "Customer"} requested return</small>
+                       </div>
+                       <span className="arr">→</span>
+                     </a>
+                  ))}
+               </div>
+            )}
+          </div>
+
+          <div className="action-center-group mt-lg">
+            <h3 className="sub-kicker">Low Stock Alerts</h3>
+            {!loading && data.lowStockAlerts?.length === 0 ? (
+               <p className="panel-empty text-success">Stock levels healthy.</p>
+            ) : (
+               <div className="dashboard-feed compact-feed">
+                  {data.lowStockAlerts?.map(prod => (
+                     <a href="/admin/products" key={prod._id} className="feed-row action-row low-stock-row">
+                       <div className="action-info">
+                         <span><strong>{prod.name}</strong></span>
+                         <small className="text-warning">{prod.stock} remaining in stock</small>
                        </div>
                        <span className="arr">→</span>
                      </a>

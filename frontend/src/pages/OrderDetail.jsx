@@ -335,6 +335,11 @@ function OrderDetail() {
           <article className="order-detail-card">
             <div className="order-detail-card-head">
               <h2>Tracking Timeline</h2>
+              {order.trackingLink && (
+                <a href={order.trackingLink} target="_blank" rel="noreferrer" className="order-tracking-btn">
+                  Track Package →
+                </a>
+              )}
             </div>
 
             <div className="order-timeline-list">
@@ -449,6 +454,12 @@ function OrderDetail() {
                 <span>Status</span>
                 <strong>{order.paymentStatus || "Pending"}</strong>
               </div>
+              {order.refundStatus && order.refundStatus !== "None" && (
+                <div>
+                  <span>Refund</span>
+                  <strong className={`refund-status-${order.refundStatus.toLowerCase()}`}>{order.refundStatus}</strong>
+                </div>
+              )}
               <div>
                 <span>Transaction ID</span>
                 <strong>{order.payment?.paymentId || "Not available"}</strong>

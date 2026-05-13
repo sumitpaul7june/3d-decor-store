@@ -66,20 +66,30 @@ const formatText = (text) => {
   });
 };
 
+const parseMarkdownHeadings = (text) => {
+  if (text.startsWith("### ")) return <h3>{formatText(text.slice(4))}</h3>;
+  if (text.startsWith("## ")) return <h2>{formatText(text.slice(3))}</h2>;
+  if (text.startsWith("# ")) return <h1>{formatText(text.slice(2))}</h1>;
+  return null;
+};
+
 const renderInfoBlocks = (content, fallback) => {
   const blocks = parseInfoBlocks(content || fallback);
 
-  return blocks.map((block, index) =>
-    block.type === "list" ? (
-      <ul key={`list-${index}`}>
-        {block.items.map((item, itemIndex) => (
-          <li key={`${item}-${itemIndex}`}>{formatText(item)}</li>
-        ))}
-      </ul>
-    ) : (
-      <p key={`paragraph-${index}`}>{formatText(block.text)}</p>
-    )
-  );
+  return blocks.map((block, index) => {
+    if (block.type === "list") {
+      return (
+        <ul key={`list-${index}`}>
+          {block.items.map((item, itemIndex) => (
+            <li key={`${item}-${itemIndex}`}>{formatText(item)}</li>
+          ))}
+        </ul>
+      );
+    }
+    const heading = parseMarkdownHeadings(block.text);
+    if (heading) return <div key={`paragraph-${index}`}>{heading}</div>;
+    return <p key={`paragraph-${index}`}>{formatText(block.text)}</p>;
+  });
 };
 
 function ProductDetail() {
@@ -383,6 +393,38 @@ function ProductDetail() {
                 </div>
               </div>
             </div>
+
+            {(product?.dimensions || product?.material || product?.careInstructions) && (
+              <div className={`pd-accordion-item ${openSection === "specs" ? "open" : ""}`}>
+                <button onClick={() => toggle("specs")}>
+                  Specifications
+                  <span>{openSection === "specs" ? "−" : "+"}</span>
+                </button>
+  
+                <div className="pd-accordion-content">
+                  <div className="pd-specs-grid">
+                    {product?.dimensions && (
+                      <div className="pd-spec-row">
+                        <span className="pd-spec-label">Dimensions</span>
+                        <span className="pd-spec-value">{product.dimensions}</span>
+                      </div>
+                    )}
+                    {product?.material && (
+                      <div className="pd-spec-row">
+                        <span className="pd-spec-label">Material</span>
+                        <span className="pd-spec-value">{product.material}</span>
+                      </div>
+                    )}
+                    {product?.careInstructions && (
+                      <div className="pd-spec-row">
+                        <span className="pd-spec-label">Care</span>
+                        <span className="pd-spec-value">{product.careInstructions}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
 
             <div className={`pd-accordion-item ${openSection === "shipping" ? "open" : ""}`}>
               <button onClick={() => toggle("shipping")}>

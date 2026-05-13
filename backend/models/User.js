@@ -60,6 +60,13 @@ const userSchema = new mongoose.Schema(
         country: String,
       },
     ],
+    
+    wishlist: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Product",
+      },
+    ],
 
     photo: String,
     resetPasswordToken: String,

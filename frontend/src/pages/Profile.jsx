@@ -2,9 +2,11 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "../api/axios";
+import ProductCard from "../components/ProductCard";
 import "./Profile.css";
 
 function Profile() {
+  const [activeTab, setActiveTab] = useState("account");
   // Profile loading states.
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -59,7 +61,7 @@ function Profile() {
       })
     : "-";
 
-  return (
+  const renderAccount = () => (
     <section className="profile-page">
       <div className="profile-page-head">
         <p className="profile-kicker">Account</p>
@@ -109,12 +111,10 @@ function Profile() {
             </div>
           </article>
 
-          {/* Helpful shortcut actions */}
           <article className="profile-card">
             <div className="profile-card-head">
               <h2>Quick Actions</h2>
             </div>
-
             <div className="profile-actions">
               <Link to="/orders/my" className="profile-action-btn">
                 View My Orders
@@ -122,12 +122,52 @@ function Profile() {
               <Link to="/track-order" className="profile-action-btn secondary">
                 Track Order
               </Link>
+              <button 
+                onClick={() => setActiveTab("wishlist")} 
+                className="profile-action-btn secondary"
+              >
+                View Wishlist
+              </button>
             </div>
           </article>
         </div>
       </div>
     </section>
   );
+
+  const renderWishlist = () => (
+    <section className="profile-page">
+      <div className="profile-page-head">
+        <p className="profile-kicker">Account</p>
+        <h1>My Wishlist</h1>
+        <p className="profile-subtitle">
+          Pieces you've saved for later.
+        </p>
+        <button onClick={() => setActiveTab("account")} className="profile-back-btn mt-4">
+          ← Back to Account
+        </button>
+      </div>
+      
+      {(!user.wishlist || user.wishlist.length === 0) ? (
+        <div className="profile-empty-state">
+          <div className="profile-empty-icon">♡</div>
+          <h2>Your wishlist is empty</h2>
+          <p>Explore our catalog to find pieces you love.</p>
+          <Link to="/products" className="profile-action-btn mt-4">Browse Products</Link>
+        </div>
+      ) : (
+        <div className="profile-wishlist-grid">
+          {user.wishlist.map(product => (
+            <ProductCard key={product._id} product={product} variant="catalog" />
+          ))}
+        </div>
+      )}
+    </section>
+  );
+
+  if (activeTab === "wishlist") return renderWishlist();
+
+  return renderAccount();
 }
 
 export default Profile;

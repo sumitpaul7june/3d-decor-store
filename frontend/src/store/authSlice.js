@@ -63,6 +63,17 @@ const authSlice = createSlice({
             // Clear persisted auth on logout.
             localStorage.removeItem("auth");
         },
+
+        setWishlist(state, action) {
+            if (state.user) {
+                state.user.wishlist = action.payload;
+                const persisted = JSON.parse(localStorage.getItem("auth") || "{}");
+                if (persisted.user) {
+                    persisted.user.wishlist = action.payload;
+                    localStorage.setItem("auth", JSON.stringify(persisted));
+                }
+            }
+        }
     },
 });
 
@@ -71,6 +82,7 @@ export const {
     loginSuccess,
     loginFailure,
     logout,
+    setWishlist,
 } = authSlice.actions;
 
 export default authSlice.reducer;

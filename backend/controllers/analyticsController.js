@@ -100,7 +100,8 @@ export const getDashboardStats = async (req, res) => {
     const [recentOrders, recentReturns, recentCustomers] = await Promise.all([
       Order.find().sort({ createdAt: -1 }).limit(4).populate("user", "name email"),
       ReturnRequest.find({ status: "Requested" }).sort({ createdAt: -1 }).limit(4).populate("user", "name email").populate("order", "_id"),
-      User.find({ role: "user" }).sort({ createdAt: -1 }).limit(4)
+      User.find({ role: "user" }).sort({ createdAt: -1 }).limit(4),
+      Product.find({ stock: { $lte: 5 } }).sort({ stock: 1 }).limit(5)
     ]);
 
     res.json({
@@ -115,7 +116,8 @@ export const getDashboardStats = async (req, res) => {
       topProducts,
       recentOrders,
       recentReturns,
-      recentCustomers
+      recentCustomers,
+      lowStockAlerts
     });
   } catch (error) {
     console.error("DASHBOARD STATS ERROR:", error);

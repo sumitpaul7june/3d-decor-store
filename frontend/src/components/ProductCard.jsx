@@ -7,6 +7,7 @@ import { getProductPresentation } from "../utils/productPresentation";
 import { buildProductPath } from "../utils/productRoutes";
 import axios from "../api/axios";
 import { addToCart, setCartFromServer } from "../store/cartSlice";
+import { setWishlist } from "../store/authSlice";
 import { buildCartItemFromProduct, normalizeServerCart } from "../utils/cartHelpers";
 import { formatCurrencyINR } from "../utils/formatters";
 
@@ -15,8 +16,13 @@ function ProductCard({ product, variant = "default" }) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
+  const user = useSelector((state) => state.auth.user);
+  const wishlist = user?.wishlist || [];
+  const inWishlist = wishlist.some(item => (item._id || item) === product._id);
   const [isAdding, setIsAdding] = useState(false);
   const [isBuying, setIsBuying] = useState(false);
+  const [wishlistLoading, setWishlistLoading] = useState(false);
+  
   const presentation = getProductPresentation(product);
   const originalPrice = product.originalPrice || product.price;
   const savings = Math.max(originalPrice - product.price, 0);
@@ -26,6 +32,8 @@ function ProductCard({ product, variant = "default" }) {
       : 0;
   const isCatalogCard = variant === "catalog";
   const isHomeCard = variant === "home";
+
+  const hoverImage = presentation.gallery?.length > 1 ? presentation.gallery[1] : null;
 
   const handleCardClick = () => {
     navigate(buildProductPath(product));
@@ -73,6 +81,24 @@ function ProductCard({ product, variant = "default" }) {
     }
   };
 
+  const handleWishlist = async (event) => {
+    event.stopPropagation();
+    if (!isAuthenticated) {
+      navigate("/login");
+      return;
+    }
+    
+    try {
+      setWishlistLoading(true);
+      const { data } = await axios.post("/users/wishlist", { productId: product._id });
+      dispatch(setWishlist(data));
+    } catch (error) {
+      console.error("Wishlist toggle failed", error);
+    } finally {
+      setWishlistLoading(false);
+    }
+  };
+
   return (
     <article
       className={`product ${isCatalogCard ? "product--catalog" : ""} ${isHomeCard ? "product--home" : ""}`}
@@ -84,15 +110,31 @@ function ProductCard({ product, variant = "default" }) {
             {isCatalogCard && discountPercent > 0 ? `Save ${discountPercent}%` : "Sale"}
           </span>
         )}
+        <button 
+          className={`product-wishlist-btn ${inWishlist ? "active" : ""}`}
+          onClick={handleWishlist}
+          disabled={wishlistLoading}
+          aria-label="Toggle wishlist"
+        >
+          {inWishlist ? "♥" : "♡"}
+        </button>
         <img
           src={presentation.coverImage}
           alt={product.name}
+          className={`product-img-main ${hoverImage ? "has-hover" : ""}`}
           onError={(e) => {
             e.currentTarget.src =
               presentation.gallery[0] ||
               "https://via.placeholder.com/600x760?text=Image+Unavailable";
           }}
         />
+        {hoverImage && (
+          <img 
+            src={hoverImage} 
+            alt={`${product.name} alternate view`} 
+            className="product-img-hover"
+          />
+        )}
       </div>
 
       <div className="product-info">

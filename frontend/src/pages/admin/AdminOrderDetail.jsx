@@ -61,6 +61,19 @@ function AdminOrderDetail() {
     }
   };
 
+  const handleDetailsChange = async (field, value) => {
+    try {
+      setStatusSaving(true);
+      setError("");
+      await axios.put(`/orders/${orderId}/details`, { [field]: value });
+      await fetchOrder();
+    } catch (err) {
+      setError(err.response?.data?.message || `Failed to update ${field}`);
+    } finally {
+      setStatusSaving(false);
+    }
+  };
+
   if (loading) {
     return (
       <section className="admin-order-detail">
@@ -276,6 +289,37 @@ function AdminOrderDetail() {
                 <option>Delivered</option>
                 <option>Cancelled</option>
               </select>
+            </label>
+            
+            <label className="admin-order-control" style={{ marginTop: '12px' }}>
+              <span>Refund status</span>
+              <select
+                value={order.refundStatus || "None"}
+                onChange={(e) => handleDetailsChange("refundStatus", e.target.value)}
+                disabled={statusSaving}
+              >
+                <option>None</option>
+                <option>Pending</option>
+                <option>Processed</option>
+              </select>
+            </label>
+
+            <label className="admin-order-control" style={{ marginTop: '12px' }}>
+              <span>Tracking Link</span>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <input
+                  type="url"
+                  placeholder="https://..."
+                  defaultValue={order.trackingLink || ""}
+                  onBlur={(e) => {
+                    if (e.target.value !== order.trackingLink) {
+                      handleDetailsChange("trackingLink", e.target.value);
+                    }
+                  }}
+                  disabled={statusSaving}
+                  style={{ flex: 1, padding: '8px', borderRadius: '8px', border: '1px solid #d7cfc2' }}
+                />
+              </div>
             </label>
 
             <div className="admin-order-summary-rows">

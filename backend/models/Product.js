@@ -34,6 +34,34 @@ const productSchema = new mongoose.Schema(
       default: "physical"
     },
 
+    status: {
+      type: String,
+      enum: ["draft", "published"],
+      default: "published"
+    },
+
+    dimensions: {
+      type: String
+    },
+
+    material: {
+      type: String
+    },
+
+    careInstructions: {
+      type: String
+    },
+
+    isFeatured: {
+      type: Boolean,
+      default: false
+    },
+
+    isBestseller: {
+      type: Boolean,
+      default: false
+    },
+
     category: {
       type: String,
       required: true

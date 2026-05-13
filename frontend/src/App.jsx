@@ -4,41 +4,50 @@ import {
   RouterProvider,
 } from "react-router-dom";
 
+import { Suspense, lazy } from "react";
 import MainLayout from "./layouts/MainLayout";
-
-// Pages
-import Home from "./pages/Home";
-import Login from "./pages/Login";
-import Signup from "./pages/Signup";
-import ForgotPassword from "./pages/ForgotPassword";
-import ResetPassword from "./pages/ResetPassword";
-import Profile from "./pages/Profile";
-import Address from "./pages/Address";
-import CheckoutSuccess from "./pages/CheckoutSuccess";
-import MyOrders from "./pages/MyOrders";
-import OrderDetail from "./pages/OrderDetail";
-import OrderInvoice from "./pages/OrderInvoice";
-import Products from "./pages/Products";
-import ProductDetail from "./pages/ProductDetail"
-import AboutUs from "./pages/AboutUs";
-import Contact from "./pages/Contact";
-import PrivacyPolicy from "./pages/PrivacyPolicy";
-import TrackOrder from "./pages/TrackOrder";
-import AdminDashboard from "./pages/admin/AdminDashboard";
-import AdminHomeContent from "./pages/admin/AdminHomeContent";
-import AdminProducts from "./pages/admin/AdminProducts";
-import AdminStorePolicies from "./pages/admin/AdminStorePolicies";
-import AdminUsers from "./pages/admin/AdminUsers";
-import AdminReturns from "./pages/admin/AdminReturns";
-
-// Route guards
+import AdminLayout from "./layouts/AdminLayout";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import PublicRoute from "./routes/PublicRoute";
-import AdminLayout from "./layouts/AdminLayout";
-import AdminOrders from "./pages/admin/AdminOrders";
-import AdminOrderDetail from "./pages/admin/AdminOrderDetail";
-import AdminOrderInvoice from "./pages/admin/AdminOrderInvoice";
 import AdminRoute from "./routes/AdminRoute";
+
+// Critical Pages (Eagerly loaded)
+import Home from "./pages/Home";
+import Products from "./pages/Products";
+import ProductDetail from "./pages/ProductDetail";
+import Login from "./pages/Login";
+
+// Non-critical Pages (Lazy loaded)
+const Signup = lazy(() => import("./pages/Signup"));
+const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
+const Profile = lazy(() => import("./pages/Profile"));
+const Address = lazy(() => import("./pages/Address"));
+const CheckoutSuccess = lazy(() => import("./pages/CheckoutSuccess"));
+const MyOrders = lazy(() => import("./pages/MyOrders"));
+const OrderDetail = lazy(() => import("./pages/OrderDetail"));
+const OrderInvoice = lazy(() => import("./pages/OrderInvoice"));
+const AboutUs = lazy(() => import("./pages/AboutUs"));
+const Contact = lazy(() => import("./pages/Contact"));
+const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
+const TrackOrder = lazy(() => import("./pages/TrackOrder"));
+
+// Admin Pages (Lazy loaded)
+const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
+const AdminHomeContent = lazy(() => import("./pages/admin/AdminHomeContent"));
+const AdminProducts = lazy(() => import("./pages/admin/AdminProducts"));
+const AdminStorePolicies = lazy(() => import("./pages/admin/AdminStorePolicies"));
+const AdminUsers = lazy(() => import("./pages/admin/AdminUsers"));
+const AdminReturns = lazy(() => import("./pages/admin/AdminReturns"));
+const AdminOrders = lazy(() => import("./pages/admin/AdminOrders"));
+const AdminOrderDetail = lazy(() => import("./pages/admin/AdminOrderDetail"));
+const AdminOrderInvoice = lazy(() => import("./pages/admin/AdminOrderInvoice"));
+
+const LoadingFallback = () => (
+  <div style={{ display: 'flex', justifyContent: 'center', padding: '4rem', color: '#666' }}>
+    Loading...
+  </div>
+);
 
 // Central route tree for public + protected + admin sections.
 const router = createBrowserRouter([
@@ -55,32 +64,32 @@ const router = createBrowserRouter([
         element: <PublicRoute />,
         children: [
           { path: "login", element: <Login /> },
-          { path: "signup", element: <Signup /> },
+          { path: "signup", element: <Suspense fallback={<LoadingFallback />}><Signup /></Suspense> },
         ],
       },
 
       // Password reset pages stay public so email links work without auth state issues.
-      { path: "forgot-password", element: <ForgotPassword /> },
-      { path: "reset-password/:token", element: <ResetPassword /> },
+      { path: "forgot-password", element: <Suspense fallback={<LoadingFallback />}><ForgotPassword /></Suspense> },
+      { path: "reset-password/:token", element: <Suspense fallback={<LoadingFallback />}><ResetPassword /></Suspense> },
 
       // Product browsing pages are always public.
       { path: "products", element: <Products /> },
       { path: "product/:productSlug", element: <ProductDetail /> },
-      { path: "about", element: <AboutUs /> },
-      { path: "contact", element: <Contact /> },
-      { path: "privacy-policy", element: <PrivacyPolicy /> },
-      { path: "track-order", element: <TrackOrder /> },
+      { path: "about", element: <Suspense fallback={<LoadingFallback />}><AboutUs /></Suspense> },
+      { path: "contact", element: <Suspense fallback={<LoadingFallback />}><Contact /></Suspense> },
+      { path: "privacy-policy", element: <Suspense fallback={<LoadingFallback />}><PrivacyPolicy /></Suspense> },
+      { path: "track-order", element: <Suspense fallback={<LoadingFallback />}><TrackOrder /></Suspense> },
 
       // Checkout/account routes require login.
       {
         element: <ProtectedRoute />,
         children: [
-          { path: "profile", element: <Profile /> },
-          { path: "orders/my", element: <MyOrders /> },
-          { path: "orders/my/:orderId", element: <OrderDetail /> },
-          { path: "orders/my/:orderId/invoice", element: <OrderInvoice /> },
-          { path: "checkout/address", element: <Address /> },
-          { path: "checkout/success/:orderId", element: <CheckoutSuccess /> },
+          { path: "profile", element: <Suspense fallback={<LoadingFallback />}><Profile /></Suspense> },
+          { path: "orders/my", element: <Suspense fallback={<LoadingFallback />}><MyOrders /></Suspense> },
+          { path: "orders/my/:orderId", element: <Suspense fallback={<LoadingFallback />}><OrderDetail /></Suspense> },
+          { path: "orders/my/:orderId/invoice", element: <Suspense fallback={<LoadingFallback />}><OrderInvoice /></Suspense> },
+          { path: "checkout/address", element: <Suspense fallback={<LoadingFallback />}><Address /></Suspense> },
+          { path: "checkout/success/:orderId", element: <Suspense fallback={<LoadingFallback />}><CheckoutSuccess /></Suspense> },
         ],
       },
 
@@ -98,15 +107,15 @@ const router = createBrowserRouter([
         path: "/admin",
         element: <AdminLayout />,
         children: [
-          { index: true, element: <AdminDashboard /> },
-          { path: "home-content", element: <AdminHomeContent /> },
-          { path: "store-policies", element: <AdminStorePolicies /> },
-          { path: "products", element: <AdminProducts /> },
-          { path: "orders", element: <AdminOrders /> },
-          { path: "returns", element: <AdminReturns /> },
-          { path: "orders/:orderId", element: <AdminOrderDetail /> },
-          { path: "orders/:orderId/invoice", element: <AdminOrderInvoice /> },
-          { path: "users", element: <AdminUsers /> },
+          { index: true, element: <Suspense fallback={<LoadingFallback />}><AdminDashboard /></Suspense> },
+          { path: "home-content", element: <Suspense fallback={<LoadingFallback />}><AdminHomeContent /></Suspense> },
+          { path: "store-policies", element: <Suspense fallback={<LoadingFallback />}><AdminStorePolicies /></Suspense> },
+          { path: "products", element: <Suspense fallback={<LoadingFallback />}><AdminProducts /></Suspense> },
+          { path: "orders", element: <Suspense fallback={<LoadingFallback />}><AdminOrders /></Suspense> },
+          { path: "returns", element: <Suspense fallback={<LoadingFallback />}><AdminReturns /></Suspense> },
+          { path: "orders/:orderId", element: <Suspense fallback={<LoadingFallback />}><AdminOrderDetail /></Suspense> },
+          { path: "orders/:orderId/invoice", element: <Suspense fallback={<LoadingFallback />}><AdminOrderInvoice /></Suspense> },
+          { path: "users", element: <Suspense fallback={<LoadingFallback />}><AdminUsers /></Suspense> },
         ],
       },
     ],

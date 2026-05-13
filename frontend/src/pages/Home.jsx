@@ -76,13 +76,14 @@ function Home() {
 
   const sectionOrder = hasCMS && homeContent.sectionOrder?.length > 0 
     ? homeContent.sectionOrder 
-    : ["promo", "hero", "products", "testimonials"];
+    : ["promo", "hero", "categories", "products", "testimonials"];
   
   const visibilityFlags = hasCMS && homeContent.visibilityFlags 
     ? homeContent.visibilityFlags 
-    : { promo: false, hero: true, products: true, testimonials: true };
+    : { promo: false, hero: true, categories: true, products: true, testimonials: true };
 
   const promoStrip = homeContent?.promoStrip || { active: false };
+  const featuredCategories = homeContent?.featuredCategories || [];
 
   useEffect(() => {
     if (activeHeroSlides.length <= 1) return undefined;
@@ -167,6 +168,33 @@ function Home() {
 
 
 
+  const renderCategories = () => {
+    if (!visibilityFlags.categories || featuredCategories.length === 0) return null;
+    return (
+      <section className="category-section">
+        <div className="section-heading center">
+          <p className="section-kicker">Shop by Space</p>
+          <h2 className="section-title">Explore our curated collections</h2>
+        </div>
+        <div className="category-grid">
+          {featuredCategories.map((cat, index) => (
+            <Link 
+              to={cat.link || `/products?category=${encodeURIComponent(cat.title)}`} 
+              key={index} 
+              className="category-card"
+              style={{ backgroundImage: `linear-gradient(to top, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0) 60%), url(${cat.image})` }}
+            >
+              <div className="category-card-content">
+                <h3>{cat.title}</h3>
+                <p>{cat.subtitle}</p>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </section>
+    );
+  };
+
   const renderProducts = () => {
     if (!visibilityFlags.products) return null;
     return (
@@ -221,6 +249,7 @@ function Home() {
   const blockRenderers = {
     promo: renderPromo,
     hero: renderHero,
+    categories: renderCategories,
     products: renderProducts,
     testimonials: renderTestimonials,
   };
