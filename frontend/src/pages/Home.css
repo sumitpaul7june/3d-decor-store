@@ -308,10 +308,10 @@
 
     .hero-slide-media {
         padding: 2rem 1.35rem;
-        min-height: 350px;
+        min-height: 60vw;
         align-items: end;
         background-position: center;
-        background-size: contain;
+        background-size: cover;
     }
 
     .hero-slide-copy {
