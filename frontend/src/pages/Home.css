@@ -49,8 +49,9 @@
 
 .hero-slide-media {
     min-height: clamp(350px, 45vw, 500px);
-    background-size: cover;
+    background-size: contain;
     background-position: center center;
+    background-repeat: no-repeat;
     display: flex;
     align-items: center;
     padding: 3.1rem clamp(1.4rem, 4vw, 4.2rem);

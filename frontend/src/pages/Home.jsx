@@ -182,7 +182,7 @@ function Home() {
     if (!visibilityFlags.products) return null;
     return (
       <section className="product-section">
-        <div className="section-heading">
+        <div className="section-heading center">
           <div>
             <p className="section-kicker">Featured Products</p>
             <h2 className="section-title">A lighter edit of standout pieces</h2>
