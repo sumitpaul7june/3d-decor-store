@@ -99,8 +99,8 @@ function NavBar() {
           {/* Logo */}
           <div className="navbar-logo">
             <Link to="/">
-              <img src="/logo-icon.png" alt="Q" className="navbar-mark-img" />
-              <img src="/logo-full.png" alt="QALARAHI" className="navbar-brand-img" />
+              <img src="/logo.png" alt="Q" className="navbar-mark-img" />
+              <img src="/logo_wide.png" alt="QALARAHI" className="navbar-brand-img" />
             </Link>
           </div>
 
