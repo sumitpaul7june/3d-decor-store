@@ -145,6 +145,25 @@ function ProductDetail() {
     setOpenSection(openSection === section ? null : section);
   };
 
+  useEffect(() => {
+    if (!product) return;
+    const presentation = getProductPresentation(product);
+    const galleryLength = presentation.gallery.length;
+    if (galleryLength <= 1) return;
+
+    const handleKeyDown = (e) => {
+      if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
+      if (e.key === "ArrowLeft") {
+        setSelectedImageIndex((prev) => (prev - 1 + galleryLength) % galleryLength);
+      } else if (e.key === "ArrowRight") {
+        setSelectedImageIndex((prev) => (prev + 1) % galleryLength);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [product]);
+
   if (loading) {
     return <section className="product-not-found">Loading product...</section>;
   }
@@ -218,19 +237,7 @@ function ProductDetail() {
     setSelectedImageIndex((prev) => (prev + 1) % gallery.length);
   };
 
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
-      if (e.key === "ArrowLeft") {
-        handlePrevImage();
-      } else if (e.key === "ArrowRight") {
-        handleNextImage();
-      }
-    };
 
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [gallery.length]);
 
   return (
     <section className="product-detail">
@@ -295,7 +302,7 @@ function ProductDetail() {
           <p className="pd-subcopy">{presentation.shortDescription}</p>
 
           <div className="pd-rating-row">
-            <span className="pd-stars">★ {product.averageRating || 5}</span>
+            <span className="pd-stars">★ {product.averageRating || 0}</span>
             <span>({product.numReviews || 0} reviews) • {presentation.trustNote}</span>
           </div>
 

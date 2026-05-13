@@ -138,12 +138,10 @@ function Home() {
                 )}
 
                 <div className="hero-slide-copy" style={{ position: "relative", zIndex: 3 }}>
-                  <p className="hero-kicker">QALARAHI</p>
+
                   <h1>{slide.title}</h1>
                   <p>{slide.subtitle}</p>
-                  <Link className="hero-cta" to={slide.ctaLink || "/products"}>
-                    {slide.ctaLabel || "Shop Collection"}
-                  </Link>
+
                 </div>
               </div>
             </article>
@@ -152,8 +150,6 @@ function Home() {
 
         {activeHeroSlides.length > 1 && (
           <>
-            <button className="hero-nav prev" onClick={prevSlide}>‹</button>
-            <button className="hero-nav next" onClick={nextSlide}>›</button>
             <div className="hero-dots">
               {activeHeroSlides.map((slide, index) => (
                 <button
