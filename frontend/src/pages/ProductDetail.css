@@ -471,29 +471,212 @@
     .pd-media-column {
         position: static;
     }
+
+    .pd-info {
+        max-width: 100%;
+    }
 }
 
 @media (max-width: 760px) {
     .product-detail {
-        width: calc(100% - 1.2rem);
-        margin: 1.4rem auto 3rem;
+        width: calc(100% - 2rem);
+        margin: 1.2rem auto 2.5rem;
     }
 
     .pd-grid {
         gap: 1.5rem;
     }
 
+    .pd-main-stage {
+        border-radius: 16px;
+    }
+
+    .pd-main-image {
+        aspect-ratio: 1 / 1;
+    }
+
     .pd-thumbnails {
         grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 0.5rem;
+    }
+
+    .pd-thumbnail {
+        border-radius: 10px;
+        padding: 0.15rem;
+    }
+
+    .pd-thumbnail img {
+        border-radius: 8px;
+    }
+
+    .pd-title {
+        font-size: 1.6rem;
     }
 
     .pd-actions {
         grid-template-columns: 1fr;
     }
 
+    .pd-quantity {
+        max-width: 140px;
+    }
+
     .pd-breadcrumb {
         flex-wrap: wrap;
         line-height: 1.5;
+        font-size: 0.78rem;
+    }
+
+    .pd-gallery-nav {
+        width: 36px;
+        height: 36px;
+        font-size: 1.4rem;
+    }
+
+    .pd-gallery-nav.prev {
+        left: 10px;
+    }
+
+    .pd-gallery-nav.next {
+        right: 10px;
+    }
+
+    .pd-full-width-reviews {
+        margin-top: 48px;
+        padding-top: 36px;
+    }
+
+    .pd-full-width-reviews h3 {
+        font-size: 22px;
+        margin-bottom: 28px;
+    }
+
+    .pd-reviews-list {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .pd-review-card {
+        padding: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .product-detail {
+        width: calc(100% - 1.25rem);
+        margin: 0.8rem auto 2rem;
+    }
+
+    .pd-breadcrumb {
+        font-size: 0.72rem;
+        margin-bottom: 1rem;
+        gap: 0.35rem;
+    }
+
+    .pd-main-stage {
+        border-radius: 12px;
+    }
+
+    .pd-thumbnails {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 0.4rem;
+        margin-top: 0.6rem;
+    }
+
+    .pd-thumbnail {
+        border-radius: 8px;
+    }
+
+    .pd-collection {
+        font-size: 0.7rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .pd-title {
+        font-size: 1.35rem;
+        margin-bottom: 0.7rem;
+    }
+
+    .pd-rating-row {
+        font-size: 0.8rem;
+        gap: 0.4rem;
+        margin-bottom: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .pd-current {
+        font-size: 1.25rem;
+    }
+
+    .pd-original {
+        font-size: 0.88rem;
+    }
+
+    .pd-tax-note {
+        font-size: 0.82rem;
+        margin-bottom: 1.25rem;
+    }
+
+    .pd-primary-btn,
+    .pd-secondary-btn {
+        padding: 0.95rem 1.2rem;
+        font-size: 0.88rem;
+    }
+
+    .pd-service-item strong {
+        font-size: 0.76rem;
+    }
+
+    .pd-service-item span {
+        font-size: 0.85rem;
+    }
+
+    .pd-accordion-item button {
+        font-size: 0.9rem;
+        padding: 0.85rem 0;
+    }
+
+    .pd-description-copy p {
+        font-size: 0.88rem;
+    }
+
+    .pd-description-copy li {
+        font-size: 0.88rem;
+    }
+
+    .pd-spec-row {
+        grid-template-columns: 100px 1fr;
+        gap: 0.6rem;
+    }
+
+    .pd-spec-label {
+        font-size: 0.78rem;
+    }
+
+    .pd-spec-value {
+        font-size: 0.88rem;
+    }
+
+    .pd-full-width-reviews {
+        margin-top: 36px;
+        padding-top: 28px;
+    }
+
+    .pd-full-width-reviews h3 {
+        font-size: 20px;
+        margin-bottom: 20px;
+    }
+
+    .pd-review-card {
+        padding: 16px;
+    }
+
+    .pd-rc-head strong {
+        font-size: 14px;
+    }
+
+    .pd-review-card p {
+        font-size: 13px;
     }
 }
 
@@ -564,3 +747,4 @@
   grid-column: 1 / -1;
   padding: 40px 0;
 }
+
