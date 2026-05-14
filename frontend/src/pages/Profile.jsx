@@ -100,11 +100,6 @@ function Profile() {
               </div>
 
               <div className="profile-row">
-                <span>Role</span>
-                <strong>{user.role || "customer"}</strong>
-              </div>
-
-              <div className="profile-row">
                 <span>Member since</span>
                 <strong>{memberSince}</strong>
               </div>

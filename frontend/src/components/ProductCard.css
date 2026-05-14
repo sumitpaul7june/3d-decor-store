@@ -333,6 +333,7 @@
 
     .product-title {
         font-size: 0.88rem;
+        min-height: auto;
     }
 
     .current-price {
@@ -346,4 +347,111 @@
     .product-card-actions {
         grid-template-columns: 1fr;
     }
+
+    .product-info {
+        padding: 0.7rem 0.7rem 0.8rem;
+    }
+
+    .product--home .product-info {
+        padding: 0.8rem 0.8rem 0.85rem;
+    }
+
+    .product-wishlist-btn {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
+
+@media (max-width: 480px) {
+    .product {
+        border-radius: 12px;
+    }
+
+    .product-image {
+        aspect-ratio: 1 / 1;
+        border-radius: 12px 12px 0 0;
+    }
+
+    .product--catalog .product-image {
+        border-radius: 10px;
+    }
+
+    .product-title {
+        font-size: 0.82rem;
+        line-height: 1.4;
+        margin-bottom: 0.35rem;
+        min-height: auto;
+    }
+
+    .product--catalog .product-title {
+        font-size: 0.82rem;
+    }
+
+    .product--home .product-title {
+        font-size: 0.85rem;
+        min-height: auto;
+    }
+
+    .current-price {
+        font-size: 0.88rem;
+    }
+
+    .original-price {
+        font-size: 0.76rem;
+    }
+
+    .product-info {
+        padding: 0.55rem 0.55rem 0.65rem;
+    }
+
+    .product--catalog .product-info {
+        padding: 0.5rem 0 0;
+    }
+
+    .product--home .product-info {
+        padding: 0.65rem 0.65rem 0.7rem;
+    }
+
+    .product-category-label {
+        font-size: 0.65rem;
+        padding: 0.2rem 0.38rem;
+        margin-bottom: 0.4rem;
+    }
+
+    .product-sale-pill {
+        font-size: 0.6rem;
+        padding: 0.22rem 0.42rem;
+        top: 8px;
+        left: 8px;
+    }
+
+    .product-sale-pill--catalog {
+        font-size: 0.58rem;
+        top: 6px;
+        left: 6px;
+    }
+
+    .product-savings {
+        font-size: 0.66rem;
+        margin-top: 0.4rem;
+    }
+
+    .product-card-btn {
+        padding: 0.65rem 0.7rem;
+        font-size: 0.78rem;
+    }
+
+    .product-card-actions {
+        margin-top: 0.6rem;
+        gap: 0.45rem;
+    }
+
+    .product-wishlist-btn {
+        width: 28px;
+        height: 28px;
+        font-size: 15px;
+        top: 8px;
+        right: 8px;
+    }
+}
+

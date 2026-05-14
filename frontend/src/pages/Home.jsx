@@ -7,12 +7,11 @@ import "./Home.css";
 
 const fallbackHeroSlides = [];
 
-const fallbackTestimonials = [
-  { author: "Aarohi Mehta", role: "Mumbai", quote: "The finish looked premium in person and the piece instantly made our living room feel more complete." }
-];
+const fallbackTestimonials = [];
 
 function Home() {
   const [current, setCurrent] = useState(0);
+  const [testimonialIndex, setTestimonialIndex] = useState(0);
   const [products, setProducts] = useState([]);
   const [homeContent, setHomeContent] = useState(null);
   const [loadingProducts, setLoadingProducts] = useState(true);
@@ -206,13 +205,24 @@ function Home() {
   };
 
   const renderTestimonials = () => {
-    if (!visibilityFlags.testimonials) return null;
+    if (!visibilityFlags.testimonials || activeTestimonials.length === 0) return null;
+
+    const goToTestimonial = (dir) => {
+      setTestimonialIndex((prev) =>
+        dir === "next"
+          ? (prev + 1) % activeTestimonials.length
+          : (prev - 1 + activeTestimonials.length) % activeTestimonials.length
+      );
+    };
+
     return (
       <section className="testimonial-section">
         <div className="section-heading center">
           <p className="section-kicker">Testimonials</p>
           <h2 className="section-title">A few words from our customers</h2>
         </div>
+
+        {/* Desktop grid */}
         <div className="testimonial-grid">
           {activeTestimonials.map((testimonial, index) => (
             <article key={`test-${index}`} className="testimonial-card">
@@ -226,6 +236,45 @@ function Home() {
               </div>
             </article>
           ))}
+        </div>
+
+        {/* Mobile slider */}
+        <div className="testimonial-slider">
+          <div
+            className="testimonial-slider-track"
+            style={{ transform: `translateX(-${testimonialIndex * 100}%)` }}
+          >
+            {activeTestimonials.map((testimonial, index) => (
+              <article key={`test-m-${index}`} className="testimonial-slide">
+                <article className="testimonial-card">
+                  <span className="testimonial-stars">
+                    {"★".repeat(testimonial.rating || 5)}{"☆".repeat(5 - (testimonial.rating || 5))}
+                  </span>
+                  <p className="testimonial-quote">“{testimonial.quote}”</p>
+                  <div className="testimonial-author">
+                    <strong>{testimonial.author}</strong>
+                    <span>{testimonial.role}</span>
+                  </div>
+                </article>
+              </article>
+            ))}
+          </div>
+
+          {activeTestimonials.length > 1 && (
+            <div className="testimonial-slider-controls">
+              <button className="testimonial-nav-btn" onClick={() => goToTestimonial("prev")} aria-label="Previous testimonial">‹</button>
+              <div className="testimonial-dots">
+                {activeTestimonials.map((_, index) => (
+                  <button
+                    key={`tdot-${index}`}
+                    className={`testimonial-dot ${index === testimonialIndex ? "active" : ""}`}
+                    onClick={() => setTestimonialIndex(index)}
+                  />
+                ))}
+              </div>
+              <button className="testimonial-nav-btn" onClick={() => goToTestimonial("next")} aria-label="Next testimonial">›</button>
+            </div>
+          )}
         </div>
       </section>
     );
